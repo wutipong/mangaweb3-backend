@@ -65,7 +65,7 @@ func main() {
 		log.Get().Info("Use .env file.")
 	}
 
-	address := setupFlag("address", ":9443", "MANGAWEB_ADDRESS", "The server address")
+	address := setupFlag("address", ":8972", "MANGAWEB_ADDRESS", "The server address")
 	dataPath := setupFlag("data", "./data", "MANGAWEB_DATA_PATH", "Manga source path")
 	connectionStr := setupFlag(
 		"database",
@@ -82,6 +82,7 @@ func main() {
 	printBanner()
 	log.Get().Sugar().Infof("MangaWeb version: %s", versionString)
 	log.Get().Sugar().Infof("Data source Path: %s", *dataPath)
+	log.Get().Sugar().Infof("Server starts at: %s", *address)
 
 	router := httprouter.New()
 

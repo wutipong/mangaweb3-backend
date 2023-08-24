@@ -31,12 +31,10 @@ type Meta struct {
 	Thumbnail   []byte    `json:"thumbnail" db:"thumbnail" bson:"thumbnail"`
 	IsRead      bool      `json:"is_read" db:"read" bson:"is_read"`
 	Tags        []string  `json:"tags" db:"tags" bson:"tags"`
-
-	Version int `json:"version" db:"version" bson:"version"`
 }
 
 // CurrentVersion the current version of `Meta` structure.
-const CurrentVersion = 1
+const CurrentVersion = 0
 
 func NewItem(name string) (i Meta, err error) {
 	createTime := time.Now()
@@ -49,7 +47,6 @@ func NewItem(name string) (i Meta, err error) {
 		Name:       name,
 		CreateTime: createTime,
 		Favorite:   false,
-		Version:    CurrentVersion,
 	}
 
 	i.GenerateImageIndices()

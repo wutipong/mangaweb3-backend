@@ -33,7 +33,7 @@ func IsTagExist(ctx context.Context, name string) bool {
 func Read(ctx context.Context, name string) (t Tag, err error) {
 	r := pool.QueryRow(
 		ctx,
-		`SELECT name, favorite, hidden, thumbnail, version
+		`SELECT name, favorite, hidden, thumbnail, 
 			FROM manga.tags
 			where name = $1;`,
 		name,
@@ -44,7 +44,6 @@ func Read(ctx context.Context, name string) (t Tag, err error) {
 		&t.Favorite,
 		&t.Hidden,
 		&t.Thumbnail,
-		&t.Version,
 	)
 
 	return
@@ -53,7 +52,7 @@ func Read(ctx context.Context, name string) (t Tag, err error) {
 func ReadAll(ctx context.Context) (tags []Tag, err error) {
 	rows, err := pool.Query(
 		ctx,
-		`SELECT name, favorite, hidden, thumbnail, version
+		`SELECT name, favorite, hidden, thumbnail
 			FROM manga.tags;`,
 	)
 
@@ -68,7 +67,6 @@ func ReadAll(ctx context.Context) (tags []Tag, err error) {
 			&t.Favorite,
 			&t.Hidden,
 			&t.Thumbnail,
-			&t.Version,
 		)
 
 		tags = append(tags, t)
@@ -81,17 +79,15 @@ func Write(ctx context.Context, t Tag) error {
 	_, err := pool.Exec(
 		ctx,
 		`INSERT INTO manga.tags(name, favorite, hidden, thumbnail, version)
-		VALUES ($1, $2, $3, $4, $5)
+		VALUES ($1, $2, $3, $4)
 		ON CONFLICT(name) DO UPDATE
 			SET favorite = $2, 
 				hidden = $3,
-				thumbnail = $4,
-				version = $5;`,
+				thumbnail = $4;`,
 		t.Name,
 		t.Favorite,
 		t.Hidden,
 		t.Thumbnail,
-		t.Version,
 	)
 	return err
 }

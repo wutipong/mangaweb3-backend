@@ -30,16 +30,15 @@ func IsItemExist(ctx context.Context, name string) bool {
 func Write(ctx context.Context, i Meta) error {
 	_, err := pool.Exec(
 		ctx,
-		`INSERT INTO manga.items(name, create_time, favorite, file_indices, thumbnail, is_read, tags, version)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		`INSERT INTO manga.items(name, create_time, favorite, file_indices, thumbnail, is_read, tags)
+			VALUES ($1, $2, $3, $4, $5, $6, $7)
 			ON CONFLICT(name) DO UPDATE
 			SET create_time = $2, 
 				favorite = $3, 
 				file_indices = $4, 
 				thumbnail = $5, 
 				is_read = $6, 
-				tags = $7, 
-				version = $8;`,
+				tags = $7;`,
 		i.Name,
 		i.CreateTime,
 		i.Favorite,
@@ -47,7 +46,6 @@ func Write(ctx context.Context, i Meta) error {
 		i.Thumbnail,
 		i.IsRead,
 		i.Tags,
-		i.Version,
 	)
 	return err
 }
@@ -58,7 +56,7 @@ func Delete(ctx context.Context, i Meta) error {
 func Read(ctx context.Context, name string) (i Meta, err error) {
 	r := pool.QueryRow(
 		ctx,
-		`SELECT name, create_time, favorite, file_indices, thumbnail, is_read, tags, version
+		`SELECT name, create_time, favorite, file_indices, thumbnail, is_read, tags
 		FROM manga.items
 		WHERE name = $1`,
 		name,
@@ -72,7 +70,6 @@ func Read(ctx context.Context, name string) (i Meta, err error) {
 		&i.Thumbnail,
 		&i.IsRead,
 		&i.Tags,
-		&i.Version,
 	)
 
 	return
@@ -80,7 +77,7 @@ func Read(ctx context.Context, name string) (i Meta, err error) {
 
 func ReadAll(ctx context.Context) (items []Meta, err error) {
 	rows, err := pool.Query(ctx,
-		`SELECT name, create_time, favorite, file_indices, thumbnail, is_read, tags, version
+		`SELECT name, create_time, favorite, file_indices, thumbnail, is_read, tags
 		FROM manga.items;`)
 
 	if err != nil {
@@ -96,8 +93,7 @@ func ReadAll(ctx context.Context) (items []Meta, err error) {
 			&i.FileIndices,
 			&i.Thumbnail,
 			&i.IsRead,
-			&i.Tags,
-			&i.Version)
+			&i.Tags)
 
 		items = append(items, i)
 	}
@@ -143,7 +139,7 @@ func Search(ctx context.Context, criteria []SearchCriteria, sort SortField, orde
 	}
 
 	query := fmt.Sprintf(
-		`SELECT name, create_time, favorite, file_indices, thumbnail, is_read, tags, version
+		`SELECT name, create_time, favorite, file_indices, thumbnail, is_read, tags
 		FROM manga.items
 		%s 
 		%s %s
@@ -170,8 +166,7 @@ func Search(ctx context.Context, criteria []SearchCriteria, sort SortField, orde
 			&i.FileIndices,
 			&i.Thumbnail,
 			&i.IsRead,
-			&i.Tags,
-			&i.Version)
+			&i.Tags)
 
 		items = append(items, i)
 	}

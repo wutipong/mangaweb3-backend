@@ -22,7 +22,6 @@ func Init(options Options) {
 		log.Get().Sugar().Info("Update missing thumbnails.")
 		UpdateMissingThumbnail()
 	})
-	ScheduleMigrateMeta()
 }
 
 func Start() {
