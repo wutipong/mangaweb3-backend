@@ -95,9 +95,6 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		handler.WriteResponse(w, err)
 	}
 
-	tagStr := req.Tag
-	favOnly := req.FavoriteOnly
-	page := req.Page
 	search := req.Search
 	searchCriteria := make([]meta.SearchCriteria, 0)
 	if search != "" {
@@ -107,24 +104,24 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		})
 	}
 
-	if favOnly {
+	if req.FavoriteOnly {
 		searchCriteria = append(searchCriteria, meta.SearchCriteria{
 			Field: meta.SearchFieldFavorite,
 			Value: true,
 		})
 	}
 
-	if tagStr != "" {
+	if req.Tag != "" {
 		searchCriteria = append(searchCriteria, meta.SearchCriteria{
 			Field: meta.SearchFieldTag,
-			Value: tagStr,
+			Value: req.Tag,
 		})
 	}
 
 	sort := req.Sort
 	order := req.Order
 
-	allMeta, err := meta.Search(r.Context(), searchCriteria, sort, order, req.ItemPerPage, page)
+	allMeta, err := meta.Search(r.Context(), searchCriteria, sort, order, req.ItemPerPage, req.Page)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -142,13 +139,13 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	pageCount := int(count / int64(req.ItemPerPage))
-	if count%int64(req.ItemPerPage) > 0 {
+	pageCount := int(count) / req.ItemPerPage
+	if int(count)%req.ItemPerPage > 0 {
 		pageCount++
 	}
 
-	if page > pageCount || page < 0 {
-		page = 0
+	if req.Page > pageCount || req.Page < 0 {
+		req.Page = 0
 	}
 
 	log.Info().
@@ -158,12 +155,12 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	data := browseResponse{
 		Request:   req,
 		Items:     items,
-		Pages:     createPageItems(page, pageCount, r.URL),
+		Pages:     createPageItems(req.Page, pageCount, r.URL),
 		TotalPage: pageCount,
 	}
 
-	if tagStr != "" {
-		tagObj, err := tag.Read(r.Context(), tagStr)
+	if req.Tag != "" {
+		tagObj, err := tag.Read(r.Context(), req.Tag)
 		if err != nil {
 			handler.WriteResponse(w, err)
 			return
