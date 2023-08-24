@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/errors"
 )
 
@@ -13,7 +14,7 @@ func WriteResponse(w http.ResponseWriter, v any) {
 		if _, ok := err.(errors.Error); !ok {
 			v = errors.ErrUnknown.Wrap(err)
 		}
-
+		log.Error().AnErr("error", v.(error)).Msg("Handler response fails.")
 	} else {
 		w.WriteHeader(http.StatusOK)
 	}
@@ -21,4 +22,6 @@ func WriteResponse(w http.ResponseWriter, v any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	b, _ := json.Marshal(v)
 	w.Write(b)
+
+	log.Info().RawJSON("response", b).Msg("Response")
 }
