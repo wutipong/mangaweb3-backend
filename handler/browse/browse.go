@@ -16,6 +16,7 @@ import (
 
 const (
 	ItemPerPage = 30
+	PathBrowse  = "/browse"
 )
 
 type browseRequest struct {

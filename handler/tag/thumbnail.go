@@ -10,6 +10,10 @@ import (
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
 
+const (
+	PathThumbnail = "/tag/thumbnail"
+)
+
 // @Param tag query string true "tag"
 // @Success      200  {body}  file
 // @Failure      500  {object}  errors.Error

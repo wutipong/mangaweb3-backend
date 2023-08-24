@@ -34,20 +34,6 @@ func setupFlag(flagName, defValue, variable, description string) *string {
 
 var versionString string = "development"
 
-const (
-	pathBrowse         = "/browse"
-	pathView           = "/view"
-	pathGetImage       = "/get_image"
-	pathUpdateCover    = "/update_cover"
-	pathThumbnail      = "/thumbnail"
-	pathFavorite       = "/favorite"
-	pathDownload       = "/download"
-	pathRescanLibrary  = "/rescan_library"
-	pathSetTagFavorite = "/tag/set_favorite"
-	pathTagList        = "/tag/list"
-	pathTagThumb       = "/tag/thumbnail"
-)
-
 //go:generate swag init
 
 // @title           Mangaweb3 API
@@ -111,30 +97,30 @@ func main() {
 func RegisterHandler(router *httprouter.Router) {
 	handler.Init(handler.Options{
 		VersionString:     versionString,
-		PathBrowse:        pathBrowse,
-		PathView:          pathView,
-		PathGetImage:      pathGetImage,
-		PathUpdateCover:   pathUpdateCover,
-		PathThumbnail:     pathThumbnail,
-		PathFavorite:      pathFavorite,
-		PathDownload:      pathDownload,
-		PathRescanLibrary: pathRescanLibrary,
-		PathTagFavorite:   pathSetTagFavorite,
-		PathTagList:       pathTagList,
-		PathTagThumbnail:  pathTagThumb,
+		PathBrowse:        browse.PathBrowse,
+		PathView:          view.PathView,
+		PathGetImage:      view.PathGetImage,
+		PathUpdateCover:   view.PathUpdateCover,
+		PathThumbnail:     browse.PathThumbnail,
+		PathFavorite:      view.PathFavorite,
+		PathDownload:      view.PathDownload,
+		PathRescanLibrary: browse.PathRescanLibrary,
+		PathTagFavorite:   handlertag.PathSetFavorite,
+		PathTagList:       handlertag.PathList,
+		PathTagThumbnail:  handlertag.PathThumbnail,
 	})
 	// Routes
-	router.POST(pathBrowse, browse.Handler)
-	router.POST(pathView, view.Handler)
-	router.GET(pathGetImage, handler.GetImage)
-	router.POST(pathUpdateCover, view.UpdateCover)
-	router.GET(pathThumbnail, browse.GetThumbnailHandler)
-	router.POST(pathFavorite, view.SetFavoriteHandler)
-	router.GET(pathDownload, view.Download)
-	router.GET(pathRescanLibrary, handler.RescanLibraryHandler)
-	router.POST(pathSetTagFavorite, handlertag.SetFavoriteHandler)
-	router.GET(pathTagList, handlertag.ListHandler)
-	router.GET(pathTagThumb, handlertag.ThumbnailHandler)
+	router.POST(browse.PathBrowse, browse.Handler)
+	router.POST(view.PathView, view.Handler)
+	router.GET(view.PathGetImage, view.GetImage)
+	router.POST(view.PathUpdateCover, view.UpdateCover)
+	router.GET(browse.PathThumbnail, browse.GetThumbnailHandler)
+	router.POST(view.PathFavorite, view.SetFavoriteHandler)
+	router.GET(view.PathDownload, view.Download)
+	router.GET(browse.PathRescanLibrary, browse.RescanLibraryHandler)
+	router.POST(handlertag.PathSetFavorite, handlertag.SetFavoriteHandler)
+	router.GET(handlertag.PathList, handlertag.ListHandler)
+	router.GET(handlertag.PathThumbnail, handlertag.ThumbnailHandler)
 
 	router.GET("/doc/:any", swaggerHandler)
 }

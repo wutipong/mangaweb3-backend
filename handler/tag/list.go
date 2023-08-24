@@ -59,6 +59,10 @@ func createItems(allTags []tag.Tag, favoriteOnly bool) []tagData {
 	return allItems
 }
 
+const (
+	PathList = "/tag/list"
+)
+
 // @accept json
 // @Param request body tag.listRequest true "request"
 // @Success      200  {object}  tag.listResponse

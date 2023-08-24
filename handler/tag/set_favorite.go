@@ -20,6 +20,10 @@ type setFavoriteResponse struct {
 	Favorite bool               `json:"favorite"`
 }
 
+const (
+	PathSetFavorite = "/tag/set_favorite"
+)
+
 // @accept json
 // @Param request body tag.setFavoriteRequest true "request"
 // @Success      200  {object}  tag.setFavoriteResponse

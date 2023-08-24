@@ -1,4 +1,4 @@
-package handler
+package browse
 
 import (
 	"net/http"
@@ -6,6 +6,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/scheduler"
 )
 
@@ -13,9 +14,13 @@ type rescanLibraryResponse struct {
 	Result bool `json:"result"`
 }
 
-// @Success      200  {object}  handler.rescanLibraryResponse
+const (
+	PathRescanLibrary = "/browse/rescan_library"
+)
+
+// @Success      200  {object}  browse.rescanLibraryResponse
 // @Failure      500  {object}  errors.Error
-// @Router /rescan_library [get]
+// @Router /browse/rescan_library [get]
 func RescanLibraryHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Info().Msg("Rescan library")
 
@@ -25,5 +30,5 @@ func RescanLibraryHandler(w http.ResponseWriter, r *http.Request, params httprou
 		Result: true,
 	}
 
-	WriteResponse(w, response)
+	handler.WriteResponse(w, response)
 }

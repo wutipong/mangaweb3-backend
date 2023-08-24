@@ -21,11 +21,15 @@ type updateCoverResponse struct {
 	Success bool               `json:"success"`
 }
 
+const (
+	PathUpdateCover = "/view/update_cover"
+)
+
 // @accept json
 // @Param request body view.updateCoverRequest true "request"
 // @Success      200  {object}  view.updateCoverResponse
 // @Failure      500  {object}  errors.Error
-// @Router /update_cover [post]
+// @Router /view/update_cover [post]
 // UpdateCover a handler to update the cover to specific image
 func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	req := updateCoverRequest{}

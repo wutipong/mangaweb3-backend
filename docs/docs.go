@@ -47,22 +47,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/download": {
+        "/browse/rescan_library": {
             "get": {
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "name of the file",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "body"
+                            "$ref": "#/definitions/browse.rescanLibraryResponse"
                         }
                     },
                     "500": {
@@ -74,7 +65,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/get_image": {
+        "/browse/thumbnail": {
             "get": {
                 "parameters": [
                     {
@@ -83,25 +74,6 @@ const docTemplate = `{
                         "name": "name",
                         "in": "query",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "width",
-                        "name": "width",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "height",
-                        "name": "height",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "index",
-                        "name": "i",
-                        "in": "query",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -109,56 +81,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "body"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/rescan_library": {
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.rescanLibraryResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/set_favorite": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/view.setFavoriteRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/view.setFavoriteResponse"
                         }
                     },
                     "500": {
@@ -261,65 +183,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/thumbnail": {
-            "get": {
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "name of the item",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "body"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/update_cover": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/view.updateCoverRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/view.updateCoverResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/view": {
             "post": {
                 "consumes": [
@@ -341,6 +204,143 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/view.viewResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/download": {
+            "get": {
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name of the file",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "body"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/get_image": {
+            "get": {
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name of the item",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "width",
+                        "name": "width",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "height",
+                        "name": "height",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "index",
+                        "name": "i",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "body"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/set_favorite": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/view.setFavoriteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/view.setFavoriteResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/update_cover": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/view.updateCoverRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/view.updateCoverResponse"
                         }
                     },
                     "500": {
@@ -440,6 +440,14 @@ const docTemplate = `{
                 }
             }
         },
+        "browse.rescanLibraryResponse": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "type": "boolean"
+                }
+            }
+        },
         "errors.Error": {
             "type": "object",
             "properties": {
@@ -451,14 +459,6 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "unknown error."
-                }
-            }
-        },
-        "handler.rescanLibraryResponse": {
-            "type": "object",
-            "properties": {
-                "result": {
-                    "type": "boolean"
                 }
             }
         },

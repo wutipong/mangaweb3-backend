@@ -1,4 +1,4 @@
-package handler
+package view
 
 import (
 	"archive/zip"
@@ -15,9 +15,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 
 	_ "golang.org/x/image/webp"
+)
+
+const (
+	PathGetImage = "/view/get_image"
 )
 
 // @Param name query string true "name of the item"
@@ -26,7 +31,7 @@ import (
 // @Param i query int true "index"
 // @Success      200  {body}  file
 // @Failure      500  {object}  errors.Error
-// @Router /get_image [get]
+// @Router /view/get_image [get]
 // GetImage returns an image with specific width/height while retains aspect ratio.
 func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	query := r.URL.Query()
@@ -53,12 +58,12 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {
-		WriteResponse(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 	data, f, err := OpenZipEntry(m, index)
 	if err != nil {
-		WriteResponse(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
@@ -84,7 +89,7 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 
 	img, err := imaging.Decode(reader, imaging.AutoOrientation(true))
 	if err != nil {
-		WriteResponse(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
@@ -97,7 +102,7 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 	err = imaging.Encode(w, img, imaging.JPEG)
 
 	if err != nil {
-		WriteResponse(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 

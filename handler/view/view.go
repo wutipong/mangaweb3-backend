@@ -28,6 +28,10 @@ type viewResponse struct {
 	Tags      []string    `json:"tags"`
 }
 
+const (
+	PathView = "/view"
+)
+
 // @accept json
 // @Param request body view.viewRequest true "request"
 // @Success      200  {object}  view.viewResponse
