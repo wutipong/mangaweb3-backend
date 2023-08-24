@@ -88,7 +88,7 @@ func createDefaultBrowseRequest() browseRequest {
 func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	req := createDefaultBrowseRequest()
 
-	if err := handler.ParseInput(r.Body, req); err != nil {
+	if err := handler.ParseInput(r.Body, &req); err != nil {
 		handler.WriteResponse(w, err)
 	}
 
