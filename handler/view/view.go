@@ -1,10 +1,7 @@
 package view
 
 import (
-	"encoding/json"
-	"fmt"
 	"hash/fnv"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -15,7 +12,6 @@ import (
 	"github.com/wutipong/mangaweb3-backend/handler"
 
 	"github.com/wutipong/mangaweb3-backend/meta"
-	"github.com/wutipong/mangaweb3-backend/tag"
 )
 
 const (
@@ -28,44 +24,26 @@ type viewRequest struct {
 }
 
 type viewData struct {
-	Request          viewRequest `json:"request"`
-	Name             string
-	Title            string
-	Version          string
-	BrowseURL        string
-	Favorite         bool
-	ImageURLs        []string
-	UpdateCoverURLs  []string
-	DownloadPageURLs []string
-	Tags             []tagData
-	DownloadURL      string
-	SetFavoriteURL   string
-}
-
-type tagData struct {
-	Name string
-	URL  string
+	Request   viewRequest `json:"request"`
+	Name      string      `json:"name"`
+	Version   string      `json:"version"`
+	BrowseURL string      `json:"browse_url"`
+	Favorite  bool        `json:"favorite"`
+	Indices   []int       `json:"indices"`
+	Tags      []string    `json:"tags"`
 }
 
 func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	req := viewRequest{}
 
-	if reqBody, err := io.ReadAll(r.Body); err != nil {
+	if err := handler.ParseInput(r.Body, &req); err != nil {
 		handler.WriteResponse(w, err)
 		return
-	} else {
-		json.Unmarshal(reqBody, &req)
 	}
 
 	item := req.Path
 
 	m, err := meta.Read(r.Context(), item)
-	if err != nil {
-		handler.WriteResponse(w, err)
-		return
-	}
-
-	pages, err := ListPages(m)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -90,65 +68,19 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		}
 	}
 
-	tags := make([]tagData, 0)
-
-	for _, tagStr := range m.Tags {
-		t, err := tag.Read(r.Context(), tagStr)
-		if err != nil {
-			handler.WriteResponse(w, err)
-			return
-		}
-
-		if !t.Hidden {
-			tags = append(tags, tagData{
-				Name: t.Name,
-				URL:  handler.CreateBrowseTagURL(t.Name),
-			})
-		}
-	}
-
 	log.Info().
 		Interface("request", req).
 		Msg("View Item")
 
 	data := viewData{
-		Request:          req,
-		Name:             item,
-		Title:            fmt.Sprintf("Manga - Viewing [%s]", item),
-		Version:          handler.CreateVersionString(),
-		BrowseURL:        browseUrl,
-		ImageURLs:        createImageURLs(item, pages),
-		UpdateCoverURLs:  createUpdateCoverURLs(item, pages),
-		DownloadPageURLs: createDownloadImageURLs(item, pages),
-		Favorite:         m.Favorite,
-		Tags:             tags,
-		DownloadURL:      handler.CreateDownloadURL(item),
-		SetFavoriteURL:   handler.CreateSetFavoriteURL(item),
+		Request:   req,
+		Name:      item,
+		Version:   handler.CreateVersionString(),
+		BrowseURL: browseUrl,
+		Favorite:  m.Favorite,
+		Tags:      m.Tags,
+		Indices:   m.FileIndices,
 	}
 
 	handler.WriteResponse(w, data)
-}
-
-func createDownloadImageURLs(file string, pages []Page) []string {
-	output := make([]string, len(pages))
-	for i, p := range pages {
-		output[i] = handler.CreateGetImageURL(file, p.Index)
-	}
-	return output
-}
-
-func createImageURLs(file string, pages []Page) []string {
-	output := make([]string, len(pages))
-	for i, p := range pages {
-		output[i] = handler.CreateGetImageWithSizeURL(file, p.Index, maxPageWidth, maxPageHeight)
-	}
-	return output
-}
-
-func createUpdateCoverURLs(file string, pages []Page) []string {
-	output := make([]string, len(pages))
-	for i, p := range pages {
-		output[i] = handler.CreateUpdateCoverURL(file, p.Index)
-	}
-	return output
 }
