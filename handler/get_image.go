@@ -22,10 +22,8 @@ import (
 
 // GetImage returns an image with specific width/height while retains aspect ratio.
 func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	item := ParseParam(params, "item")
-	item = filepath.FromSlash(item)
-
 	query := r.URL.Query()
+	item := query.Get("name")
 
 	var width, height int64 = 0, 0
 	if w, e := strconv.ParseInt(query.Get("width"), 10, 64); e == nil {
