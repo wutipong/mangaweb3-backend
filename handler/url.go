@@ -21,20 +21,6 @@ func CreateURL(p ...string) string {
 	return path.Join(p...)
 }
 
-func CreateViewURL(filepath string) string {
-	urlStr := CreateFilePathURL(filepath)
-	urlStr = CreateURL(options.PathView, urlStr)
-
-	return urlStr
-}
-
-func CreateThumbnailURL(filepath string) string {
-	urlStr := CreateFilePathURL(filepath)
-	urlStr = CreateURL(options.PathThumbnail, urlStr)
-
-	return urlStr
-}
-
 func CreateRescanURL() string {
 	return CreateURL(options.PathRescanLibrary)
 }

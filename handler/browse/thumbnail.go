@@ -2,7 +2,9 @@ package browse
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"path/filepath"
 
@@ -13,8 +15,19 @@ import (
 	"go.uber.org/zap"
 )
 
+type thumbnailRequest struct {
+	Path string `json:"path"`
+}
+
 func ThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	item := handler.ParseParam(params, "item")
+	req := thumbnailRequest{}
+	if reqBody, err := io.ReadAll(r.Body); err != nil {
+		handler.WriteResponse(w, err)
+	} else {
+		json.Unmarshal(reqBody, &req)
+	}
+
+	item := req.Path
 	item = filepath.FromSlash(item)
 
 	log.Get().Info("Item Thumbnail", zap.String("item_name", item))

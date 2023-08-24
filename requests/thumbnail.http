@@ -1,0 +1,6 @@
+POST http://localhost:8972/thumbnail HTTP/1.1
+content-type: application/json
+
+{
+    "path": "[成年コミック] [Artist 蒟吉人]\\[成年コミック] [蒟吉人] ミダラBooks [WebP].zip"
+}
