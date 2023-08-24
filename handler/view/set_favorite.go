@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
-	"github.com/wutipong/mangaweb3-backend/log"
+
 	"github.com/wutipong/mangaweb3-backend/meta"
-	"go.uber.org/zap"
 )
 
 type setFavoriteRequest struct {
@@ -40,7 +40,9 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 
 	item := req.Name
 
-	log.Get().Info("Set Favorite Item", zap.String("item_name", item))
+	log.Info().
+		Interface("request", req).
+		Msg("Set Favorite Item.")
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {

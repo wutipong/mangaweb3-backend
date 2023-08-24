@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
-	"github.com/wutipong/mangaweb3-backend/log"
+	"github.com/rs/zerolog/log"
 )
 
 var scheduler *gocron.Scheduler
@@ -15,11 +15,11 @@ type Options struct {
 func Init(options Options) {
 	scheduler = gocron.NewScheduler(time.UTC)
 	scheduler.Every(30).Minutes().Do(func() {
-		log.Get().Sugar().Info("Update metadata set.")
+		log.Print("Update metadata set.")
 		ScanLibrary()
-		log.Get().Sugar().Info("Update tag list.")
+		log.Print("Update tag list.")
 		UpdateTags()
-		log.Get().Sugar().Info("Update missing thumbnails.")
+		log.Print("Update missing thumbnails.")
 		UpdateMissingThumbnail()
 	})
 }

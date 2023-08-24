@@ -3,7 +3,7 @@ package scheduler
 import (
 	"context"
 
-	"github.com/wutipong/mangaweb3-backend/log"
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
@@ -19,9 +19,15 @@ func UpdateMissingThumbnail() error {
 			continue
 		}
 		e := m.GenerateThumbnail(0)
-		log.Get().Sugar().Infof("Re-generating new thumbnail for %s", m.Name)
+
+		log.Info().
+			Str("name", m.Name).
+			Msg("generating new thumbnail.")
 		if e != nil {
-			log.Get().Sugar().Errorf("Failed to generate thumbnail for %s", m.Name)
+			log.Error().
+				Str("name", m.Name).
+				AnErr("error", err).
+				Msg("Failed to generate thumbnail.")
 			continue
 		}
 
@@ -33,7 +39,7 @@ func UpdateMissingThumbnail() error {
 
 func ScheduleUpdateMissingThumbnail() {
 	scheduler.Every(1).Hour().Do(func() {
-		log.Get().Sugar().Info("Updating missing thumbnail")
+		log.Print("Updating missing thumbnail.")
 		UpdateMissingThumbnail()
 	})
 }

@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
-	"github.com/wutipong/mangaweb3-backend/log"
 
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
@@ -66,7 +66,7 @@ func createItems(allTags []tag.Tag, favoriteOnly bool) []ItemData {
 func TagListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	query := r.URL.Query()
 
-	log.Get().Info("Tag list")
+	log.Info().Msg("Tag list")
 
 	favOnly := false
 	if f, e := strconv.ParseBool(query.Get("favorite")); e == nil {

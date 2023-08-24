@@ -7,10 +7,10 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
-	"github.com/wutipong/mangaweb3-backend/log"
+
 	"github.com/wutipong/mangaweb3-backend/meta"
-	"go.uber.org/zap"
 )
 
 type updateCoverRequest struct {
@@ -35,7 +35,9 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 	item := req.Name
 	index := req.Index
 
-	log.Get().Info("Update Cover", zap.String("item_name", item), zap.Int("index", index))
+	log.Info().
+		Interface("request", req).
+		Msg("Update cover.")
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {

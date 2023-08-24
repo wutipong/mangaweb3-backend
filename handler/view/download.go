@@ -3,21 +3,19 @@ package view
 import (
 	"io"
 	"net/http"
-	"path/filepath"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
-	"github.com/wutipong/mangaweb3-backend/log"
+
 	"github.com/wutipong/mangaweb3-backend/meta"
-	"go.uber.org/zap"
 )
 
 func Download(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	item := handler.ParseParam(params, "item")
-	item = filepath.FromSlash(item)
 
-	log.Get().Info("Download", zap.String("item_name", item))
+	log.Info().Str("name", item).Msg("Download")
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {

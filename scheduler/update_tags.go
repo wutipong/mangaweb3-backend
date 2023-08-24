@@ -3,7 +3,7 @@ package scheduler
 import (
 	"context"
 
-	"github.com/wutipong/mangaweb3-backend/log"
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
@@ -24,6 +24,9 @@ func UpdateTags() error {
 
 	allTag, err := tag.ReadAll(context.Background())
 	if err != nil {
+		log.Error().
+			AnErr("error", err).
+			Msg("Cannot read metadata.")
 		return err
 	}
 
@@ -63,7 +66,7 @@ func UpdateTags() error {
 
 func ScheduleUpdateTags() {
 	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
-		log.Get().Sugar().Info("Update tags.")
+		log.Print("Update tags.")
 		UpdateTags()
 	})
 }

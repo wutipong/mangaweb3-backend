@@ -3,7 +3,7 @@ package scheduler
 import (
 	"context"
 
-	"github.com/wutipong/mangaweb3-backend/log"
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
@@ -15,9 +15,9 @@ func RebuildThumbnail() error {
 
 	for _, m := range allMeta {
 		e := m.GenerateThumbnail(0)
-		log.Get().Sugar().Infof("Generating new thumbnail for %s", m.Name)
+		log.Info().Str("Generating new thumbnail for", m.Name)
 		if e != nil {
-			log.Get().Sugar().Errorf("Failed to generate thumbnail for %s", m.Name)
+			log.Error().Str("item", m.Name).AnErr("error", e).Msg("Fails to create thumbnail.")
 			continue
 		}
 
@@ -29,7 +29,7 @@ func RebuildThumbnail() error {
 
 func ScheduleRebuildThumbnail() {
 	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
-		log.Get().Sugar().Info("Force updating thumbnail")
+		log.Print("Force updating thumbnail")
 		RebuildThumbnail()
 	})
 }

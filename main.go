@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 
 	"net/http"
 	"os"
@@ -12,11 +11,11 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/handler/browse"
 	handlertag "github.com/wutipong/mangaweb3-backend/handler/tag"
 	"github.com/wutipong/mangaweb3-backend/handler/view"
-	"github.com/wutipong/mangaweb3-backend/log"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/scheduler"
 	"github.com/wutipong/mangaweb3-backend/tag"
@@ -48,15 +47,9 @@ const (
 )
 
 func main() {
-	err := log.Init()
-	if err != nil {
-		panic(err)
-	}
-	defer log.Close()
 
-	err = godotenv.Load()
-	if err != nil {
-		log.Get().Info("Use .env file.")
+	if err := godotenv.Load(); err != nil {
+		log.Info().Msg("Use .env file.")
 	}
 
 	address := setupFlag("address", ":8972", "MANGAWEB_ADDRESS", "The server address")
@@ -72,16 +65,14 @@ func main() {
 
 	meta.BaseDirectory = *dataPath
 
-	printBanner()
-	log.Get().Sugar().Infof("MangaWeb version: %s", versionString)
-	log.Get().Sugar().Infof("Data source Path: %s", *dataPath)
-	log.Get().Sugar().Infof("Server starts at: %s", *address)
+	log.Printf("MangaWeb version: %s", versionString)
+	log.Printf("Data source Path: %s", *dataPath)
+	log.Printf("Server starts at: %s", *address)
 
 	router := httprouter.New()
-
 	conn, err := pgxpool.New(context.Background(), *connectionStr)
 	if err != nil {
-		log.Get().Sugar().Fatal(err)
+		log.Error().AnErr("error", err).Msg("Connect to Postgres fails")
 
 		return
 	}
@@ -96,10 +87,13 @@ func main() {
 	RegisterHandler(router)
 	scheduler.Start()
 
-	log.Get().Info("Server starts.")
-	log.Get().Sugar().Fatal(http.ListenAndServe(*address, router))
+	log.Info().Msg("Server starts.")
+	if err = http.ListenAndServe(*address, router); err != nil {
+		log.Error().AnErr("error", err).Msg("Starting server fails")
+		return
+	}
 
-	log.Get().Sugar().Info("shutting down the server")
+	log.Print("shutting down the server")
 	scheduler.Stop()
 }
 
@@ -130,17 +124,4 @@ func RegisterHandler(router *httprouter.Router) {
 	router.GET(pathTagFavorite, handlertag.SetFavoriteHandler)
 	router.GET(pathTagList, handlertag.TagListHandler)
 	router.GET(pathTagThumb, handlertag.ThumbnailHandler)
-}
-
-func printBanner() {
-	fmt.Printf(
-		`
-	███╗░░░███╗░█████╗░███╗░░██╗░██████╗░░█████╗░░██╗░░░░░░░██╗███████╗██████╗░
-	████╗░████║██╔══██╗████╗░██║██╔════╝░██╔══██╗░██║░░██╗░░██║██╔════╝██╔══██╗
-	██╔████╔██║███████║██╔██╗██║██║░░██╗░███████║░╚██╗████╗██╔╝█████╗░░██████╦╝
-	██║╚██╔╝██║██╔══██║██║╚████║██║░░╚██╗██╔══██║░░████╔═████║░██╔══╝░░██╔══██╗
-	██║░╚═╝░██║██║░░██║██║░╚███║╚██████╔╝██║░░██║░░╚██╔╝░╚██╔╝░███████╗██████╦╝
-	╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝░╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚══════╝╚═════╝░
-	Version: %s`, versionString)
-	fmt.Println()
 }

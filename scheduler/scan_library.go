@@ -3,7 +3,7 @@ package scheduler
 import (
 	"context"
 
-	"github.com/wutipong/mangaweb3-backend/log"
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
@@ -30,16 +30,23 @@ func ScanLibrary() error {
 			continue
 		}
 
-		log.Get().Sugar().Infof("Creating metadata for %s", file)
+		log.Info().
+			Str("file", file).
+			Msg("Creating metadata.")
 
 		item, err := meta.NewItem(file)
 		if err != nil {
-			log.Get().Sugar().Errorf("Failed to create meta data : %v", err)
+			log.
+				Error().
+				AnErr("error", err).
+				Msg("Failed to create meta data.")
 		}
 
 		err = meta.Write(context.Background(), item)
 		if err != nil {
-			log.Get().Sugar().Errorf("Failed to write meta data : %v", err)
+			log.Error().
+				AnErr("error", err).
+				Msg("Failed to write meta data.")
 		}
 	}
 
@@ -55,9 +62,12 @@ func ScanLibrary() error {
 			continue
 		}
 
-		log.Get().Sugar().Infof("Deleting metadata for %s", m.Name)
+		log.Info().Str("file", m.Name).Msg("Deleting metadata.")
 		if err := meta.Delete(context.Background(), m); err != nil {
-			log.Get().Sugar().Infof("Failed to delete meta for %s", m.Name)
+			log.Error().
+				Str("name", m.Name).
+				AnErr("error", err).
+				Msg("Failed to delete meta")
 		}
 
 	}
@@ -67,7 +77,7 @@ func ScanLibrary() error {
 
 func ScheduleScanLibrary() {
 	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
-		log.Get().Sugar().Infof("Scanning Library.")
+		log.Print("Scanning Library.")
 		ScanLibrary()
 	})
 }

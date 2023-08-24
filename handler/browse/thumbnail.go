@@ -6,16 +6,18 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
-	"github.com/wutipong/mangaweb3-backend/log"
+
 	"github.com/wutipong/mangaweb3-backend/meta"
-	"go.uber.org/zap"
 )
 
 func ThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	item := r.URL.Query().Get("name")
 
-	log.Get().Info("Item Thumbnail", zap.String("item_name", item))
+	log.Info().
+		Str("name", item).
+		Msg("Thumbnail")
 
 	m, err := meta.Read(r.Context(), item)
 	if errors.Is(err, sql.ErrNoRows) {

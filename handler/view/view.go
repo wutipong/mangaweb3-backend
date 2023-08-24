@@ -10,10 +10,10 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
-	"go.uber.org/zap"
 
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
-	"github.com/wutipong/mangaweb3-backend/log"
+
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
@@ -95,7 +95,6 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	for _, tagStr := range m.Tags {
 		t, err := tag.Read(r.Context(), tagStr)
 		if err != nil {
-			log.Get().Sugar().Fatal(err)
 			handler.WriteResponse(w, err)
 			return
 		}
@@ -108,7 +107,9 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		}
 	}
 
-	log.Get().Info("View Item", zap.String("item_name", item))
+	log.Info().
+		Interface("request", req).
+		Msg("View Item")
 
 	data := viewData{
 		Request:          req,

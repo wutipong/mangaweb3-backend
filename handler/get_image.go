@@ -13,9 +13,9 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/julienschmidt/httprouter"
-	"github.com/wutipong/mangaweb3-backend/log"
+
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/meta"
-	"go.uber.org/zap"
 
 	_ "golang.org/x/image/webp"
 )
@@ -40,7 +40,9 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 		index = i
 	}
 
-	log.Get().Info("Get image", zap.String("item_name", item), zap.Int("index", index))
+	log.Info().
+		Interface("request", query).
+		Msg("Get image")
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {

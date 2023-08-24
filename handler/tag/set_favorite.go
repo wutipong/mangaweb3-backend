@@ -7,20 +7,25 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/wutipong/mangaweb3-backend/handler"
-	"github.com/wutipong/mangaweb3-backend/log"
+
 	"github.com/wutipong/mangaweb3-backend/tag"
-	"go.uber.org/zap"
 )
 
+type setTagFavoriteRequest struct {
+	Tag      string `json:"tag"`
+	Favorite bool   `json:"favorite"`
+}
+
 type setTagFavoriteResponse struct {
-	Favorite bool `json:"favorite"`
+	Request  setTagFavoriteRequest `json:"request"`
+	Favorite bool                  `json:"favorite"`
 }
 
 func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	tagStr := handler.ParseParam(params, "tag")
 	tagStr = filepath.FromSlash(tagStr)
 
-	log.Get().Info("Set favorite tag", zap.String("tag", tagStr))
+	//log.Get().Info("Set favorite tag", zap.String("tag", tagStr))
 
 	query := r.URL.Query()
 
@@ -38,6 +43,7 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 	}
 
 	response := setTagFavoriteResponse{
+		// Request:  req,
 		Favorite: m.Favorite,
 	}
 

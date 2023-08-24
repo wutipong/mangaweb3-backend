@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/wutipong/mangaweb3-backend/log"
+
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/scheduler"
 )
 
@@ -13,7 +14,7 @@ type RescanLibraryResponse struct {
 }
 
 func RescanLibraryHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	log.Get().Info("Rescan library")
+	log.Info().Msg("Rescan library")
 
 	scheduler.ScheduleScanLibrary()
 

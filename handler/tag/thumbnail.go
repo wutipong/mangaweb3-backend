@@ -5,17 +5,17 @@ import (
 	"path/filepath"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
-	"github.com/wutipong/mangaweb3-backend/log"
+
 	"github.com/wutipong/mangaweb3-backend/tag"
-	"go.uber.org/zap"
 )
 
 func ThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	tagStr := handler.ParseParam(params, "tag")
 	tagStr = filepath.FromSlash(tagStr)
 
-	log.Get().Info("Tag thumbnail image", zap.String("tag", tagStr))
+	log.Info().Str("tag", tagStr).Msg("Tag thumbnail image")
 
 	m, err := tag.Read(r.Context(), tagStr)
 	if err != nil {

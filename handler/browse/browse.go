@@ -1,20 +1,18 @@
 package browse
 
 import (
-	"encoding/json"
 	"fmt"
 	"hash/fnv"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
-	"go.uber.org/zap"
 
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
-	"github.com/wutipong/mangaweb3-backend/log"
+
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
@@ -97,19 +95,10 @@ func createDefaultBrowseRequest() browseRequest {
 }
 
 func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	reqBody, err := io.ReadAll(r.Body)
-	if err != nil {
-		handler.WriteResponse(w, err)
-		return
-	}
-
 	req := createDefaultBrowseRequest()
-	if len(reqBody) != 0 {
-		err = json.Unmarshal(reqBody, &req)
-		if err != nil {
-			handler.WriteResponse(w, err)
-			return
-		}
+
+	if err := handler.ParseInput(r.Body, req); err != nil {
+		handler.WriteResponse(w, err)
 	}
 
 	tagStr := req.Tag
@@ -168,12 +157,9 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		page = 0
 	}
 
-	log.Get().Info("Browse",
-		zap.Int("page", page),
-		zap.String("tag", tagStr),
-		zap.Bool("favorite_only", favOnly),
-		zap.String("sort_by", string(sort)),
-		zap.String("sort_order", string(order)))
+	log.Info().
+		Interface("request", req).
+		Msg("Browse")
 
 	data := browseData{
 		Request:      req,
