@@ -23,7 +23,7 @@ type viewRequest struct {
 	Path string `json:"path"`
 }
 
-type viewData struct {
+type viewResponse struct {
 	Request   viewRequest `json:"request"`
 	Name      string      `json:"name"`
 	Version   string      `json:"version"`
@@ -33,6 +33,11 @@ type viewData struct {
 	Tags      []string    `json:"tags"`
 }
 
+// @accept json
+// @param request body view.viewRequest true "request"
+// @Success      200  {object}  view.viewResponse
+// @Failure      500  {object}  errors.Error
+// @Router /view [post]
 func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	req := viewRequest{}
 
@@ -72,7 +77,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		Interface("request", req).
 		Msg("View Item")
 
-	data := viewData{
+	data := viewResponse{
 		Request:   req,
 		Name:      item,
 		Version:   handler.CreateVersionString(),

@@ -1,4 +1,39 @@
 basePath: /
+definitions:
+  errors.Error:
+    properties:
+      cause: {}
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  view.viewRequest:
+    properties:
+      path:
+        type: string
+    type: object
+  view.viewResponse:
+    properties:
+      browse_url:
+        type: string
+      favorite:
+        type: boolean
+      indices:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      request:
+        $ref: '#/definitions/view.viewRequest'
+      tags:
+        items:
+          type: string
+        type: array
+      version:
+        type: string
+    type: object
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
@@ -11,5 +46,25 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Mangaweb3 API
   version: "3.0"
-paths: {}
+paths:
+  /view:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/view.viewRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/view.viewResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
 swagger: "2.0"

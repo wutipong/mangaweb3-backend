@@ -48,6 +48,8 @@ const (
 	pathTagThumb       = "/tag_thumb"
 )
 
+//go:generate swag init
+
 // @title           Mangaweb3 API
 // @version         3.0
 // @description     API Server for Mangaweb
