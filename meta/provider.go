@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/wutipong/mangaweb3-backend/errors"
 )
 
 var pool *pgxpool.Pool
@@ -49,8 +48,15 @@ func Write(ctx context.Context, i Meta) error {
 	)
 	return err
 }
+
 func Delete(ctx context.Context, i Meta) error {
-	return errors.ErrNotImplemented
+	_, err := pool.Exec(
+		ctx,
+		`DELETE FROM manga.items
+		WHERE name = $1`,
+		i.Name,
+	)
+	return err
 }
 
 func Read(ctx context.Context, name string) (i Meta, err error) {
