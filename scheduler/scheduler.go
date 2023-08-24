@@ -15,11 +15,11 @@ type Options struct {
 func Init(options Options) {
 	scheduler = gocron.NewScheduler(time.UTC)
 	scheduler.Every(30).Minutes().Do(func() {
-		log.Print("Update metadata set.")
+		log.Info().Msg("Update metadata set.")
 		ScanLibrary()
-		log.Print("Update tag list.")
+		log.Info().Msg("Update tag list.")
 		UpdateTags()
-		log.Print("Update missing thumbnails.")
+		log.Info().Msg("Update missing thumbnails.")
 		UpdateMissingThumbnail()
 	})
 }

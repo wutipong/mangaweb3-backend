@@ -77,7 +77,7 @@ func ScanLibrary() error {
 
 func ScheduleScanLibrary() {
 	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
-		log.Print("Scanning Library.")
+		log.Info().Msg("Scanning Library.")
 		ScanLibrary()
 	})
 }

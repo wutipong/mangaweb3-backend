@@ -29,7 +29,7 @@ func RebuildThumbnail() error {
 
 func ScheduleRebuildThumbnail() {
 	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
-		log.Print("Force updating thumbnail")
+		log.Info().Msg("Force updating thumbnail")
 		RebuildThumbnail()
 	})
 }

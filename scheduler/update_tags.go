@@ -66,7 +66,7 @@ func UpdateTags() error {
 
 func ScheduleUpdateTags() {
 	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
-		log.Print("Update tags.")
+		log.Info().Msg("Update tags.")
 		UpdateTags()
 	})
 }

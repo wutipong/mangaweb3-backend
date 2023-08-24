@@ -65,9 +65,11 @@ func main() {
 
 	meta.BaseDirectory = *dataPath
 
-	log.Printf("MangaWeb version: %s", versionString)
-	log.Printf("Data source Path: %s", *dataPath)
-	log.Printf("Server starts at: %s", *address)
+	log.Info().
+		Str("version", versionString).
+		Str("data_path", *dataPath).
+		Str("address", *address).
+		Msg("Server started.")
 
 	router := httprouter.New()
 	conn, err := pgxpool.New(context.Background(), *connectionStr)
@@ -93,7 +95,7 @@ func main() {
 		return
 	}
 
-	log.Print("shutting down the server")
+	log.Info().Msg("shutting down the server")
 	scheduler.Stop()
 }
 

@@ -39,7 +39,7 @@ func UpdateMissingThumbnail() error {
 
 func ScheduleUpdateMissingThumbnail() {
 	scheduler.Every(1).Hour().Do(func() {
-		log.Print("Updating missing thumbnail.")
+		log.Info().Msg("Updating missing thumbnail.")
 		UpdateMissingThumbnail()
 	})
 }
