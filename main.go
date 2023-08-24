@@ -12,6 +12,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/rs/zerolog/log"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
+	_ "github.com/wutipong/mangaweb3-backend/docs"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/handler/browse"
 	handlertag "github.com/wutipong/mangaweb3-backend/handler/tag"
@@ -46,8 +48,19 @@ const (
 	pathTagThumb       = "/tag_thumb"
 )
 
-func main() {
+// @title           Mangaweb3 API
+// @version         3.0
+// @description     API Server for Mangaweb
 
+// @license.name  MIT
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8972
+// @BasePath  /
+
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
+func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Info().Msg("Use .env file.")
 	}
@@ -126,4 +139,10 @@ func RegisterHandler(router *httprouter.Router) {
 	router.POST(pathSetTagFavorite, handlertag.SetFavoriteHandler)
 	router.GET(pathTagList, handlertag.TagListHandler)
 	router.GET(pathTagThumb, handlertag.ThumbnailHandler)
+
+	router.GET("/doc/:any", swaggerHandler)
+}
+
+func swaggerHandler(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
+	httpSwagger.WrapHandler(res, req)
 }

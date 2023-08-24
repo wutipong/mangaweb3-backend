@@ -1,0 +1,15 @@
+basePath: /
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8972
+info:
+  contact: {}
+  description: API Server for Mangaweb
+  license:
+    name: MIT
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Mangaweb3 API
+  version: "3.0"
+paths: {}
+swagger: "2.0"
