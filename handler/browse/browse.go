@@ -118,10 +118,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		})
 	}
 
-	sort := req.Sort
-	order := req.Order
-
-	allMeta, err := meta.Search(r.Context(), searchCriteria, sort, order, req.ItemPerPage, req.Page)
+	allMeta, err := meta.Search(r.Context(), searchCriteria, req.Sort, req.Order, req.ItemPerPage, req.Page)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
