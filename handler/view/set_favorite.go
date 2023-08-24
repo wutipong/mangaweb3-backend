@@ -1,9 +1,9 @@
 package view
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
-	"path/filepath"
-	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/wutipong/mangaweb3-backend/handler"
@@ -12,17 +12,35 @@ import (
 	"go.uber.org/zap"
 )
 
+type setFavoriteRequest struct {
+	Name     string `json:"name"`
+	Favorite bool   `json:"favorite"`
+}
+
 type setFavoriteResponse struct {
-	Favorite bool `json:"favorite"`
+	Request  setFavoriteRequest `json:"request"`
+	Favorite bool               `json:"favorite"`
 }
 
 func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	item := handler.ParseParam(params, "item")
-	item = filepath.FromSlash(item)
+	req := setFavoriteRequest{}
+	var reqBody []byte
+
+	if read, err := io.ReadAll(r.Body); err != nil {
+		handler.WriteResponse(w, err)
+		return
+	} else {
+		reqBody = read
+	}
+
+	if err := json.Unmarshal(reqBody, &req); err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
+
+	item := req.Name
 
 	log.Get().Info("Set Favorite Item", zap.String("item_name", item))
-
-	query := r.URL.Query()
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {
@@ -30,14 +48,13 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 		return
 	}
 
-	if fav, e := strconv.ParseBool(query.Get("favorite")); e == nil {
-		if fav != m.Favorite {
-			m.Favorite = fav
-			meta.Write(r.Context(), m)
-		}
+	if req.Favorite != m.Favorite {
+		m.Favorite = req.Favorite
+		meta.Write(r.Context(), m)
 	}
 
 	response := setFavoriteResponse{
+		Request:  req,
 		Favorite: m.Favorite,
 	}
 
