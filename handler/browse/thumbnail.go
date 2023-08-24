@@ -8,11 +8,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
-
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
-func ThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func GetThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	item := r.URL.Query().Get("name")
 
 	log.Info().

@@ -33,17 +33,17 @@ func setupFlag(flagName, defValue, variable, description string) *string {
 var versionString string = "development"
 
 const (
-	pathBrowse        = "/browse"
-	pathView          = "/view"
-	pathGetImage      = "/get_image"
-	pathUpdateCover   = "/update_cover"
-	pathThumbnail     = "/thumbnail"
-	pathFavorite      = "/favorite"
-	pathDownload      = "/download"
-	pathRescanLibrary = "/rescan_library"
-	pathTagFavorite   = "/tag_favorite"
-	pathTagList       = "/tag_list"
-	pathTagThumb      = "/tag_thumb"
+	pathBrowse         = "/browse"
+	pathView           = "/view"
+	pathGetImage       = "/get_image"
+	pathUpdateCover    = "/update_cover"
+	pathThumbnail      = "/thumbnail"
+	pathFavorite       = "/favorite"
+	pathDownload       = "/download"
+	pathRescanLibrary  = "/rescan_library"
+	pathSetTagFavorite = "/set_tag_favorite"
+	pathTagList        = "/tag_list"
+	pathTagThumb       = "/tag_thumb"
 )
 
 func main() {
@@ -110,7 +110,7 @@ func RegisterHandler(router *httprouter.Router) {
 		PathFavorite:      pathFavorite,
 		PathDownload:      pathDownload,
 		PathRescanLibrary: pathRescanLibrary,
-		PathTagFavorite:   pathTagFavorite,
+		PathTagFavorite:   pathSetTagFavorite,
 		PathTagList:       pathTagList,
 		PathTagThumbnail:  pathTagThumb,
 	})
@@ -119,11 +119,11 @@ func RegisterHandler(router *httprouter.Router) {
 	router.POST(pathView, view.Handler)
 	router.GET(pathGetImage, handler.GetImage)
 	router.POST(pathUpdateCover, view.UpdateCover)
-	router.GET(pathThumbnail, browse.ThumbnailHandler)
+	router.GET(pathThumbnail, browse.GetThumbnailHandler)
 	router.POST(pathFavorite, view.SetFavoriteHandler)
 	router.GET(pathDownload, view.Download)
 	router.GET(pathRescanLibrary, handler.RescanLibraryHandler)
-	router.GET(pathTagFavorite, handlertag.SetFavoriteHandler)
+	router.POST(pathSetTagFavorite, handlertag.SetFavoriteHandler)
 	router.GET(pathTagList, handlertag.TagListHandler)
 	router.GET(pathTagThumb, handlertag.ThumbnailHandler)
 }

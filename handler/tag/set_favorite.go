@@ -2,10 +2,9 @@ package tag
 
 import (
 	"net/http"
-	"path/filepath"
-	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
 
 	"github.com/wutipong/mangaweb3-backend/tag"
@@ -22,28 +21,26 @@ type setTagFavoriteResponse struct {
 }
 
 func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	tagStr := handler.ParseParam(params, "tag")
-	tagStr = filepath.FromSlash(tagStr)
+	req := setTagFavoriteRequest{}
+	if err := handler.ParseInput(r.Body, req); err != nil {
+		handler.WriteResponse(w, err)
+	}
 
-	//log.Get().Info("Set favorite tag", zap.String("tag", tagStr))
+	log.Info().Interface("request", req).Msg("Set favorite tag.")
 
-	query := r.URL.Query()
-
-	m, err := tag.Read(r.Context(), tagStr)
+	m, err := tag.Read(r.Context(), req.Tag)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
 
-	if fav, e := strconv.ParseBool(query.Get("favorite")); e == nil {
-		if fav != m.Favorite {
-			m.Favorite = fav
-			tag.Write(r.Context(), m)
-		}
+	if req.Favorite != m.Favorite {
+		m.Favorite = req.Favorite
+		tag.Write(r.Context(), m)
 	}
 
 	response := setTagFavoriteResponse{
-		// Request:  req,
+		Request:  req,
 		Favorite: m.Favorite,
 	}
 
