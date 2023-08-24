@@ -11,6 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	_ "github.com/wutipong/mangaweb3-backend/docs"
@@ -43,6 +44,8 @@ var versionString string = "development"
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
 	if err := godotenv.Load(); err != nil {
 		log.Info().Msg("Use .env file.")
 	}
