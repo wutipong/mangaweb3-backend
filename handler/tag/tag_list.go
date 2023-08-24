@@ -4,7 +4,6 @@ import (
 	"hash/fnv"
 	"net/http"
 	"sort"
-	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
@@ -17,19 +16,23 @@ const (
 	ItemPerPage = 40
 )
 
-type PageData struct {
-	Version string
-	Tags    []ItemData
+type listRequest struct {
+	FavoriteOnly bool `json:"favorite_only"`
 }
 
-type ItemData struct {
-	ID       uint64
-	Name     string
-	Favorite bool
+type listResponse struct {
+	Request listRequest `json:"request"`
+	Tags    []tagData   `json:"tags"`
 }
 
-func createItems(allTags []tag.Tag, favoriteOnly bool) []ItemData {
-	allItems := make([]ItemData, len(allTags))
+type tagData struct {
+	ID       uint64 `json:"id"`
+	Name     string `json:"name"`
+	Favorite bool   `json:"favorite"`
+}
+
+func createItems(allTags []tag.Tag, favoriteOnly bool) []tagData {
+	allItems := make([]tagData, len(allTags))
 
 	for i, t := range allTags {
 		isAdding := true
@@ -42,7 +45,7 @@ func createItems(allTags []tag.Tag, favoriteOnly bool) []ItemData {
 			hash.Write([]byte(t.Name))
 			id := hash.Sum64()
 
-			allItems[i] = ItemData{
+			allItems[i] = tagData{
 				ID:       id,
 				Name:     t.Name,
 				Favorite: t.Favorite,
@@ -56,15 +59,22 @@ func createItems(allTags []tag.Tag, favoriteOnly bool) []ItemData {
 	return allItems
 }
 
-func TagListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	query := r.URL.Query()
-
-	log.Info().Msg("Tag list")
-
-	favOnly := false
-	if f, e := strconv.ParseBool(query.Get("favorite")); e == nil {
-		favOnly = f
+// @accept json
+// @Param request body tag.listRequest true "request"
+// @Success      200  {object}  tag.listResponse
+// @Failure      500  {object}  errors.Error
+// @Router /tag/list [post]
+func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	req := listRequest{
+		FavoriteOnly: false,
 	}
+
+	if err := handler.ParseInput(r.Body, &req); err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
+
+	log.Info().Interface("request", req).Msg("Tag list")
 
 	allTags, err := tag.ReadAll(r.Context())
 	if err != nil {
@@ -72,11 +82,10 @@ func TagListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		return
 	}
 
-	tagData := createItems(allTags, favOnly)
+	tagData := createItems(allTags, req.FavoriteOnly)
 
-	data := PageData{
-		Version: handler.CreateVersionString(),
-		Tags:    tagData,
+	data := listResponse{
+		Tags: tagData,
 	}
 
 	handler.WriteResponse(w, data)

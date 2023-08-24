@@ -1,9 +1,7 @@
 package view
 
 import (
-	"encoding/json"
 	_ "image/png"
-	"io"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -23,29 +21,30 @@ type updateCoverResponse struct {
 	Success bool               `json:"success"`
 }
 
+// @accept json
+// @Param request body view.updateCoverRequest true "request"
+// @Success      200  {object}  view.updateCoverResponse
+// @Failure      500  {object}  errors.Error
+// @Router /update_cover [post]
 // UpdateCover a handler to update the cover to specific image
 func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	req := updateCoverRequest{}
-	if reqBody, err := io.ReadAll(r.Body); err != nil {
+	if err := handler.ParseInput(r.Body, &req); err != nil {
 		handler.WriteResponse(w, err)
-	} else {
-		json.Unmarshal(reqBody, &req)
+		return
 	}
-
-	item := req.Name
-	index := req.Index
 
 	log.Info().
 		Interface("request", req).
 		Msg("Update cover.")
 
-	m, err := meta.Read(r.Context(), item)
+	m, err := meta.Read(r.Context(), req.Name)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
 
-	entryIndex := m.FileIndices[index]
+	entryIndex := m.FileIndices[req.Index]
 
 	err = m.GenerateThumbnail(entryIndex)
 	if err != nil {

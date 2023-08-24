@@ -10,6 +10,10 @@ import (
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
 
+// @Param tag query string true "tag"
+// @Success      200  {body}  file
+// @Failure      500  {object}  errors.Error
+// @Router /tag/thumbnail [get]
 func ThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	tagStr := r.URL.Query().Get("tag")
 

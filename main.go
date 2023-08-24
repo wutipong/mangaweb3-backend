@@ -39,13 +39,13 @@ const (
 	pathView           = "/view"
 	pathGetImage       = "/get_image"
 	pathUpdateCover    = "/update_cover"
-	pathThumbnail      = "/get_thumbnail"
+	pathThumbnail      = "/thumbnail"
 	pathFavorite       = "/favorite"
 	pathDownload       = "/download"
 	pathRescanLibrary  = "/rescan_library"
-	pathSetTagFavorite = "/set_tag_favorite"
-	pathTagList        = "/tag_list"
-	pathTagThumb       = "/tag_thumb"
+	pathSetTagFavorite = "/tag/set_favorite"
+	pathTagList        = "/tag/list"
+	pathTagThumb       = "/tag/thumbnail"
 )
 
 //go:generate swag init
@@ -133,7 +133,7 @@ func RegisterHandler(router *httprouter.Router) {
 	router.GET(pathDownload, view.Download)
 	router.GET(pathRescanLibrary, handler.RescanLibraryHandler)
 	router.POST(pathSetTagFavorite, handlertag.SetFavoriteHandler)
-	router.GET(pathTagList, handlertag.TagListHandler)
+	router.GET(pathTagList, handlertag.ListHandler)
 	router.GET(pathTagThumb, handlertag.ThumbnailHandler)
 
 	router.GET("/doc/:any", swaggerHandler)

@@ -20,6 +20,13 @@ import (
 	_ "golang.org/x/image/webp"
 )
 
+// @Param name query string true "name of the item"
+// @Param width query int false "width"
+// @Param height query int false "height"
+// @Param i query int true "index"
+// @Success      200  {body}  file
+// @Failure      500  {object}  errors.Error
+// @Router /get_image [get]
 // GetImage returns an image with specific width/height while retains aspect ratio.
 func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	query := r.URL.Query()

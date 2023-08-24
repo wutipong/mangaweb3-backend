@@ -14,7 +14,7 @@ import (
 // @Param name query string true "name of the item"
 // @Success      200  {body}  file
 // @Failure      500  {object}  errors.Error
-// @Router /get_thumbnail [get]
+// @Router /thumbnail [get]
 func GetThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	item := r.URL.Query().Get("name")
 

@@ -22,6 +22,11 @@ type setFavoriteResponse struct {
 	Favorite bool               `json:"favorite"`
 }
 
+// @accept json
+// @Param request body view.setFavoriteRequest true "request"
+// @Success      200  {object}  view.setFavoriteResponse
+// @Failure      500  {object}  errors.Error
+// @Router /set_favorite [post]
 func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	req := setFavoriteRequest{}
 	var reqBody []byte

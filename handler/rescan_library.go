@@ -9,16 +9,19 @@ import (
 	"github.com/wutipong/mangaweb3-backend/scheduler"
 )
 
-type RescanLibraryResponse struct {
+type rescanLibraryResponse struct {
 	Result bool `json:"result"`
 }
 
+// @Success      200  {object}  handler.rescanLibraryResponse
+// @Failure      500  {object}  errors.Error
+// @Router /rescan_library [get]
 func RescanLibraryHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Info().Msg("Rescan library")
 
 	scheduler.ScheduleScanLibrary()
 
-	response := RescanLibraryResponse{
+	response := rescanLibraryResponse{
 		Result: true,
 	}
 

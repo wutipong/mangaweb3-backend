@@ -12,8 +12,12 @@ import (
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
+// @Param name query string true "name of the file"
+// @Success      200  {body}  file
+// @Failure      500  {object}  errors.Error
+// @Router /download [get]
 func Download(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	item := handler.ParseParam(params, "item")
+	item := r.URL.Query().Get("name")
 
 	log.Info().Str("name", item).Msg("Download")
 
