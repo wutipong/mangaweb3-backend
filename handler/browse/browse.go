@@ -1,8 +1,10 @@
 package browse
 
 import (
+	"encoding/json"
 	"fmt"
 	"hash/fnv"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -21,7 +23,17 @@ const (
 	ItemPerPage = 30
 )
 
+type browseRequest struct {
+	Tag          string         `json:"tag"`
+	FavoriteOnly bool           `json:"favorite_only"`
+	Page         int            `json:"page"`
+	Search       string         `json:"search"`
+	Sort         meta.SortField `json:"sort"`
+	Order        meta.SortOrder `json:"order"`
+}
+
 type browseData struct {
+	Request           browseRequest `json:"request"`
 	Title             string
 	Version           string
 	FavoriteOnly      bool
@@ -77,23 +89,37 @@ func createItems(allMeta []meta.Meta) (allItems []item, err error) {
 	return
 }
 
+func createDefaultBrowseRequest() browseRequest {
+	return browseRequest{
+		Tag:          "",
+		FavoriteOnly: false,
+		Page:         0,
+		Search:       "",
+		Sort:         meta.SortFieldCreateTime,
+		Order:        meta.SortOrderDescending,
+	}
+}
+
 func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	query := r.URL.Query()
-	tagStr := handler.ParseParam(params, "tag")
-
-	query.Get("favorite")
-
-	favOnly := false
-	if f, e := strconv.ParseBool(query.Get("favorite")); e == nil {
-		favOnly = f
+	reqBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		handler.WriteError(w, err)
+		return
 	}
 
-	page := 0
-	if i, e := strconv.ParseInt(query.Get("page"), 10, 0); e == nil {
-		page = int(i)
+	req := createDefaultBrowseRequest()
+	if len(reqBody) != 0 {
+		err = json.Unmarshal(reqBody, &req)
+		if err != nil {
+			handler.WriteError(w, err)
+			return
+		}
 	}
 
-	search := query.Get("search")
+	tagStr := req.Tag
+	favOnly := req.FavoriteOnly
+	page := req.Page
+	search := req.Search
 	searchCriteria := make([]meta.SearchCriteria, 0)
 	if search != "" {
 		searchCriteria = append(searchCriteria, meta.SearchCriteria{
@@ -116,8 +142,8 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		})
 	}
 
-	sort := parseSortField(query.Get("sort"))
-	order := parseSortOrder(query.Get("order"))
+	sort := req.Sort
+	order := req.Order
 
 	allMeta, err := meta.Search(r.Context(), searchCriteria, sort, order, ItemPerPage, page)
 	if err != nil {
@@ -154,6 +180,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		zap.String("sort_order", string(order)))
 
 	data := browseData{
+		Request:      req,
 		Title:        "Browse - All items",
 		Version:      handler.CreateVersionString(),
 		FavoriteOnly: favOnly,
@@ -182,33 +209,6 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	}
 
 	handler.WriteJson(w, data)
-}
-
-func parseSortOrder(orderStr string) meta.SortOrder {
-	order := meta.SortOrder(orderStr)
-
-	switch order {
-	case meta.SortOrderAscending:
-		return order
-	case meta.SortOrderDescending:
-		return order
-	}
-
-	return meta.SortOrderDescending
-}
-
-func parseSortField(sortBy string) meta.SortField {
-	sort := meta.SortField(sortBy)
-
-	switch sort {
-	case meta.SortFieldName:
-		return sort
-	case meta.SortFieldCreateTime:
-		return sort
-
-	default:
-		return meta.SortFieldCreateTime
-	}
 }
 
 func createPageItems(current int, count int, baseUrl *url.URL) []pageItem {

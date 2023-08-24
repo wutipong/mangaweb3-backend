@@ -129,8 +129,7 @@ func RegisterHandler(router *httprouter.Router, pathPrefix string) {
 		PathTagThumbnail:  pathTagThumb,
 	})
 	// Routes
-	router.GET(handler.CreateURL(pathRoot), root)
-	router.GET(handler.CreateBrowseURLPattern(), browse.Handler)
+	router.POST(handler.CreateBrowseURLPattern(), browse.Handler)
 	router.GET(handler.CreateViewURLPattern(), view.Handler)
 	router.GET(handler.CreateGetImageURLPattern(), handler.GetImage)
 	router.GET(handler.CreateUpdateCoverURLPattern(), view.UpdateCover)
@@ -143,10 +142,6 @@ func RegisterHandler(router *httprouter.Router, pathPrefix string) {
 	router.GET(handler.CreateTagThumbnailURLPattern(), handlertag.ThumbnailHandler)
 
 	router.ServeFiles(handler.CreateURL(pathStatic, "*filepath"), http.Dir("static"))
-}
-
-func root(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	http.Redirect(w, r, handler.CreateBrowseTagURL(""), http.StatusPermanentRedirect)
 }
 
 func printBanner() {
