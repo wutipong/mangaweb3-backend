@@ -22,10 +22,6 @@ import (
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
 
-// Recreate the static resource file.
-//go:generate npm install
-//go:generate npm run build
-
 func setupFlag(flagName, defValue, variable, description string) *string {
 	varValue := os.Getenv(variable)
 	if varValue != "" {
