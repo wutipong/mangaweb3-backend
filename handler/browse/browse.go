@@ -1,7 +1,6 @@
 package browse
 
 import (
-	"fmt"
 	"hash/fnv"
 	"net/http"
 	"net/url"
@@ -28,38 +27,27 @@ type browseRequest struct {
 	Order        meta.SortOrder `json:"order"`
 }
 
-type browseData struct {
-	Request           browseRequest `json:"request"`
-	Title             string
-	Version           string
-	FavoriteOnly      bool
-	SortBy            string
-	SortOrder         string
-	Tag               string
-	TagFavorite       bool
-	SetTagFavoriteURL string
-	BrowseURL         string
-	TagListURL        string
-	SearchText        string
-	RescanURL         string
-	Items             []item
-	Pages             []pageItem
+type browseResponse struct {
+	Request     browseRequest `json:"request"`
+	TagFavorite bool          `json:"tag_favorite"`
+	Items       []item        `json:"items"`
+	Pages       []pageItem    `json:"pages"`
 }
 
 type item struct {
-	ID         uint64
-	Name       string
-	CreateTime time.Time
-	Favorite   bool
-	IsRead     bool
+	ID         uint64    `json:"id"`
+	Name       string    `json:"name"`
+	CreateTime time.Time `json:"create_time"`
+	Favorite   bool      `json:"favorite"`
+	IsRead     bool      `json:"is_read"`
 }
 
 type pageItem struct {
-	Content         string
-	LinkURL         string
-	IsActive        bool
-	IsEnabled       bool
-	IsHiddenOnSmall bool
+	Content         string `json:"content"`
+	LinkURL         string `json:"link_url"`
+	IsActive        bool   `json:"is_active"`
+	IsEnabled       bool   `json:"is_enabled"`
+	IsHiddenOnSmall bool   `json:"is_hidden_on_small"`
 }
 
 func createItems(allMeta []meta.Meta) (allItems []item, err error) {
@@ -92,6 +80,11 @@ func createDefaultBrowseRequest() browseRequest {
 	}
 }
 
+// @accept json
+// @Param request body browse.browseRequest false "request"
+// @Success      200  {object}  browse.browseResponse
+// @Failure      500  {object}  errors.Error
+// @Router /browse [post]
 func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	req := createDefaultBrowseRequest()
 
@@ -159,25 +152,13 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		Interface("request", req).
 		Msg("Browse")
 
-	data := browseData{
-		Request:      req,
-		Title:        "Browse - All items",
-		Version:      handler.CreateVersionString(),
-		FavoriteOnly: favOnly,
-		SortBy:       string(sort),
-		SortOrder:    string(order),
-		Items:        items,
-		Pages:        createPageItems(page, pageCount, r.URL),
-		BrowseURL:    handler.CreateBrowseURL(""),
-		TagListURL:   handler.CreateTagListURL(),
-		SearchText:   search,
-		RescanURL:    handler.CreateRescanURL(),
+	data := browseResponse{
+		Request: req,
+		Items:   items,
+		Pages:   createPageItems(page, pageCount, r.URL),
 	}
 
 	if tagStr != "" {
-		data.Title = fmt.Sprintf("Browse - %s", tagStr)
-		data.Tag = tagStr
-
 		tagObj, err := tag.Read(r.Context(), tagStr)
 		if err != nil {
 			handler.WriteResponse(w, err)
@@ -185,7 +166,6 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		}
 
 		data.TagFavorite = tagObj.Favorite
-		data.SetTagFavoriteURL = handler.CreateSetTagFavoriteURL(tagStr)
 	}
 
 	handler.WriteResponse(w, data)

@@ -34,7 +34,7 @@ type viewResponse struct {
 }
 
 // @accept json
-// @param request body view.viewRequest true "request"
+// @Param request body view.viewRequest true "request"
 // @Success      200  {object}  view.viewResponse
 // @Failure      500  {object}  errors.Error
 // @Router /view [post]

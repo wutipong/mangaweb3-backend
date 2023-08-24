@@ -11,15 +11,69 @@ const docTemplate = `{
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
         "contact": {},
-        "license": {
-            "name": "MIT",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/browse": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/browse.browseRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/browse.browseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/get_thumbnail": {
+            "get": {
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name of the item",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "body"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/view": {
             "post": {
                 "consumes": [
@@ -54,6 +108,92 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "browse.browseRequest": {
+            "type": "object",
+            "properties": {
+                "favorite_only": {
+                    "type": "boolean"
+                },
+                "order": {
+                    "$ref": "#/definitions/meta.SortOrder"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "search": {
+                    "type": "string"
+                },
+                "sort": {
+                    "$ref": "#/definitions/meta.SortField"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "browse.browseResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/browse.item"
+                    }
+                },
+                "pages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/browse.pageItem"
+                    }
+                },
+                "request": {
+                    "$ref": "#/definitions/browse.browseRequest"
+                },
+                "tag_favorite": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "browse.item": {
+            "type": "object",
+            "properties": {
+                "create_time": {
+                    "type": "string"
+                },
+                "favorite": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_read": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "browse.pageItem": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_enabled": {
+                    "type": "boolean"
+                },
+                "is_hidden_on_small": {
+                    "type": "boolean"
+                },
+                "link_url": {
+                    "type": "string"
+                }
+            }
+        },
         "errors.Error": {
             "type": "object",
             "properties": {
@@ -65,6 +205,28 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "meta.SortField": {
+            "type": "string",
+            "enum": [
+                "name",
+                "createTime"
+            ],
+            "x-enum-varnames": [
+                "SortFieldName",
+                "SortFieldCreateTime"
+            ]
+        },
+        "meta.SortOrder": {
+            "type": "string",
+            "enum": [
+                "ascending",
+                "descending"
+            ],
+            "x-enum-varnames": [
+                "SortOrderAscending",
+                "SortOrderDescending"
+            ]
         },
         "view.viewRequest": {
             "type": "object",
@@ -116,8 +278,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "3.0",
-	Host:             "localhost:8972",
-	BasePath:         "/",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Mangaweb3 API",
 	Description:      "API Server for Mangaweb",

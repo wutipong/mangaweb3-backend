@@ -39,7 +39,7 @@ const (
 	pathView           = "/view"
 	pathGetImage       = "/get_image"
 	pathUpdateCover    = "/update_cover"
-	pathThumbnail      = "/thumbnail"
+	pathThumbnail      = "/get_thumbnail"
 	pathFavorite       = "/favorite"
 	pathDownload       = "/download"
 	pathRescanLibrary  = "/rescan_library"
@@ -53,12 +53,6 @@ const (
 // @title           Mangaweb3 API
 // @version         3.0
 // @description     API Server for Mangaweb
-
-// @license.name  MIT
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8972
-// @BasePath  /
 
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/

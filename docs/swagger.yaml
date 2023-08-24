@@ -1,5 +1,60 @@
-basePath: /
 definitions:
+  browse.browseRequest:
+    properties:
+      favorite_only:
+        type: boolean
+      order:
+        $ref: '#/definitions/meta.SortOrder'
+      page:
+        type: integer
+      search:
+        type: string
+      sort:
+        $ref: '#/definitions/meta.SortField'
+      tag:
+        type: string
+    type: object
+  browse.browseResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/browse.item'
+        type: array
+      pages:
+        items:
+          $ref: '#/definitions/browse.pageItem'
+        type: array
+      request:
+        $ref: '#/definitions/browse.browseRequest'
+      tag_favorite:
+        type: boolean
+    type: object
+  browse.item:
+    properties:
+      create_time:
+        type: string
+      favorite:
+        type: boolean
+      id:
+        type: integer
+      is_read:
+        type: boolean
+      name:
+        type: string
+    type: object
+  browse.pageItem:
+    properties:
+      content:
+        type: string
+      is_active:
+        type: boolean
+      is_enabled:
+        type: boolean
+      is_hidden_on_small:
+        type: boolean
+      link_url:
+        type: string
+    type: object
   errors.Error:
     properties:
       cause: {}
@@ -8,6 +63,22 @@ definitions:
       message:
         type: string
     type: object
+  meta.SortField:
+    enum:
+    - name
+    - createTime
+    type: string
+    x-enum-varnames:
+    - SortFieldName
+    - SortFieldCreateTime
+  meta.SortOrder:
+    enum:
+    - ascending
+    - descending
+    type: string
+    x-enum-varnames:
+    - SortOrderAscending
+    - SortOrderDescending
   view.viewRequest:
     properties:
       path:
@@ -37,16 +108,48 @@ definitions:
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: localhost:8972
 info:
   contact: {}
   description: API Server for Mangaweb
-  license:
-    name: MIT
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Mangaweb3 API
   version: "3.0"
 paths:
+  /browse:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/browse.browseRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/browse.browseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+  /get_thumbnail:
+    get:
+      parameters:
+      - description: name of the item
+        in: query
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: body
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
   /view:
     post:
       consumes:
