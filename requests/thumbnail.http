@@ -1,6 +1,1 @@
-POST http://localhost:8972/thumbnail HTTP/1.1
-content-type: application/json
-
-{
-    "path": "[成年コミック] [Artist 蒟吉人]\\[成年コミック] [蒟吉人] ミダラBooks [WebP].zip"
-}
+GET http://localhost:8972/thumbnail?name=%5B%E6%88%90%E5%B9%B4%E3%82%B3%E3%83%9F%E3%83%83%E3%82%AF%5D%20%5BArtist%20%E8%92%9F%E5%90%89%E4%BA%BA%5D%5C%5B%E6%88%90%E5%B9%B4%E3%82%B3%E3%83%9F%E3%83%83%E3%82%AF%5D%20%5B%E8%92%9F%E5%90%89%E4%BA%BA%5D%20%E3%83%9F%E3%83%80%E3%83%A9Books%20%5BWebP%5D.zip HTTP/1.1
