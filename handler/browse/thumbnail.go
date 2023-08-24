@@ -2,11 +2,8 @@ package browse
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
-	"path/filepath"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/wutipong/mangaweb3-backend/handler"
@@ -15,20 +12,8 @@ import (
 	"go.uber.org/zap"
 )
 
-type thumbnailRequest struct {
-	Path string `json:"path"`
-}
-
 func ThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	req := thumbnailRequest{}
-	if reqBody, err := io.ReadAll(r.Body); err != nil {
-		handler.WriteResponse(w, err)
-	} else {
-		json.Unmarshal(reqBody, &req)
-	}
-
-	item := req.Path
-	item = filepath.FromSlash(item)
+	item := r.URL.Query().Get("name")
 
 	log.Get().Info("Item Thumbnail", zap.String("item_name", item))
 
