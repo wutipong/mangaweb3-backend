@@ -2,7 +2,6 @@ package tag
 
 import (
 	"net/http"
-	"path/filepath"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
@@ -12,8 +11,7 @@ import (
 )
 
 func ThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	tagStr := handler.ParseParam(params, "tag")
-	tagStr = filepath.FromSlash(tagStr)
+	tagStr := r.URL.Query().Get("tag")
 
 	log.Info().Str("tag", tagStr).Msg("Tag thumbnail image")
 
