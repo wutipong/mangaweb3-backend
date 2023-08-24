@@ -34,7 +34,6 @@ func setupFlag(flagName, defValue, variable, description string) *string {
 var versionString string = "development"
 
 const (
-	pathRoot          = "/"
 	pathBrowse        = "/browse"
 	pathView          = "/view"
 	pathStatic        = "/static"
@@ -69,7 +68,6 @@ func main() {
 		"MANGAWEB_DB",
 		"Specify the database connection string",
 	)
-	prefix := setupFlag("prefix", "", "MANGAWEB_PREFIX", "URL prefix")
 
 	flag.Parse()
 
@@ -96,7 +94,7 @@ func main() {
 
 	scheduler.Init(scheduler.Options{})
 
-	RegisterHandler(router, *prefix)
+	RegisterHandler(router)
 	scheduler.Start()
 
 	log.Get().Info("Server starts.")
@@ -106,11 +104,9 @@ func main() {
 	scheduler.Stop()
 }
 
-func RegisterHandler(router *httprouter.Router, pathPrefix string) {
+func RegisterHandler(router *httprouter.Router) {
 	handler.Init(handler.Options{
 		VersionString:     versionString,
-		PathPrefix:        pathPrefix,
-		PathRoot:          pathRoot,
 		PathBrowse:        pathBrowse,
 		PathView:          pathView,
 		PathStatic:        pathStatic,
@@ -125,19 +121,17 @@ func RegisterHandler(router *httprouter.Router, pathPrefix string) {
 		PathTagThumbnail:  pathTagThumb,
 	})
 	// Routes
-	router.POST(handler.CreateBrowseURLPattern(), browse.Handler)
-	router.GET(handler.CreateViewURLPattern(), view.Handler)
-	router.GET(handler.CreateGetImageURLPattern(), handler.GetImage)
-	router.GET(handler.CreateUpdateCoverURLPattern(), view.UpdateCover)
-	router.GET(handler.CreateThumbnailURLPattern(), browse.ThumbnailHandler)
-	router.GET(handler.CreateSetFavoriteURLPattern(), view.SetFavoriteHandler)
-	router.GET(handler.CreateDownloadURLPattern(), view.Download)
-	router.GET(handler.CreateRescanURLPattern(), handler.RescanLibraryHandler)
-	router.GET(handler.CreateSetTagFavoriteURLPattern(), handlertag.SetFavoriteHandler)
-	router.GET(handler.CreateTagListURLPattern(), handlertag.TagListHandler)
-	router.GET(handler.CreateTagThumbnailURLPattern(), handlertag.ThumbnailHandler)
-
-	router.ServeFiles(handler.CreateURL(pathStatic, "*filepath"), http.Dir("static"))
+	router.POST(pathBrowse, browse.Handler)
+	router.GET(pathView, view.Handler)
+	router.GET(pathGetImage, handler.GetImage)
+	router.GET(pathUpdateCover, view.UpdateCover)
+	router.GET(pathThumbnail, browse.ThumbnailHandler)
+	router.GET(pathFavorite, view.SetFavoriteHandler)
+	router.GET(pathDownload, view.Download)
+	router.GET(pathRescanLibrary, handler.RescanLibraryHandler)
+	router.GET(pathTagFavorite, handlertag.SetFavoriteHandler)
+	router.GET(pathTagList, handlertag.TagListHandler)
+	router.GET(pathTagThumb, handlertag.ThumbnailHandler)
 }
 
 func printBanner() {

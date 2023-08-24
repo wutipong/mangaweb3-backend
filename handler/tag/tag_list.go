@@ -75,7 +75,7 @@ func TagListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 
 	allTags, err := tag.ReadAll(r.Context())
 	if err != nil {
-		handler.WriteError(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
@@ -89,5 +89,5 @@ func TagListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		BrowseURL:  handler.CreateBrowseURL(""),
 	}
 
-	handler.WriteJson(w, data)
+	handler.WriteResponse(w, data)
 }

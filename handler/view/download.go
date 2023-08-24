@@ -21,20 +21,20 @@ func Download(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {
-		handler.WriteError(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
 	reader, err := m.Open()
 	if err != nil {
-		handler.WriteError(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 	defer reader.Close()
 
 	bytes, err := io.ReadAll(reader)
 	if err != nil {
-		handler.WriteError(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 

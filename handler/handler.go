@@ -5,8 +5,6 @@ var options Options
 type Options struct {
 	VersionString string
 
-	PathPrefix        string
-	PathRoot          string
 	PathBrowse        string
 	PathView          string
 	PathStatic        string

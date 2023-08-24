@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"github.com/stretchr/testify/suite"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
 type URLTestSuite struct {
@@ -13,7 +14,6 @@ type URLTestSuite struct {
 
 func (suite *URLTestSuite) SetupSuite() {
 	Init(Options{
-		PathRoot:          "/",
 		PathBrowse:        "/browse",
 		PathView:          "/view",
 		PathStatic:        "/static",

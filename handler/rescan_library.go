@@ -21,5 +21,5 @@ func RescanLibraryHandler(w http.ResponseWriter, r *http.Request, params httprou
 		Result: true,
 	}
 
-	WriteJson(w, response)
+	WriteResponse(w, response)
 }

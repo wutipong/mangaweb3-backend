@@ -103,7 +103,7 @@ func createDefaultBrowseRequest() browseRequest {
 func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
-		handler.WriteError(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
@@ -111,7 +111,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	if len(reqBody) != 0 {
 		err = json.Unmarshal(reqBody, &req)
 		if err != nil {
-			handler.WriteError(w, err)
+			handler.WriteResponse(w, err)
 			return
 		}
 	}
@@ -147,19 +147,19 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	allMeta, err := meta.Search(r.Context(), searchCriteria, sort, order, ItemPerPage, page)
 	if err != nil {
-		handler.WriteError(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
 	items, err := createItems(allMeta)
 	if err != nil {
-		handler.WriteError(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
 	count, err := meta.Count(r.Context(), searchCriteria)
 	if err != nil {
-		handler.WriteError(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
@@ -200,7 +200,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 		tagObj, err := tag.Read(r.Context(), tagStr)
 		if err != nil {
-			handler.WriteError(w, err)
+			handler.WriteResponse(w, err)
 			return
 		}
 
@@ -208,7 +208,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		data.SetTagFavoriteURL = handler.CreateSetTagFavoriteURL(tagStr)
 	}
 
-	handler.WriteJson(w, data)
+	handler.WriteResponse(w, data)
 }
 
 func createPageItems(current int, count int, baseUrl *url.URL) []pageItem {

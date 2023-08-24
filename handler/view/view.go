@@ -49,13 +49,13 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {
-		handler.WriteError(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
 	pages, err := ListPages(m)
 	if err != nil {
-		handler.WriteError(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
@@ -91,7 +91,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		t, err := tag.Read(r.Context(), tagStr)
 		if err != nil {
 			log.Get().Sugar().Fatal(err)
-			handler.WriteError(w, err)
+			handler.WriteResponse(w, err)
 			return
 		}
 
@@ -119,7 +119,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		SetFavoriteURL:   handler.CreateSetFavoriteURL(item),
 	}
 
-	handler.WriteJson(w, data)
+	handler.WriteResponse(w, data)
 }
 
 func createDownloadImageURLs(file string, pages []Page) []string {

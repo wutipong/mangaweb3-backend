@@ -24,12 +24,12 @@ func ThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.
 		m, _ = meta.NewItem(item)
 		err = meta.Write(r.Context(), m)
 		if err != nil {
-			handler.WriteError(w, err)
+			handler.WriteResponse(w, err)
 			return
 		}
 
 	} else if err != nil {
-		handler.WriteError(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 

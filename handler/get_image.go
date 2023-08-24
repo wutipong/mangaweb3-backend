@@ -46,12 +46,12 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {
-		WriteError(w, err)
+		WriteResponse(w, err)
 		return
 	}
 	data, f, err := OpenZipEntry(m, index)
 	if err != nil {
-		WriteError(w, err)
+		WriteResponse(w, err)
 		return
 	}
 
@@ -77,7 +77,7 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 
 	img, err := imaging.Decode(reader, imaging.AutoOrientation(true))
 	if err != nil {
-		WriteError(w, err)
+		WriteResponse(w, err)
 		return
 	}
 
@@ -90,7 +90,7 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 	err = imaging.Encode(w, img, imaging.JPEG)
 
 	if err != nil {
-		WriteError(w, err)
+		WriteResponse(w, err)
 		return
 	}
 

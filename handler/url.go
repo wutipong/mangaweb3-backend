@@ -18,9 +18,7 @@ func CreateFilePathURL(p string) string {
 }
 
 func CreateURL(p ...string) string {
-	args := append([]string{options.PathPrefix}, p...)
-
-	return path.Join(args...)
+	return path.Join(p...)
 }
 
 func CreateViewURL(filepath string) string {
@@ -102,8 +100,4 @@ func CreateTagThumbnailURL(filepath string) string {
 	urlStr = CreateURL(options.PathTagThumbnail, urlStr)
 
 	return urlStr
-}
-
-func CreateRootURL() string {
-	return CreateURL(options.PathRoot)
 }

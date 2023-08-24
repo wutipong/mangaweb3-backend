@@ -26,7 +26,7 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 
 	m, err := tag.Read(r.Context(), tagStr)
 	if err != nil {
-		handler.WriteJson(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
@@ -41,5 +41,5 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 		Favorite: m.Favorite,
 	}
 
-	handler.WriteJson(w, response)
+	handler.WriteResponse(w, response)
 }

@@ -29,7 +29,7 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {
-		handler.WriteJson(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
@@ -37,15 +37,15 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 
 	err = m.GenerateThumbnail(entryIndex)
 	if err != nil {
-		handler.WriteJson(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
 	err = meta.Write(r.Context(), m)
 	if err != nil {
-		handler.WriteJson(w, err)
+		handler.WriteResponse(w, err)
 		return
 	}
 
-	handler.WriteJson(w, "success")
+	handler.WriteResponse(w, "success")
 }
