@@ -1,10 +1,10 @@
 package view
 
 import (
+	"encoding/json"
 	_ "image/png"
+	"io"
 	"net/http"
-	"path/filepath"
-	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/wutipong/mangaweb3-backend/handler"
@@ -13,17 +13,27 @@ import (
 	"go.uber.org/zap"
 )
 
+type updateCoverRequest struct {
+	Name  string `json:"name"`
+	Index int    `json:"index"`
+}
+
+type updateCoverResponse struct {
+	Request updateCoverRequest `json:"request"`
+	Success bool               `json:"success"`
+}
+
 // UpdateCover a handler to update the cover to specific image
 func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	item := handler.ParseParam(params, "item")
-	item = filepath.FromSlash(item)
-
-	query := r.URL.Query()
-
-	var index = 0
-	if i, err := strconv.Atoi(query.Get("i")); err == nil {
-		index = i
+	req := updateCoverRequest{}
+	if reqBody, err := io.ReadAll(r.Body); err != nil {
+		handler.WriteResponse(w, err)
+	} else {
+		json.Unmarshal(reqBody, &req)
 	}
+
+	item := req.Name
+	index := req.Index
 
 	log.Get().Info("Update Cover", zap.String("item_name", item), zap.Int("index", index))
 
@@ -47,5 +57,8 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		return
 	}
 
-	handler.WriteResponse(w, "success")
+	handler.WriteResponse(w, updateCoverResponse{
+		Request: req,
+		Success: true,
+	})
 }

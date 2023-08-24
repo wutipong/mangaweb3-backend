@@ -122,7 +122,7 @@ func RegisterHandler(router *httprouter.Router) {
 	router.POST(pathBrowse, browse.Handler)
 	router.POST(pathView, view.Handler)
 	router.GET(pathGetImage, handler.GetImage)
-	router.GET(pathUpdateCover, view.UpdateCover)
+	router.POST(pathUpdateCover, view.UpdateCover)
 	router.GET(pathThumbnail, browse.ThumbnailHandler)
 	router.GET(pathFavorite, view.SetFavoriteHandler)
 	router.GET(pathDownload, view.Download)
