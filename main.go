@@ -122,7 +122,7 @@ func RegisterHandler(router *httprouter.Router) {
 	})
 	// Routes
 	router.POST(pathBrowse, browse.Handler)
-	router.GET(pathView, view.Handler)
+	router.POST(pathView, view.Handler)
 	router.GET(pathGetImage, handler.GetImage)
 	router.GET(pathUpdateCover, view.UpdateCover)
 	router.GET(pathThumbnail, browse.ThumbnailHandler)

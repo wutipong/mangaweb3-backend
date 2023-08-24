@@ -1,11 +1,12 @@
 package view
 
 import (
+	"encoding/json"
 	"fmt"
 	"hash/fnv"
+	"io"
 	"net/http"
 	"net/url"
-	"path/filepath"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
@@ -22,7 +23,12 @@ const (
 	maxPageHeight = 1600
 )
 
+type viewRequest struct {
+	Path string `json:"path"`
+}
+
 type viewData struct {
+	Request          viewRequest `json:"request"`
 	Name             string
 	Title            string
 	Version          string
@@ -42,10 +48,16 @@ type tagData struct {
 }
 
 func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	item := handler.ParseParam(params, "item")
-	item = filepath.FromSlash(item)
+	req := viewRequest{}
 
-	query := r.URL.Query()
+	if reqBody, err := io.ReadAll(r.Body); err != nil {
+		handler.WriteResponse(w, err)
+		return
+	} else {
+		json.Unmarshal(reqBody, &req)
+	}
+
+	item := req.Path
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {
@@ -62,13 +74,6 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	hash := fnv.New64()
 	hash.Write([]byte(item))
 	id := hash.Sum64()
-
-	if fav, e := strconv.ParseBool(query.Get("favorite")); e == nil {
-		if fav != m.Favorite {
-			m.Favorite = fav
-			meta.Write(r.Context(), m)
-		}
-	}
 
 	if !m.IsRead {
 		m.IsRead = true
@@ -106,6 +111,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Get().Info("View Item", zap.String("item_name", item))
 
 	data := viewData{
+		Request:          req,
 		Name:             item,
 		Title:            fmt.Sprintf("Manga - Viewing [%s]", item),
 		Version:          handler.CreateVersionString(),

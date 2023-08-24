@@ -51,13 +51,11 @@ type browseData struct {
 }
 
 type item struct {
-	ID           uint64
-	Name         string
-	CreateTime   time.Time
-	ViewURL      string
-	ThumbnailURL string
-	Favorite     bool
-	IsRead       bool
+	ID         uint64
+	Name       string
+	CreateTime time.Time
+	Favorite   bool
+	IsRead     bool
 }
 
 type pageItem struct {
@@ -77,13 +75,11 @@ func createItems(allMeta []meta.Meta) (allItems []item, err error) {
 		id := hash.Sum64()
 
 		allItems[i] = item{
-			ID:           id,
-			Name:         m.Name,
-			CreateTime:   m.CreateTime,
-			Favorite:     m.Favorite,
-			IsRead:       m.IsRead,
-			ThumbnailURL: handler.CreateThumbnailURL(m.Name),
-			ViewURL:      handler.CreateViewURL(m.Name),
+			ID:         id,
+			Name:       m.Name,
+			CreateTime: m.CreateTime,
+			Favorite:   m.Favorite,
+			IsRead:     m.IsRead,
 		}
 	}
 	return

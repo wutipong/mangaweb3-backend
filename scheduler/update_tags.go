@@ -9,7 +9,6 @@ import (
 )
 
 func UpdateTags() error {
-
 	allMeta, err := meta.ReadAll(context.Background())
 	if err != nil {
 		return err

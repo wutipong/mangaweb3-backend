@@ -40,14 +40,6 @@ func (suite *URLTestSuite) TestCreateURLTwoParam() {
 	suite.Assert().Equal(u, "/browse/abcdefg")
 }
 
-func (suite *URLTestSuite) TestCreateViewURL() {
-	u := CreateViewURL(suite.FilePath)
-
-	suite.Assert().Equal(
-		"/view/%E5%90%8C%E4%BA%BA%E3%83%9E%E3%83%B3%E3%82%AC/%E3%82%A8%E3%83%AD%E3%81%84%E3%81%BE%E3%82%93%E3%81%8C.zip",
-		u)
-}
-
 func (suite *URLTestSuite) TestCreateRescanURL() {
 	u := CreateRescanURL()
 	suite.Assert().Equal("/rescan_library", u)
@@ -80,14 +72,6 @@ func (suite *URLTestSuite) TestCreateSetFavoriteURL() {
 	u := CreateSetFavoriteURL(suite.FilePath)
 	suite.Assert().Equal(
 		"/favorite/%E5%90%8C%E4%BA%BA%E3%83%9E%E3%83%B3%E3%82%AC/%E3%82%A8%E3%83%AD%E3%81%84%E3%81%BE%E3%82%93%E3%81%8C.zip",
-		u,
-	)
-}
-
-func (suite *URLTestSuite) TestCreateThumbnailURL() {
-	u := CreateThumbnailURL(suite.FilePath)
-	suite.Assert().Equal(
-		"/thumbnail/%E5%90%8C%E4%BA%BA%E3%83%9E%E3%83%B3%E3%82%AC/%E3%82%A8%E3%83%AD%E3%81%84%E3%81%BE%E3%82%93%E3%81%8C.zip",
 		u,
 	)
 }
