@@ -8,8 +8,8 @@ var ErrUnknown = New(0, "unknown error.")
 var ErrNotImplemented = New(1, "not implemented.")
 
 type Error struct {
-	Code    uint   `json:"code"`
-	Message string `json:"message"`
+	Code    uint   `json:"code" example:"0"`
+	Message string `json:"message" example:"unknown error."`
 	Cause   error  `json:"cause"`
 }
 

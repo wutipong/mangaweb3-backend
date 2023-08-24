@@ -445,10 +445,12 @@ const docTemplate = `{
             "properties": {
                 "cause": {},
                 "code": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 0
                 },
                 "message": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "unknown error."
                 }
             }
         },

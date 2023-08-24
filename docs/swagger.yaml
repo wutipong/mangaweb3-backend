@@ -59,8 +59,10 @@ definitions:
     properties:
       cause: {}
       code:
+        example: 0
         type: integer
       message:
+        example: unknown error.
         type: string
     type: object
   handler.rescanLibraryResponse:
