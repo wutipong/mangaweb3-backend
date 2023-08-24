@@ -14,11 +14,6 @@ import (
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
-const (
-	maxPageWidth  = 1600
-	maxPageHeight = 1600
-)
-
 type viewRequest struct {
 	Path string `json:"path"`
 }
