@@ -1,7 +1,7 @@
 mangaweb.exe
 .vscode/launch.json
 mangaweb
-__debug_bin
+__debug_bin*
 node_modules
 .parcel-cache
 data-private
