@@ -15,14 +15,14 @@ import (
 )
 
 const (
-	ItemPerPage = 30
-	PathBrowse  = "/browse"
+	PathBrowse = "/browse"
 )
 
 type browseRequest struct {
 	Tag          string         `json:"tag"`
 	FavoriteOnly bool           `json:"favorite_only"`
 	Page         int            `json:"page"`
+	ItemPerPage  int            `json:"item_per_page"`
 	Search       string         `json:"search"`
 	Sort         meta.SortField `json:"sort"`
 	Order        meta.SortOrder `json:"order"`
@@ -31,6 +31,7 @@ type browseRequest struct {
 type browseResponse struct {
 	Request     browseRequest `json:"request"`
 	TagFavorite bool          `json:"tag_favorite"`
+	TotalPage   int           `json:"total_page"`
 	Items       []item        `json:"items"`
 	Pages       []pageItem    `json:"pages"`
 }
@@ -78,6 +79,7 @@ func createDefaultBrowseRequest() browseRequest {
 		Search:       "",
 		Sort:         meta.SortFieldCreateTime,
 		Order:        meta.SortOrderDescending,
+		ItemPerPage:  30,
 	}
 }
 
@@ -122,7 +124,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	sort := req.Sort
 	order := req.Order
 
-	allMeta, err := meta.Search(r.Context(), searchCriteria, sort, order, ItemPerPage, page)
+	allMeta, err := meta.Search(r.Context(), searchCriteria, sort, order, req.ItemPerPage, page)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -140,8 +142,8 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	pageCount := int(count / ItemPerPage)
-	if count%ItemPerPage > 0 {
+	pageCount := int(count / int64(req.ItemPerPage))
+	if count%int64(req.ItemPerPage) > 0 {
 		pageCount++
 	}
 
@@ -154,9 +156,10 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		Msg("Browse")
 
 	data := browseResponse{
-		Request: req,
-		Items:   items,
-		Pages:   createPageItems(page, pageCount, r.URL),
+		Request:   req,
+		Items:     items,
+		Pages:     createPageItems(page, pageCount, r.URL),
+		TotalPage: pageCount,
 	}
 
 	if tagStr != "" {

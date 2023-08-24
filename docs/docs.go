@@ -360,6 +360,9 @@ const docTemplate = `{
                 "favorite_only": {
                     "type": "boolean"
                 },
+                "item_per_page": {
+                    "type": "integer"
+                },
                 "order": {
                     "$ref": "#/definitions/meta.SortOrder"
                 },
@@ -397,6 +400,9 @@ const docTemplate = `{
                 },
                 "tag_favorite": {
                     "type": "boolean"
+                },
+                "total_page": {
+                    "type": "integer"
                 }
             }
         },

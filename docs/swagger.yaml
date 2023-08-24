@@ -3,6 +3,8 @@ definitions:
     properties:
       favorite_only:
         type: boolean
+      item_per_page:
+        type: integer
       order:
         $ref: '#/definitions/meta.SortOrder'
       page:
@@ -28,6 +30,8 @@ definitions:
         $ref: '#/definitions/browse.browseRequest'
       tag_favorite:
         type: boolean
+      total_page:
+        type: integer
     type: object
   browse.item:
     properties:
