@@ -7,7 +7,6 @@ type Options struct {
 
 	PathBrowse        string
 	PathView          string
-	PathStatic        string
 	PathGetImage      string
 	PathUpdateCover   string
 	PathThumbnail     string

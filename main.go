@@ -36,7 +36,6 @@ var versionString string = "development"
 const (
 	pathBrowse        = "/browse"
 	pathView          = "/view"
-	pathStatic        = "/static"
 	pathGetImage      = "/get_image"
 	pathUpdateCover   = "/update_cover"
 	pathThumbnail     = "/thumbnail"
@@ -109,7 +108,6 @@ func RegisterHandler(router *httprouter.Router) {
 		VersionString:     versionString,
 		PathBrowse:        pathBrowse,
 		PathView:          pathView,
-		PathStatic:        pathStatic,
 		PathGetImage:      pathGetImage,
 		PathUpdateCover:   pathUpdateCover,
 		PathThumbnail:     pathThumbnail,

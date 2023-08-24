@@ -16,7 +16,6 @@ func (suite *URLTestSuite) SetupSuite() {
 	Init(Options{
 		PathBrowse:        "/browse",
 		PathView:          "/view",
-		PathStatic:        "/static",
 		PathGetImage:      "/get_image",
 		PathUpdateCover:   "/update_cover",
 		PathThumbnail:     "/thumbnail",
