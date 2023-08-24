@@ -18,19 +18,14 @@ const (
 )
 
 type PageData struct {
-	Title      string
-	Version    string
-	BrowseURL  string
-	TagListURL string
-	Tags       []ItemData
+	Version string
+	Tags    []ItemData
 }
 
 type ItemData struct {
-	ID           uint64
-	Name         string
-	Favorite     bool
-	URL          string
-	ThumbnailURL string
+	ID       uint64
+	Name     string
+	Favorite bool
 }
 
 func createItems(allTags []tag.Tag, favoriteOnly bool) []ItemData {
@@ -48,11 +43,9 @@ func createItems(allTags []tag.Tag, favoriteOnly bool) []ItemData {
 			id := hash.Sum64()
 
 			allItems[i] = ItemData{
-				ID:           id,
-				Name:         t.Name,
-				Favorite:     t.Favorite,
-				URL:          handler.CreateBrowseTagURL(t.Name),
-				ThumbnailURL: handler.CreateTagThumbnailURL(t.Name),
+				ID:       id,
+				Name:     t.Name,
+				Favorite: t.Favorite,
 			}
 		}
 	}
@@ -82,11 +75,8 @@ func TagListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 	tagData := createItems(allTags, favOnly)
 
 	data := PageData{
-		Title:      "Tag list",
-		Version:    handler.CreateVersionString(),
-		Tags:       tagData,
-		TagListURL: handler.CreateTagListURL(),
-		BrowseURL:  handler.CreateBrowseURL(""),
+		Version: handler.CreateVersionString(),
+		Tags:    tagData,
 	}
 
 	handler.WriteResponse(w, data)
