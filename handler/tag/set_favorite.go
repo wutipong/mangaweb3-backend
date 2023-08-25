@@ -31,7 +31,7 @@ const (
 // @Router /tag/set_favorite [post]
 func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	req := setFavoriteRequest{}
-	if err := handler.ParseInput(r.Body, req); err != nil {
+	if err := handler.ParseInput(r.Body, &req); err != nil {
 		handler.WriteResponse(w, err)
 	}
 

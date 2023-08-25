@@ -33,8 +33,6 @@ var versionString string = "development"
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-
 	if err := godotenv.Load(); err != nil {
 		log.Error().
 			AnErr("error", err).
@@ -55,6 +53,11 @@ func main() {
 	connectionStr := "postgres://postgres:password@localhost:5432/manga"
 	if v, b := os.LookupEnv("MANGAWEB_DB"); b {
 		connectionStr = v
+	}
+
+	if _, b := os.LookupEnv("MANGAWEB_DEVELOPMENT"); b {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).
+			Level(zerolog.DebugLevel)
 	}
 
 	meta.BaseDirectory = dataPath
