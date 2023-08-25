@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
-
 	"net/http"
 	"os"
 
@@ -24,15 +22,6 @@ import (
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
 
-func setupFlag(flagName, defValue, variable, description string) *string {
-	varValue := os.Getenv(variable)
-	if varValue != "" {
-		defValue = varValue
-	}
-
-	return flag.String(flagName, defValue, description)
-}
-
 var versionString string = "development"
 
 //go:generate swag init
@@ -47,30 +36,37 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	if err := godotenv.Load(); err != nil {
-		log.Info().Msg("Use .env file.")
+		log.Error().
+			AnErr("error", err).
+			Msg("Use .env file.")
+
+		return
 	}
 
-	address := setupFlag("address", ":8972", "MANGAWEB_ADDRESS", "The server address")
-	dataPath := setupFlag("data", "./data", "MANGAWEB_DATA_PATH", "Manga source path")
-	connectionStr := setupFlag(
-		"database",
-		"postgres://postgres:password@localhost:5432/manga",
-		"MANGAWEB_DB",
-		"Specify the database connection string",
-	)
+	address := ":8972"
+	if v, b := os.LookupEnv("MANGAWEB_ADDRESS"); b {
+		address = v
+	}
 
-	flag.Parse()
+	dataPath := "./data"
+	if v, b := os.LookupEnv("MANGAWEB_DATA_PATH"); b {
+		dataPath = v
+	}
+	connectionStr := "postgres://postgres:password@localhost:5432/manga"
+	if v, b := os.LookupEnv("MANGAWEB_DB"); b {
+		connectionStr = v
+	}
 
-	meta.BaseDirectory = *dataPath
+	meta.BaseDirectory = dataPath
 
 	log.Info().
 		Str("version", versionString).
-		Str("data_path", *dataPath).
-		Str("address", *address).
+		Str("data_path", dataPath).
+		Str("address", address).
 		Msg("Server started.")
 
 	router := httprouter.New()
-	conn, err := pgxpool.New(context.Background(), *connectionStr)
+	conn, err := pgxpool.New(context.Background(), connectionStr)
 	if err != nil {
 		log.Error().AnErr("error", err).Msg("Connect to Postgres fails")
 
@@ -88,7 +84,7 @@ func main() {
 	scheduler.Start()
 
 	log.Info().Msg("Server starts.")
-	if err = http.ListenAndServe(*address, router); err != nil {
+	if err = http.ListenAndServe(address, router); err != nil {
 		log.Error().AnErr("error", err).Msg("Starting server fails")
 		return
 	}
