@@ -118,7 +118,7 @@ func RegisterHandler(router *httprouter.Router) {
 	router.GET(view.PathDownload, view.Download)
 	router.GET(browse.PathRescanLibrary, browse.RescanLibraryHandler)
 	router.POST(handlertag.PathSetFavorite, handlertag.SetFavoriteHandler)
-	router.GET(handlertag.PathList, handlertag.ListHandler)
+	router.POST(handlertag.PathList, handlertag.ListHandler)
 	router.GET(handlertag.PathThumbnail, handlertag.ThumbnailHandler)
 
 	router.GET("/doc/:any", swaggerHandler)
