@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 
+	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -87,7 +88,9 @@ func main() {
 	scheduler.Start()
 
 	log.Info().Msg("Server starts.")
-	if err = http.ListenAndServe(address, router); err != nil {
+
+	handler := cors.Default().Handler(router)
+	if err = http.ListenAndServe(address, handler); err != nil {
 		log.Error().AnErr("error", err).Msg("Starting server fails")
 		return
 	}
