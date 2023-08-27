@@ -56,7 +56,7 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		return
 	}
 
-	_, err = meta.Write(r.Context(), m)
+	err = meta.Write(r.Context(), m)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

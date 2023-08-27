@@ -18,8 +18,8 @@ func IsItemExist(ctx context.Context, name string) bool {
 
 	return count > 0
 }
-func Write(ctx context.Context, i *ent.Meta) (m *ent.Meta, err error) {
-	m, err = client.Meta.Create().
+func Write(ctx context.Context, i *ent.Meta) error {
+	return client.Meta.Create().
 		SetName(i.Name).
 		SetCreateTime(i.CreateTime).
 		SetFavorite(i.Favorite).
@@ -27,9 +27,8 @@ func Write(ctx context.Context, i *ent.Meta) (m *ent.Meta, err error) {
 		SetThumbnail(i.Thumbnail).
 		SetRead(i.Read).
 		SetTags(i.Tags).
-		Save(ctx)
-
-	return
+		OnConflict(sql.ConflictColumns(meta.FieldName)).
+		UpdateNewValues().Exec(ctx)
 }
 
 func Delete(ctx context.Context, i *ent.Meta) error {

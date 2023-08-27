@@ -29,7 +29,7 @@ func GetThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprout
 	m, err := meta.Read(r.Context(), item)
 	if errors.Is(err, sql.ErrNoRows) {
 		m, _ = meta.NewItem(item)
-		_, err = meta.Write(r.Context(), m)
+		err = meta.Write(r.Context(), m)
 		if err != nil {
 			handler.WriteResponse(w, err)
 			return
