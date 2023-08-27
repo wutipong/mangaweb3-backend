@@ -11,6 +11,7 @@ require (
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/julienschmidt/httprouter v1.3.0
+	github.com/rs/cors v1.9.0
 	github.com/rs/zerolog v1.30.0
 	github.com/swaggo/swag v1.16.1
 	golang.org/x/image v0.8.0
@@ -31,7 +32,6 @@ require (
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rs/cors v1.9.0 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
