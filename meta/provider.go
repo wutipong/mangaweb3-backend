@@ -52,7 +52,25 @@ func Search(ctx context.Context,
 
 	predicates := populatePredicates(criteria, []predicate.Meta{})
 
-	return client.Meta.Query().Where(predicates...).Limit(pageSize).Offset(pageSize * page).All(ctx)
+	var orderTerm sql.OrderTermOption
+
+	switch order {
+	case SortOrderAscending:
+		orderTerm = sql.OrderAsc()
+	case SortOrderDescending:
+		orderTerm = sql.OrderDesc()
+	}
+
+	var orderOption meta.OrderOption
+	switch sort {
+	case SortFieldName:
+		orderOption = meta.ByName(orderTerm)
+
+	case SortFieldCreateTime:
+		orderOption = meta.ByCreateTime(orderTerm)
+	}
+
+	return client.Meta.Query().Where(predicates...).Limit(pageSize).Offset(pageSize * page).Order(orderOption).All(ctx)
 }
 
 func populatePredicates(criteria []SearchCriteria, predicates []predicate.Meta) []predicate.Meta {
