@@ -7,6 +7,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
 
 	"github.com/wutipong/mangaweb3-backend/tag"
@@ -31,7 +32,7 @@ type tagData struct {
 	Favorite bool   `json:"favorite"`
 }
 
-func createItems(allTags []tag.Tag, favoriteOnly bool) []tagData {
+func createItems(allTags []*ent.Tag, favoriteOnly bool) []tagData {
 	allItems := make([]tagData, len(allTags))
 
 	for i, t := range allTags {

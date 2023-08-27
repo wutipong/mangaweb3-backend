@@ -14,7 +14,7 @@ func RebuildThumbnail() error {
 	}
 
 	for _, m := range allMeta {
-		e := m.GenerateThumbnail(0)
+		e := meta.GenerateThumbnail(m, 0)
 		log.Info().Str("Generating new thumbnail for", m.Name)
 		if e != nil {
 			log.Error().Str("item", m.Name).AnErr("error", e).Msg("Fails to create thumbnail.")

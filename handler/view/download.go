@@ -31,7 +31,7 @@ func Download(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 		return
 	}
 
-	reader, err := m.Open()
+	reader, err := meta.Open(m)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

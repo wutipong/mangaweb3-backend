@@ -2,18 +2,21 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 	"os"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
-
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	_ "github.com/wutipong/mangaweb3-backend/docs"
+	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/handler/browse"
 	handlertag "github.com/wutipong/mangaweb3-backend/handler/tag"
@@ -25,7 +28,7 @@ import (
 
 var versionString string = "development"
 
-//go:generate swag init
+//go:generate go run -mod=mod github.com/swaggo/swag/cmd/swag@latest init
 
 // @title           Mangaweb3 API
 // @version         3.0
@@ -34,12 +37,8 @@ var versionString string = "development"
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Error().
-			AnErr("error", err).
-			Msg("Use .env file.")
-
-		return
+	if err := godotenv.Overload(); err == nil {
+		log.Info().Msg("Use .env file.")
 	}
 
 	address := ":8972"
@@ -69,28 +68,36 @@ func main() {
 		Str("address", address).
 		Msg("Server started.")
 
-	router := httprouter.New()
-	conn, err := pgxpool.New(context.Background(), connectionStr)
-	if err != nil {
+	var client *ent.Client = nil
+	if db, err := sql.Open("pgx", connectionStr); err != nil {
 		log.Error().AnErr("error", err).Msg("Connect to Postgres fails")
+		return
+	} else {
+		drv := entsql.OpenDB(dialect.Postgres, db)
+		defer db.Close()
 
+		client = ent.NewClient(ent.Driver(drv))
+		defer client.Close()
+	}
+
+	if err := client.Schema.Create(context.Background()); err != nil {
+		log.Error().AnErr("error", err).Msg("failed creating schema resources.")
 		return
 	}
 
-	defer conn.Close()
-
-	tag.Init(conn)
-	meta.Init(conn)
+	meta.Init(client)
+	tag.Init(client)
 
 	scheduler.Init(scheduler.Options{})
-
-	RegisterHandler(router)
 	scheduler.Start()
+
+	router := httprouter.New()
+	RegisterHandler(router)
 
 	log.Info().Msg("Server starts.")
 
 	handler := cors.Default().Handler(router)
-	if err = http.ListenAndServe(address, handler); err != nil {
+	if err := http.ListenAndServe(address, handler); err != nil {
 		log.Error().AnErr("error", err).Msg("Starting server fails")
 		return
 	}

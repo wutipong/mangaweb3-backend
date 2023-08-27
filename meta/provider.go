@@ -2,209 +2,76 @@ package meta
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/wutipong/mangaweb3-backend/ent"
+	"github.com/wutipong/mangaweb3-backend/ent/meta"
+	"github.com/wutipong/mangaweb3-backend/ent/predicate"
 )
 
-var pool *pgxpool.Pool
-
-func Init(p *pgxpool.Pool) {
-	pool = p
-}
-
 func IsItemExist(ctx context.Context, name string) bool {
-	r := pool.QueryRow(
-		ctx,
-		`select exists (select 1 from items where name = $1)`,
-		name,
-	)
-
-	exists := false
-	r.Scan(&exists)
-
-	return exists
-}
-func Write(ctx context.Context, i Meta) error {
-	_, err := pool.Exec(
-		ctx,
-		`INSERT INTO manga.items(name, create_time, favorite, file_indices, thumbnail, is_read, tags)
-			VALUES ($1, $2, $3, $4, $5, $6, $7)
-			ON CONFLICT(name) DO UPDATE
-			SET create_time = $2, 
-				favorite = $3, 
-				file_indices = $4, 
-				thumbnail = $5, 
-				is_read = $6, 
-				tags = $7;`,
-		i.Name,
-		i.CreateTime,
-		i.Favorite,
-		i.FileIndices,
-		i.Thumbnail,
-		i.IsRead,
-		i.Tags,
-	)
-	return err
-}
-
-func Delete(ctx context.Context, i Meta) error {
-	_, err := pool.Exec(
-		ctx,
-		`DELETE FROM manga.items
-		WHERE name = $1`,
-		i.Name,
-	)
-	return err
-}
-
-func Read(ctx context.Context, name string) (i Meta, err error) {
-	r := pool.QueryRow(
-		ctx,
-		`SELECT name, create_time, favorite, file_indices, thumbnail, is_read, tags
-		FROM manga.items
-		WHERE name = $1`,
-		name,
-	)
-
-	err = r.Scan(
-		&i.Name,
-		&i.CreateTime,
-		&i.Favorite,
-		&i.FileIndices,
-		&i.Thumbnail,
-		&i.IsRead,
-		&i.Tags,
-	)
-
-	return
-}
-
-func ReadAll(ctx context.Context) (items []Meta, err error) {
-	rows, err := pool.Query(ctx,
-		`SELECT name, create_time, favorite, file_indices, thumbnail, is_read, tags
-		FROM manga.items;`)
-
+	count, err := client.Meta.Query().Where(meta.Name(name)).Count(ctx)
 	if err != nil {
-		return
+		return false
 	}
 
-	for rows.Next() {
-		var i Meta
-		rows.Scan(
-			&i.Name,
-			&i.CreateTime,
-			&i.Favorite,
-			&i.FileIndices,
-			&i.Thumbnail,
-			&i.IsRead,
-			&i.Tags)
-
-		items = append(items, i)
-	}
+	return count > 0
+}
+func Write(ctx context.Context, i *ent.Meta) (m *ent.Meta, err error) {
+	m, err = client.Meta.Create().
+		SetName(i.Name).
+		SetCreateTime(i.CreateTime).
+		SetFavorite(i.Favorite).
+		SetFileIndices(i.FileIndices).
+		SetThumbnail(i.Thumbnail).
+		SetRead(i.Read).
+		SetTags(i.Tags).
+		Save(ctx)
 
 	return
 }
-func Search(ctx context.Context, criteria []SearchCriteria, sort SortField, order SortOrder, pageSize int, page int) (items []Meta, err error) {
-	// TODO: sanitize the query.
-	criteriaStr := make([]string, 0)
+
+func Delete(ctx context.Context, i *ent.Meta) error {
+	return client.Meta.DeleteOne(i).Exec(ctx)
+}
+
+func Read(ctx context.Context, name string) (i *ent.Meta, err error) {
+	return client.Meta.Query().Where(meta.Name(name)).Only(ctx)
+}
+
+func ReadAll(ctx context.Context) (items []*ent.Meta, err error) {
+	return client.Meta.Query().All(ctx)
+}
+
+func Search(ctx context.Context,
+	criteria []SearchCriteria,
+	sort SortField,
+	order SortOrder,
+	pageSize int,
+	page int) (items []*ent.Meta, err error) {
+
+	predicates := populatePredicates(criteria, []predicate.Meta{})
+
+	return client.Meta.Query().Where(predicates...).Limit(pageSize).Offset(pageSize * page).All(ctx)
+
+}
+
+func populatePredicates(criteria []SearchCriteria, predicates []predicate.Meta) []predicate.Meta {
 	for _, c := range criteria {
 		switch c.Field {
 		case SearchFieldName:
-			criteriaStr = append(criteriaStr, fmt.Sprintf(`items.name LIKE '%%%s%%'`, c.Value.(string)))
-
+			predicates = append(predicates, meta.NameContains(c.Value.(string)))
 		case SearchFieldFavorite:
-			criteriaStr = append(criteriaStr, fmt.Sprintf(`items.favorite = %v`, c.Value.(bool)))
+			predicates = append(predicates, meta.Favorite(c.Value.(bool)))
 
 		case SearchFieldTag:
-			criteriaStr = append(criteriaStr, fmt.Sprintf(`items.tags @> ARRAY['%s']`, c.Value.(string)))
+			///TODO: Field tags is broken.
+			// predicates = append(predicates, meta. Favorite(c.Value.(bool)))
 		}
 	}
-
-	where := ""
-	if len(criteria) > 0 {
-		where = fmt.Sprintf(`WHERE %s `, strings.Join(criteriaStr, " AND "))
-	}
-
-	sortBy := ""
-	switch sort {
-	case SortFieldName:
-		sortBy = `ORDER BY name`
-	case SortFieldCreateTime:
-		sortBy = `ORDER BY create_time`
-	}
-
-	sortOrder := ""
-	switch order {
-	case SortOrderAscending:
-		sortOrder = "ASC"
-	case SortOrderDescending:
-		sortOrder = "DESC"
-
-	}
-
-	query := fmt.Sprintf(
-		`SELECT name, create_time, favorite, file_indices, thumbnail, is_read, tags
-		FROM manga.items
-		%s 
-		%s %s
-		LIMIT %d OFFSET %d;`,
-		where,
-		sortBy,
-		sortOrder,
-		pageSize,
-		pageSize*page,
-	)
-
-	rows, err := pool.Query(ctx, query)
-
-	if err != nil {
-		return
-	}
-
-	for rows.Next() {
-		var i Meta
-		rows.Scan(
-			&i.Name,
-			&i.CreateTime,
-			&i.Favorite,
-			&i.FileIndices,
-			&i.Thumbnail,
-			&i.IsRead,
-			&i.Tags)
-
-		items = append(items, i)
-	}
-
-	return
+	return predicates
 }
-func Count(ctx context.Context, criteria []SearchCriteria) (count int64, err error) {
-	// TODO: sanitize the query.
-	criteriaStr := make([]string, 0)
-	for _, c := range criteria {
-		switch c.Field {
-		case SearchFieldName:
-			criteriaStr = append(criteriaStr, fmt.Sprintf(`items.name LIKE '%%%s%%'`, c.Value.(string)))
+func Count(ctx context.Context, criteria []SearchCriteria) (count int, err error) {
+	predicates := populatePredicates(criteria, []predicate.Meta{})
 
-		case SearchFieldFavorite:
-			criteriaStr = append(criteriaStr, fmt.Sprintf(`items.favorite = %v`, c.Value.(bool)))
-
-		case SearchFieldTag:
-			criteriaStr = append(criteriaStr, fmt.Sprintf(`items.tags @> ARRAY['%s']`, c.Value.(string)))
-		}
-	}
-
-	where := ""
-	if len(criteria) > 0 {
-		where = fmt.Sprintf(`WHERE %s `, strings.Join(criteriaStr, " AND "))
-	}
-
-	r := pool.QueryRow(
-		ctx,
-		fmt.Sprintf(`select count (*) from manga.items %s;`, where),
-	)
-
-	r.Scan(&count)
-	return
+	return client.Meta.Query().Where(predicates...).Count(ctx)
 }

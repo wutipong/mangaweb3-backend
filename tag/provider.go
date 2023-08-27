@@ -3,91 +3,46 @@ package tag
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/wutipong/mangaweb3-backend/errors"
+	"entgo.io/ent/dialect/sql"
+	"github.com/wutipong/mangaweb3-backend/ent"
+	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
 
-var pool *pgxpool.Pool = nil
+var client *ent.Client
 
-func Init(p *pgxpool.Pool) {
-	pool = p
+func Init(c *ent.Client) {
+	client = c
 }
 
-func Delete(ctx context.Context, t Tag) error {
-	return errors.ErrNotImplemented
+func Delete(ctx context.Context, t ent.Tag) error {
+	return client.Tag.DeleteOne(&t).Exec(ctx)
 }
 
 func IsTagExist(ctx context.Context, name string) bool {
-	r := pool.QueryRow(
-		ctx,
-		`select exists (select 1 from tags where name = $1)`,
-		name,
-	)
-
-	exists := false
-	r.Scan(&exists)
-
-	return exists
-}
-
-func Read(ctx context.Context, name string) (t Tag, err error) {
-	r := pool.QueryRow(
-		ctx,
-		`SELECT name, favorite, hidden, thumbnail 
-			FROM manga.tags
-			where name = $1;`,
-		name,
-	)
-
-	err = r.Scan(
-		&t.Name,
-		&t.Favorite,
-		&t.Hidden,
-		&t.Thumbnail,
-	)
-
-	return
-}
-
-func ReadAll(ctx context.Context) (tags []Tag, err error) {
-	rows, err := pool.Query(
-		ctx,
-		`SELECT name, favorite, hidden, thumbnail
-			FROM manga.tags;`,
-	)
-
+	count, err := client.Tag.Query().Where(tag.Name(name)).Count(ctx)
 	if err != nil {
-		return
+		return false
 	}
 
-	for rows.Next() {
-		var t Tag
-		rows.Scan(
-			&t.Name,
-			&t.Favorite,
-			&t.Hidden,
-			&t.Thumbnail,
-		)
-
-		tags = append(tags, t)
-	}
-
-	return
+	return count > 0
 }
 
-func Write(ctx context.Context, t Tag) error {
-	_, err := pool.Exec(
-		ctx,
-		`INSERT INTO manga.tags(name, favorite, hidden, thumbnail)
-		VALUES ($1, $2, $3, $4)
-		ON CONFLICT(name) DO UPDATE
-			SET favorite = $2, 
-				hidden = $3,
-				thumbnail = $4;`,
-		t.Name,
-		t.Favorite,
-		t.Hidden,
-		t.Thumbnail,
-	)
-	return err
+func Read(ctx context.Context, name string) (t *ent.Tag, err error) {
+	return client.Tag.Query().Where(tag.Name(name)).Only(ctx)
+}
+
+func ReadAll(ctx context.Context) (tags []*ent.Tag, err error) {
+	return client.Tag.Query().All(ctx)
+
+}
+
+func Write(ctx context.Context, t *ent.Tag) error {
+	return client.Tag.Create().
+		SetName(t.Name).
+		SetHidden(t.Hidden).
+		SetFavorite(t.Favorite).
+		SetThumbnail(t.Thumbnail).
+		OnConflict(sql.ConflictColumns(tag.FieldName)).
+		UpdateNewValues().
+		Exec(ctx)
 }

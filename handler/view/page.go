@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"path/filepath"
 
+	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
@@ -12,7 +13,7 @@ type Page struct {
 	Name  string
 }
 
-func ListPages(m meta.Meta) (pages []Page, err error) {
+func ListPages(m *ent.Meta) (pages []Page, err error) {
 	if len(m.FileIndices) == 0 {
 		return
 	}

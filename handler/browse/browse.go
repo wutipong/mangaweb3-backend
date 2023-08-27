@@ -9,6 +9,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/tag"
@@ -52,7 +53,7 @@ type pageItem struct {
 	IsHiddenOnSmall bool   `json:"is_hidden_on_small"`
 }
 
-func createItems(allMeta []meta.Meta) (allItems []item, err error) {
+func createItems(allMeta []*ent.Meta) (allItems []item, err error) {
 	allItems = make([]item, len(allMeta))
 
 	for i, m := range allMeta {
@@ -65,7 +66,7 @@ func createItems(allMeta []meta.Meta) (allItems []item, err error) {
 			Name:       m.Name,
 			CreateTime: m.CreateTime,
 			Favorite:   m.Favorite,
-			IsRead:     m.IsRead,
+			IsRead:     m.Read,
 		}
 	}
 	return

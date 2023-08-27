@@ -50,13 +50,13 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 
 	entryIndex := m.FileIndices[req.Index]
 
-	err = m.GenerateThumbnail(entryIndex)
+	err = meta.GenerateThumbnail(m, entryIndex)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
 
-	err = meta.Write(r.Context(), m)
+	_, err = meta.Write(r.Context(), m)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

@@ -1,7 +1,6 @@
 package view
 
 import (
-	"hash/fnv"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -53,21 +52,19 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	hash := fnv.New64()
-	hash.Write([]byte(item))
-	id := hash.Sum64()
+	id := m.ID
 
-	if !m.IsRead {
-		m.IsRead = true
+	if !m.Read {
+		m.Read = true
 		meta.Write(r.Context(), m)
 	}
 
 	browseUrl := r.Referer()
 	if browseUrl == "" {
-		browseUrl = handler.CreateBrowseURL(strconv.FormatUint(id, 16))
+		browseUrl = handler.CreateBrowseURL(strconv.FormatInt(int64(id), 16))
 	} else {
 		if u, e := url.Parse(browseUrl); e == nil {
-			u.Fragment = strconv.FormatUint(id, 10)
+			u.Fragment = strconv.FormatInt(int64(id), 16)
 			browseUrl = u.String()
 		}
 	}

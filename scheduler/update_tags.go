@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
@@ -35,7 +36,7 @@ func UpdateTags() error {
 		allTagSet[t.Name] = true
 	}
 
-	findMetaWithTag := func(tag string) meta.Meta {
+	findMetaWithTag := func(tag string) *ent.Meta {
 		for _, m := range allMeta {
 			for _, t := range m.Tags {
 				if t == tag {
@@ -44,16 +45,20 @@ func UpdateTags() error {
 			}
 		}
 
-		return meta.Meta{}
+		return &ent.Meta{}
 	}
 
 	for tagStr := range tagSet {
 		if _, found := allTagSet[tagStr]; !found {
-			t := tag.NewTag(tagStr)
+			t := ent.Tag{
+				Name:     tagStr,
+				Favorite: false,
+				Hidden:   false,
+			}
 			m := findMetaWithTag(tagStr)
 			t.Thumbnail = m.Thumbnail
 
-			err = tag.Write(context.Background(), t)
+			err = tag.Write(context.Background(), &t)
 
 			if err != nil {
 				return err

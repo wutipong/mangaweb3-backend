@@ -15,6 +15,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 
@@ -109,7 +110,7 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 	w.Header().Set("Content-Type", "image/jpeg")
 }
 
-func OpenZipEntry(m meta.Meta, index int) (content []byte, filename string, err error) {
+func OpenZipEntry(m *ent.Meta, index int) (content []byte, filename string, err error) {
 	if len(m.FileIndices) == 0 {
 		err = fmt.Errorf("image file not found")
 	}

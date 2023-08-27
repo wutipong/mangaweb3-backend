@@ -14,49 +14,44 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/facette/natsort"
+	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/tag"
 
 	_ "golang.org/x/image/webp"
 )
 
-// Meta the metadata for each manga item.
-// Do not change the field type nor names. Add new field when necessary.
-// Also, when update the structure, if the new field is required, increment the CurrentVersion by one
-// and create a migration function.
-type Meta struct {
-	Name        string    `json:"name" db:"name" bson:"name"`
-	CreateTime  time.Time `json:"create_time" db:"create_time" bson:"create_time"`
-	Favorite    bool      `json:"favorite" db:"favorite" bson:"favorite"`
-	FileIndices []int     `json:"file_indices" bson:"file_indices"`
-	Thumbnail   []byte    `json:"thumbnail" db:"thumbnail" bson:"thumbnail"`
-	IsRead      bool      `json:"is_read" db:"read" bson:"is_read"`
-	Tags        []string  `json:"tags" db:"tags" bson:"tags"`
+var client *ent.Client
+
+func Init(c *ent.Client) {
+	client = c
 }
 
-// CurrentVersion the current version of `Meta` structure.
-const CurrentVersion = 0
-
-func NewItem(name string) (i Meta, err error) {
+func NewItem(name string) (i *ent.Meta, err error) {
 	createTime := time.Now()
 
 	if stat, e := fs.Stat(os.DirFS(BaseDirectory), name); e == nil {
 		createTime = stat.ModTime()
 	}
 
-	i = Meta{
+	i = &ent.Meta{
 		Name:       name,
 		CreateTime: createTime,
 		Favorite:   false,
 	}
 
-	i.GenerateImageIndices()
-	i.GenerateThumbnail(0)
-	i.PopulateTags()
+	if err = GenerateImageIndices(i); err != nil {
+		return
+	}
 
+	if err = GenerateThumbnail(i, 0); err != nil {
+		return
+	}
+
+	PopulateTags(i)
 	return
 }
 
-func (m *Meta) Open() (reader io.ReadCloser, err error) {
+func Open(m *ent.Meta) (reader io.ReadCloser, err error) {
 	mutex := new(sync.Mutex)
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -67,7 +62,7 @@ func (m *Meta) Open() (reader io.ReadCloser, err error) {
 	return
 }
 
-func (m *Meta) GenerateThumbnail(fileIndex int) error {
+func GenerateThumbnail(m *ent.Meta, fileIndex int) error {
 	mutex := new(sync.Mutex)
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -110,7 +105,7 @@ func (m *Meta) GenerateThumbnail(fileIndex int) error {
 	return nil
 }
 
-func (m *Meta) GenerateImageIndices() error {
+func GenerateImageIndices(m *ent.Meta) error {
 	mutex := new(sync.Mutex)
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -150,6 +145,6 @@ func (m *Meta) GenerateImageIndices() error {
 	return nil
 }
 
-func (m *Meta) PopulateTags() {
+func PopulateTags(m *ent.Meta) {
 	m.Tags = tag.ParseTag(m.Name)
 }
