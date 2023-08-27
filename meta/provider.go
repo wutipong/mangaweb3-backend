@@ -3,6 +3,8 @@ package meta
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
@@ -52,7 +54,6 @@ func Search(ctx context.Context,
 	predicates := populatePredicates(criteria, []predicate.Meta{})
 
 	return client.Meta.Query().Where(predicates...).Limit(pageSize).Offset(pageSize * page).All(ctx)
-
 }
 
 func populatePredicates(criteria []SearchCriteria, predicates []predicate.Meta) []predicate.Meta {
@@ -64,8 +65,9 @@ func populatePredicates(criteria []SearchCriteria, predicates []predicate.Meta) 
 			predicates = append(predicates, meta.Favorite(c.Value.(bool)))
 
 		case SearchFieldTag:
-			///TODO: Field tags is broken.
-			// predicates = append(predicates, meta. Favorite(c.Value.(bool)))
+			predicates = append(predicates, func(s *sql.Selector) {
+				s.Where(sqljson.ValueContains(meta.FieldTags, c.Value.(string)))
+			})
 		}
 	}
 	return predicates

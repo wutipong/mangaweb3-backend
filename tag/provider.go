@@ -28,12 +28,11 @@ func IsTagExist(ctx context.Context, name string) bool {
 }
 
 func Read(ctx context.Context, name string) (t *ent.Tag, err error) {
-	return client.Tag.Query().Where(tag.Name(name)).Only(ctx)
+	return client.Tag.Query().Where(tag.Name(name)).First(ctx)
 }
 
 func ReadAll(ctx context.Context) (tags []*ent.Tag, err error) {
 	return client.Tag.Query().All(ctx)
-
 }
 
 func Write(ctx context.Context, t *ent.Tag) error {
