@@ -585,9 +585,6 @@ const docTemplate = `{
         "view.viewResponse": {
             "type": "object",
             "properties": {
-                "browse_url": {
-                    "type": "string"
-                },
                 "favorite": {
                     "type": "boolean"
                 },

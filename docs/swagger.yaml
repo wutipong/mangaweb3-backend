@@ -150,8 +150,6 @@ definitions:
     type: object
   view.viewResponse:
     properties:
-      browse_url:
-        type: string
       favorite:
         type: boolean
       indices:
