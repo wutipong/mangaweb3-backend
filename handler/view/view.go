@@ -14,7 +14,7 @@ import (
 )
 
 type viewRequest struct {
-	Path string `json:"path"`
+	Name string `json:"name"`
 }
 
 type viewResponse struct {
@@ -44,7 +44,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	item := req.Path
+	item := req.Name
 
 	m, err := meta.Read(r.Context(), item)
 	if err != nil {

@@ -3,8 +3,6 @@ package browse
 import (
 	"hash/fnv"
 	"net/http"
-	"net/url"
-	"strconv"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -34,7 +32,6 @@ type browseResponse struct {
 	TagFavorite bool          `json:"tag_favorite"`
 	TotalPage   int           `json:"total_page"`
 	Items       []item        `json:"items"`
-	Pages       []pageItem    `json:"pages"`
 }
 
 type item struct {
@@ -43,14 +40,6 @@ type item struct {
 	CreateTime time.Time `json:"create_time"`
 	Favorite   bool      `json:"favorite"`
 	IsRead     bool      `json:"is_read"`
-}
-
-type pageItem struct {
-	Content         string `json:"content"`
-	LinkURL         string `json:"link_url"`
-	IsActive        bool   `json:"is_active"`
-	IsEnabled       bool   `json:"is_enabled"`
-	IsHiddenOnSmall bool   `json:"is_hidden_on_small"`
 }
 
 func createItems(allMeta []*ent.Meta) (allItems []item, err error) {
@@ -153,7 +142,6 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	data := browseResponse{
 		Request:   req,
 		Items:     items,
-		Pages:     createPageItems(req.Page, pageCount, r.URL),
 		TotalPage: pageCount,
 	}
 
@@ -168,88 +156,4 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	}
 
 	handler.WriteResponse(w, data)
-}
-
-func createPageItems(current int, count int, baseUrl *url.URL) []pageItem {
-	const (
-		First    = "First"
-		Previous = "Previous"
-		Next     = "Next"
-		Last     = "Last"
-
-		DisplayPageCount     = 6
-		HalfDisplayPageCount = DisplayPageCount / 2
-	)
-
-	firstPage := 0
-	lastPage := count - 1
-	previousPage := current - 1
-	nextPage := current + 1
-
-	changePageParam := func(baseUrl *url.URL, page int) *url.URL {
-		query := baseUrl.Query()
-
-		if query.Has("page") {
-			query.Set("page", strconv.Itoa(page))
-		} else {
-			query.Add("page", strconv.Itoa(page))
-		}
-
-		baseUrl.RawQuery = query.Encode()
-		return baseUrl
-	}
-
-	output := make([]pageItem, 0)
-	output = append(output, pageItem{
-		Content:         First,
-		LinkURL:         changePageParam(baseUrl, firstPage).String(),
-		IsActive:        false,
-		IsEnabled:       true,
-		IsHiddenOnSmall: false,
-	})
-
-	enablePrevious := previousPage >= firstPage
-	output = append(output, pageItem{
-		Content:         Previous,
-		LinkURL:         changePageParam(baseUrl, previousPage).String(),
-		IsActive:        false,
-		IsEnabled:       enablePrevious,
-		IsHiddenOnSmall: false,
-	})
-
-	for i := current - HalfDisplayPageCount; i <= current+HalfDisplayPageCount; i++ {
-		if i < firstPage {
-			continue
-		}
-		if i > lastPage {
-			continue
-		}
-
-		output = append(output, pageItem{
-			Content:         strconv.Itoa(i),
-			LinkURL:         changePageParam(baseUrl, i).String(),
-			IsActive:        i == current,
-			IsEnabled:       true,
-			IsHiddenOnSmall: !(i == current),
-		})
-	}
-
-	enableNext := nextPage < count
-	output = append(output, pageItem{
-		Content:         Next,
-		LinkURL:         changePageParam(baseUrl, nextPage).String(),
-		IsActive:        false,
-		IsEnabled:       enableNext,
-		IsHiddenOnSmall: false,
-	})
-
-	output = append(output, pageItem{
-		Content:         Last,
-		LinkURL:         changePageParam(baseUrl, lastPage).String(),
-		IsActive:        false,
-		IsEnabled:       true,
-		IsHiddenOnSmall: false,
-	})
-
-	return output
 }
