@@ -110,22 +110,10 @@ func RegisterHandler(router *httprouter.Router) {
 	handler.Init(handler.Options{
 		VersionString: versionString,
 	})
-	// Routes
-	router.GET(browse.PathRescanLibrary, browse.RescanLibraryHandler)
-	router.GET(browse.PathThumbnail, browse.GetThumbnailHandler)
-	router.POST(browse.PathBrowse, browse.Handler)
-	router.GET(browse.PathRecreateThumbnails, browse.RecreateThumbnailHandler)
 
-	router.GET(view.PathDownload, view.Download)
-	router.GET(view.PathGetImage, view.GetImage)
-	router.POST(view.PathFavorite, view.SetFavoriteHandler)
-	router.POST(view.PathUpdateCover, view.UpdateCover)
-	router.POST(view.PathView, view.Handler)
-
-	router.GET(handlertag.PathThumbnail, handlertag.ThumbnailHandler)
-	router.GET(handlertag.PathRecreateThumbnails, handlertag.RecreateThumbnailHandler)
-	router.POST(handlertag.PathList, handlertag.ListHandler)
-	router.POST(handlertag.PathSetFavorite, handlertag.SetFavoriteHandler)
+	browse.Register(router)
+	handlertag.Register(router)
+	view.Register(router)
 
 	router.GET("/doc/:any", swaggerHandler)
 }
