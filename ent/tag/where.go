@@ -197,6 +197,16 @@ func ThumbnailLTE(v []byte) predicate.Tag {
 	return predicate.Tag(sql.FieldLTE(FieldThumbnail, v))
 }
 
+// ThumbnailIsNil applies the IsNil predicate on the "thumbnail" field.
+func ThumbnailIsNil() predicate.Tag {
+	return predicate.Tag(sql.FieldIsNull(FieldThumbnail))
+}
+
+// ThumbnailNotNil applies the NotNil predicate on the "thumbnail" field.
+func ThumbnailNotNil() predicate.Tag {
+	return predicate.Tag(sql.FieldNotNull(FieldThumbnail))
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Tag) predicate.Tag {
 	return predicate.Tag(func(s *sql.Selector) {

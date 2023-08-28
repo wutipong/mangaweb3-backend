@@ -22,10 +22,6 @@ definitions:
         items:
           $ref: '#/definitions/browse.item'
         type: array
-      pages:
-        items:
-          $ref: '#/definitions/browse.pageItem'
-        type: array
       request:
         $ref: '#/definitions/browse.browseRequest'
       tag_favorite:
@@ -46,18 +42,10 @@ definitions:
       name:
         type: string
     type: object
-  browse.pageItem:
+  browse.recreateThumbnailsResponse:
     properties:
-      content:
-        type: string
-      is_active:
+      result:
         type: boolean
-      is_enabled:
-        type: boolean
-      is_hidden_on_small:
-        type: boolean
-      link_url:
-        type: string
     type: object
   browse.rescanLibraryResponse:
     properties:
@@ -157,7 +145,7 @@ definitions:
     type: object
   view.viewRequest:
     properties:
-      path:
+      name:
         type: string
     type: object
   view.viewResponse:
@@ -215,7 +203,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/browse.rescanLibraryResponse'
+            $ref: '#/definitions/browse.recreateThumbnailsResponse'
         "500":
           description: Internal Server Error
           schema:

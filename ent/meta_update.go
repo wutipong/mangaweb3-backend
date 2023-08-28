@@ -73,6 +73,12 @@ func (mu *MetaUpdate) SetThumbnail(b []byte) *MetaUpdate {
 	return mu
 }
 
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (mu *MetaUpdate) ClearThumbnail() *MetaUpdate {
+	mu.mutation.ClearThumbnail()
+	return mu
+}
+
 // SetRead sets the "read" field.
 func (mu *MetaUpdate) SetRead(b bool) *MetaUpdate {
 	mu.mutation.SetRead(b)
@@ -165,6 +171,9 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.Thumbnail(); ok {
 		_spec.SetField(meta.FieldThumbnail, field.TypeBytes, value)
 	}
+	if mu.mutation.ThumbnailCleared() {
+		_spec.ClearField(meta.FieldThumbnail, field.TypeBytes)
+	}
 	if value, ok := mu.mutation.Read(); ok {
 		_spec.SetField(meta.FieldRead, field.TypeBool, value)
 	}
@@ -237,6 +246,12 @@ func (muo *MetaUpdateOne) AppendFileIndices(i []int) *MetaUpdateOne {
 // SetThumbnail sets the "thumbnail" field.
 func (muo *MetaUpdateOne) SetThumbnail(b []byte) *MetaUpdateOne {
 	muo.mutation.SetThumbnail(b)
+	return muo
+}
+
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (muo *MetaUpdateOne) ClearThumbnail() *MetaUpdateOne {
+	muo.mutation.ClearThumbnail()
 	return muo
 }
 
@@ -361,6 +376,9 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	}
 	if value, ok := muo.mutation.Thumbnail(); ok {
 		_spec.SetField(meta.FieldThumbnail, field.TypeBytes, value)
+	}
+	if muo.mutation.ThumbnailCleared() {
+		_spec.ClearField(meta.FieldThumbnail, field.TypeBytes)
 	}
 	if value, ok := muo.mutation.Read(); ok {
 		_spec.SetField(meta.FieldRead, field.TypeBool, value)

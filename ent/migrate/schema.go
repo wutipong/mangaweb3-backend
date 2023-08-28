@@ -15,7 +15,7 @@ var (
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "favorite", Type: field.TypeBool, Default: false},
 		{Name: "file_indices", Type: field.TypeJSON},
-		{Name: "thumbnail", Type: field.TypeBytes},
+		{Name: "thumbnail", Type: field.TypeBytes, Nullable: true},
 		{Name: "read", Type: field.TypeBool},
 		{Name: "tags", Type: field.TypeJSON},
 	}
@@ -31,7 +31,7 @@ var (
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "favorite", Type: field.TypeBool, Default: false},
 		{Name: "hidden", Type: field.TypeBool, Default: false},
-		{Name: "thumbnail", Type: field.TypeBytes},
+		{Name: "thumbnail", Type: field.TypeBytes, Nullable: true},
 	}
 	// TagsTable holds the schema information for the "tags" table.
 	TagsTable = &schema.Table{

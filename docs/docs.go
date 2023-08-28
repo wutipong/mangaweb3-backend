@@ -53,7 +53,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/browse.rescanLibraryResponse"
+                            "$ref": "#/definitions/browse.recreateThumbnailsResponse"
                         }
                     },
                     "500": {
@@ -389,12 +389,6 @@ const docTemplate = `{
                         "$ref": "#/definitions/browse.item"
                     }
                 },
-                "pages": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/browse.pageItem"
-                    }
-                },
                 "request": {
                     "$ref": "#/definitions/browse.browseRequest"
                 },
@@ -426,23 +420,11 @@ const docTemplate = `{
                 }
             }
         },
-        "browse.pageItem": {
+        "browse.recreateThumbnailsResponse": {
             "type": "object",
             "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "is_active": {
+                "result": {
                     "type": "boolean"
-                },
-                "is_enabled": {
-                    "type": "boolean"
-                },
-                "is_hidden_on_small": {
-                    "type": "boolean"
-                },
-                "link_url": {
-                    "type": "string"
                 }
             }
         },
@@ -595,7 +577,7 @@ const docTemplate = `{
         "view.viewRequest": {
             "type": "object",
             "properties": {
-                "path": {
+                "name": {
                     "type": "string"
                 }
             }

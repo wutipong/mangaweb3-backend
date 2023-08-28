@@ -67,6 +67,12 @@ func (tu *TagUpdate) SetThumbnail(b []byte) *TagUpdate {
 	return tu
 }
 
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (tu *TagUpdate) ClearThumbnail() *TagUpdate {
+	tu.mutation.ClearThumbnail()
+	return tu
+}
+
 // Mutation returns the TagMutation object of the builder.
 func (tu *TagUpdate) Mutation() *TagMutation {
 	return tu.mutation
@@ -133,6 +139,9 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.Thumbnail(); ok {
 		_spec.SetField(tag.FieldThumbnail, field.TypeBytes, value)
 	}
+	if tu.mutation.ThumbnailCleared() {
+		_spec.ClearField(tag.FieldThumbnail, field.TypeBytes)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{tag.Label}
@@ -190,6 +199,12 @@ func (tuo *TagUpdateOne) SetNillableHidden(b *bool) *TagUpdateOne {
 // SetThumbnail sets the "thumbnail" field.
 func (tuo *TagUpdateOne) SetThumbnail(b []byte) *TagUpdateOne {
 	tuo.mutation.SetThumbnail(b)
+	return tuo
+}
+
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (tuo *TagUpdateOne) ClearThumbnail() *TagUpdateOne {
+	tuo.mutation.ClearThumbnail()
 	return tuo
 }
 
@@ -288,6 +303,9 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 	}
 	if value, ok := tuo.mutation.Thumbnail(); ok {
 		_spec.SetField(tag.FieldThumbnail, field.TypeBytes, value)
+	}
+	if tuo.mutation.ThumbnailCleared() {
+		_spec.ClearField(tag.FieldThumbnail, field.TypeBytes)
 	}
 	_node = &Tag{config: tuo.config}
 	_spec.Assign = _node.assignValues

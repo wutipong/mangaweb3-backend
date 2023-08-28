@@ -338,9 +338,22 @@ func (m *MetaMutation) OldThumbnail(ctx context.Context) (v []byte, err error) {
 	return oldValue.Thumbnail, nil
 }
 
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (m *MetaMutation) ClearThumbnail() {
+	m.thumbnail = nil
+	m.clearedFields[meta.FieldThumbnail] = struct{}{}
+}
+
+// ThumbnailCleared returns if the "thumbnail" field was cleared in this mutation.
+func (m *MetaMutation) ThumbnailCleared() bool {
+	_, ok := m.clearedFields[meta.FieldThumbnail]
+	return ok
+}
+
 // ResetThumbnail resets all changes to the "thumbnail" field.
 func (m *MetaMutation) ResetThumbnail() {
 	m.thumbnail = nil
+	delete(m.clearedFields, meta.FieldThumbnail)
 }
 
 // SetRead sets the "read" field.
@@ -618,7 +631,11 @@ func (m *MetaMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *MetaMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(meta.FieldThumbnail) {
+		fields = append(fields, meta.FieldThumbnail)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -631,6 +648,11 @@ func (m *MetaMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *MetaMutation) ClearField(name string) error {
+	switch name {
+	case meta.FieldThumbnail:
+		m.ClearThumbnail()
+		return nil
+	}
 	return fmt.Errorf("unknown Meta nullable field %s", name)
 }
 
@@ -964,9 +986,22 @@ func (m *TagMutation) OldThumbnail(ctx context.Context) (v []byte, err error) {
 	return oldValue.Thumbnail, nil
 }
 
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (m *TagMutation) ClearThumbnail() {
+	m.thumbnail = nil
+	m.clearedFields[tag.FieldThumbnail] = struct{}{}
+}
+
+// ThumbnailCleared returns if the "thumbnail" field was cleared in this mutation.
+func (m *TagMutation) ThumbnailCleared() bool {
+	_, ok := m.clearedFields[tag.FieldThumbnail]
+	return ok
+}
+
 // ResetThumbnail resets all changes to the "thumbnail" field.
 func (m *TagMutation) ResetThumbnail() {
 	m.thumbnail = nil
+	delete(m.clearedFields, tag.FieldThumbnail)
 }
 
 // Where appends a list predicates to the TagMutation builder.
@@ -1115,7 +1150,11 @@ func (m *TagMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *TagMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(tag.FieldThumbnail) {
+		fields = append(fields, tag.FieldThumbnail)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1128,6 +1167,11 @@ func (m *TagMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *TagMutation) ClearField(name string) error {
+	switch name {
+	case tag.FieldThumbnail:
+		m.ClearThumbnail()
+		return nil
+	}
 	return fmt.Errorf("unknown Tag nullable field %s", name)
 }
 

@@ -132,9 +132,6 @@ func (mc *MetaCreate) check() error {
 	if _, ok := mc.mutation.FileIndices(); !ok {
 		return &ValidationError{Name: "file_indices", err: errors.New(`ent: missing required field "Meta.file_indices"`)}
 	}
-	if _, ok := mc.mutation.Thumbnail(); !ok {
-		return &ValidationError{Name: "thumbnail", err: errors.New(`ent: missing required field "Meta.thumbnail"`)}
-	}
 	if _, ok := mc.mutation.Read(); !ok {
 		return &ValidationError{Name: "read", err: errors.New(`ent: missing required field "Meta.read"`)}
 	}
@@ -308,6 +305,12 @@ func (u *MetaUpsert) UpdateThumbnail() *MetaUpsert {
 	return u
 }
 
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (u *MetaUpsert) ClearThumbnail() *MetaUpsert {
+	u.SetNull(meta.FieldThumbnail)
+	return u
+}
+
 // SetRead sets the "read" field.
 func (u *MetaUpsert) SetRead(v bool) *MetaUpsert {
 	u.Set(meta.FieldRead, v)
@@ -439,6 +442,13 @@ func (u *MetaUpsertOne) SetThumbnail(v []byte) *MetaUpsertOne {
 func (u *MetaUpsertOne) UpdateThumbnail() *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateThumbnail()
+	})
+}
+
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (u *MetaUpsertOne) ClearThumbnail() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnail()
 	})
 }
 
@@ -737,6 +747,13 @@ func (u *MetaUpsertBulk) SetThumbnail(v []byte) *MetaUpsertBulk {
 func (u *MetaUpsertBulk) UpdateThumbnail() *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateThumbnail()
+	})
+}
+
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (u *MetaUpsertBulk) ClearThumbnail() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnail()
 	})
 }
 

@@ -234,6 +234,16 @@ func ThumbnailLTE(v []byte) predicate.Meta {
 	return predicate.Meta(sql.FieldLTE(FieldThumbnail, v))
 }
 
+// ThumbnailIsNil applies the IsNil predicate on the "thumbnail" field.
+func ThumbnailIsNil() predicate.Meta {
+	return predicate.Meta(sql.FieldIsNull(FieldThumbnail))
+}
+
+// ThumbnailNotNil applies the NotNil predicate on the "thumbnail" field.
+func ThumbnailNotNil() predicate.Meta {
+	return predicate.Meta(sql.FieldNotNull(FieldThumbnail))
+}
+
 // ReadEQ applies the EQ predicate on the "read" field.
 func ReadEQ(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldEQ(FieldRead, v))

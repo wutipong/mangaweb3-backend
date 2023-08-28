@@ -122,9 +122,6 @@ func (tc *TagCreate) check() error {
 	if _, ok := tc.mutation.Hidden(); !ok {
 		return &ValidationError{Name: "hidden", err: errors.New(`ent: missing required field "Tag.hidden"`)}
 	}
-	if _, ok := tc.mutation.Thumbnail(); !ok {
-		return &ValidationError{Name: "thumbnail", err: errors.New(`ent: missing required field "Tag.thumbnail"`)}
-	}
 	return nil
 }
 
@@ -268,6 +265,12 @@ func (u *TagUpsert) UpdateThumbnail() *TagUpsert {
 	return u
 }
 
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (u *TagUpsert) ClearThumbnail() *TagUpsert {
+	u.SetNull(tag.FieldThumbnail)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -361,6 +364,13 @@ func (u *TagUpsertOne) SetThumbnail(v []byte) *TagUpsertOne {
 func (u *TagUpsertOne) UpdateThumbnail() *TagUpsertOne {
 	return u.Update(func(s *TagUpsert) {
 		s.UpdateThumbnail()
+	})
+}
+
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (u *TagUpsertOne) ClearThumbnail() *TagUpsertOne {
+	return u.Update(func(s *TagUpsert) {
+		s.ClearThumbnail()
 	})
 }
 
@@ -617,6 +627,13 @@ func (u *TagUpsertBulk) SetThumbnail(v []byte) *TagUpsertBulk {
 func (u *TagUpsertBulk) UpdateThumbnail() *TagUpsertBulk {
 	return u.Update(func(s *TagUpsert) {
 		s.UpdateThumbnail()
+	})
+}
+
+// ClearThumbnail clears the value of the "thumbnail" field.
+func (u *TagUpsertBulk) ClearThumbnail() *TagUpsertBulk {
+	return u.Update(func(s *TagUpsert) {
+		s.ClearThumbnail()
 	})
 }
 
