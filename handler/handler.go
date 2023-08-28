@@ -4,18 +4,6 @@ var options Options
 
 type Options struct {
 	VersionString string
-
-	PathBrowse        string
-	PathView          string
-	PathGetImage      string
-	PathUpdateCover   string
-	PathThumbnail     string
-	PathFavorite      string
-	PathDownload      string
-	PathRescanLibrary string
-	PathTagFavorite   string
-	PathTagList       string
-	PathTagThumbnail  string
 }
 
 func Init(o Options) {

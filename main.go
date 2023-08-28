@@ -109,20 +109,6 @@ func main() {
 func RegisterHandler(router *httprouter.Router) {
 	handler.Init(handler.Options{
 		VersionString: versionString,
-
-		PathView:        view.PathView,
-		PathGetImage:    view.PathGetImage,
-		PathUpdateCover: view.PathUpdateCover,
-		PathFavorite:    view.PathFavorite,
-		PathDownload:    view.PathDownload,
-
-		PathThumbnail:     browse.PathThumbnail,
-		PathRescanLibrary: browse.PathRescanLibrary,
-		PathBrowse:        browse.PathBrowse,
-
-		PathTagFavorite:  handlertag.PathSetFavorite,
-		PathTagList:      handlertag.PathList,
-		PathTagThumbnail: handlertag.PathThumbnail,
 	})
 	// Routes
 	router.GET(browse.PathRescanLibrary, browse.RescanLibraryHandler)
