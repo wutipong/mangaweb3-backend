@@ -137,6 +137,7 @@ func RegisterHandler(router *httprouter.Router) {
 	router.POST(view.PathView, view.Handler)
 
 	router.GET(handlertag.PathThumbnail, handlertag.ThumbnailHandler)
+	router.GET(handlertag.PathRecreateThumbnails, handlertag.RecreateThumbnailHandler)
 	router.POST(handlertag.PathList, handlertag.ListHandler)
 	router.POST(handlertag.PathSetFavorite, handlertag.SetFavoriteHandler)
 
