@@ -108,31 +108,37 @@ func main() {
 
 func RegisterHandler(router *httprouter.Router) {
 	handler.Init(handler.Options{
-		VersionString:     versionString,
-		PathBrowse:        browse.PathBrowse,
-		PathView:          view.PathView,
-		PathGetImage:      view.PathGetImage,
-		PathUpdateCover:   view.PathUpdateCover,
+		VersionString: versionString,
+
+		PathView:        view.PathView,
+		PathGetImage:    view.PathGetImage,
+		PathUpdateCover: view.PathUpdateCover,
+		PathFavorite:    view.PathFavorite,
+		PathDownload:    view.PathDownload,
+
 		PathThumbnail:     browse.PathThumbnail,
-		PathFavorite:      view.PathFavorite,
-		PathDownload:      view.PathDownload,
 		PathRescanLibrary: browse.PathRescanLibrary,
-		PathTagFavorite:   handlertag.PathSetFavorite,
-		PathTagList:       handlertag.PathList,
-		PathTagThumbnail:  handlertag.PathThumbnail,
+		PathBrowse:        browse.PathBrowse,
+
+		PathTagFavorite:  handlertag.PathSetFavorite,
+		PathTagList:      handlertag.PathList,
+		PathTagThumbnail: handlertag.PathThumbnail,
 	})
 	// Routes
-	router.POST(browse.PathBrowse, browse.Handler)
-	router.POST(view.PathView, view.Handler)
-	router.GET(view.PathGetImage, view.GetImage)
-	router.POST(view.PathUpdateCover, view.UpdateCover)
-	router.GET(browse.PathThumbnail, browse.GetThumbnailHandler)
-	router.POST(view.PathFavorite, view.SetFavoriteHandler)
-	router.GET(view.PathDownload, view.Download)
 	router.GET(browse.PathRescanLibrary, browse.RescanLibraryHandler)
-	router.POST(handlertag.PathSetFavorite, handlertag.SetFavoriteHandler)
-	router.POST(handlertag.PathList, handlertag.ListHandler)
+	router.GET(browse.PathThumbnail, browse.GetThumbnailHandler)
+	router.POST(browse.PathBrowse, browse.Handler)
+	router.GET(browse.PathRecreateThumbnails, browse.RecreateThumbnailHandler)
+
+	router.GET(view.PathDownload, view.Download)
+	router.GET(view.PathGetImage, view.GetImage)
+	router.POST(view.PathFavorite, view.SetFavoriteHandler)
+	router.POST(view.PathUpdateCover, view.UpdateCover)
+	router.POST(view.PathView, view.Handler)
+
 	router.GET(handlertag.PathThumbnail, handlertag.ThumbnailHandler)
+	router.POST(handlertag.PathList, handlertag.ListHandler)
+	router.POST(handlertag.PathSetFavorite, handlertag.SetFavoriteHandler)
 
 	router.GET("/doc/:any", swaggerHandler)
 }
