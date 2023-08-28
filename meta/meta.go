@@ -91,7 +91,7 @@ func GenerateThumbnail(m *ent.Meta, fileIndex int) error {
 		return err
 	}
 
-	const thumbnailSize = 200
+	const thumbnailSize = 360
 	if img.Bounds().Dx() > thumbnailSize {
 		resized := imaging.Resize(img, thumbnailSize, 0, imaging.MitchellNetravali)
 		img = resized

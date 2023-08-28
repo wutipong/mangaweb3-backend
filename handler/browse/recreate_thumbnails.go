@@ -15,7 +15,7 @@ type recreateThumbnailsResponse struct {
 }
 
 const (
-	PathRecreateThumbnails = "/browse/recreate_thumbnail"
+	PathRecreateThumbnails = "/browse/recreate_thumbnails"
 )
 
 // @Success      200  {object}  browse.recreateThumbnailsResponse
