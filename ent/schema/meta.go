@@ -17,7 +17,7 @@ func (Meta) Fields() []ent.Field {
 		field.Time("create_time"),
 		field.Bool("favorite").Default(false),
 		field.Ints("file_indices"),
-		field.Bytes("thumbnail").Optional(),
+		field.Bytes("thumbnail").Optional().Sensitive(),
 		field.Bool("read"),
 		field.Strings("tags"),
 	}

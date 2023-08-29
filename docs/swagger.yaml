@@ -20,7 +20,7 @@ definitions:
     properties:
       items:
         items:
-          $ref: '#/definitions/browse.item'
+          $ref: '#/definitions/ent.Meta'
         type: array
       request:
         $ref: '#/definitions/browse.browseRequest'
@@ -28,19 +28,6 @@ definitions:
         type: boolean
       total_page:
         type: integer
-    type: object
-  browse.item:
-    properties:
-      create_time:
-        type: string
-      favorite:
-        type: boolean
-      id:
-        type: integer
-      is_read:
-        type: boolean
-      name:
-        type: string
     type: object
   browse.recreateThumbnailsResponse:
     properties:
@@ -51,6 +38,49 @@ definitions:
     properties:
       result:
         type: boolean
+    type: object
+  ent.Meta:
+    properties:
+      create_time:
+        description: CreateTime holds the value of the "create_time" field.
+        type: string
+      favorite:
+        description: Favorite holds the value of the "favorite" field.
+        type: boolean
+      file_indices:
+        description: FileIndices holds the value of the "file_indices" field.
+        items:
+          type: integer
+        type: array
+      id:
+        description: ID of the ent.
+        type: integer
+      name:
+        description: Name holds the value of the "name" field.
+        type: string
+      read:
+        description: Read holds the value of the "read" field.
+        type: boolean
+      tags:
+        description: Tags holds the value of the "tags" field.
+        items:
+          type: string
+        type: array
+    type: object
+  ent.Tag:
+    properties:
+      favorite:
+        description: Favorite holds the value of the "favorite" field.
+        type: boolean
+      hidden:
+        description: Hidden holds the value of the "hidden" field.
+        type: boolean
+      id:
+        description: ID of the ent.
+        type: integer
+      name:
+        description: Name holds the value of the "name" field.
+        type: string
     type: object
   errors.Error:
     properties:
@@ -82,6 +112,10 @@ definitions:
     properties:
       favorite_only:
         type: boolean
+      item_per_page:
+        type: integer
+      page:
+        type: integer
     type: object
   tag.listResponse:
     properties:
@@ -89,8 +123,10 @@ definitions:
         $ref: '#/definitions/tag.listRequest'
       tags:
         items:
-          $ref: '#/definitions/tag.tagData'
+          $ref: '#/definitions/ent.Tag'
         type: array
+      total_page:
+        type: integer
     type: object
   tag.setFavoriteRequest:
     properties:
@@ -105,15 +141,6 @@ definitions:
         type: boolean
       request:
         $ref: '#/definitions/tag.setFavoriteRequest'
-    type: object
-  tag.tagData:
-    properties:
-      favorite:
-        type: boolean
-      id:
-        type: integer
-      name:
-        type: string
     type: object
   view.setFavoriteRequest:
     properties:

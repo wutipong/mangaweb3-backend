@@ -386,7 +386,7 @@ const docTemplate = `{
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/browse.item"
+                        "$ref": "#/definitions/ent.Meta"
                     }
                 },
                 "request": {
@@ -397,26 +397,6 @@ const docTemplate = `{
                 },
                 "total_page": {
                     "type": "integer"
-                }
-            }
-        },
-        "browse.item": {
-            "type": "object",
-            "properties": {
-                "create_time": {
-                    "type": "string"
-                },
-                "favorite": {
-                    "type": "boolean"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "is_read": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },
@@ -433,6 +413,66 @@ const docTemplate = `{
             "properties": {
                 "result": {
                     "type": "boolean"
+                }
+            }
+        },
+        "ent.Meta": {
+            "type": "object",
+            "properties": {
+                "create_time": {
+                    "description": "CreateTime holds the value of the \"create_time\" field.",
+                    "type": "string"
+                },
+                "favorite": {
+                    "description": "Favorite holds the value of the \"favorite\" field.",
+                    "type": "boolean"
+                },
+                "file_indices": {
+                    "description": "FileIndices holds the value of the \"file_indices\" field.",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Name holds the value of the \"name\" field.",
+                    "type": "string"
+                },
+                "read": {
+                    "description": "Read holds the value of the \"read\" field.",
+                    "type": "boolean"
+                },
+                "tags": {
+                    "description": "Tags holds the value of the \"tags\" field.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "ent.Tag": {
+            "type": "object",
+            "properties": {
+                "favorite": {
+                    "description": "Favorite holds the value of the \"favorite\" field.",
+                    "type": "boolean"
+                },
+                "hidden": {
+                    "description": "Hidden holds the value of the \"hidden\" field.",
+                    "type": "boolean"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Name holds the value of the \"name\" field.",
+                    "type": "string"
                 }
             }
         },
@@ -477,6 +517,12 @@ const docTemplate = `{
             "properties": {
                 "favorite_only": {
                     "type": "boolean"
+                },
+                "item_per_page": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
                 }
             }
         },
@@ -489,8 +535,11 @@ const docTemplate = `{
                 "tags": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/tag.tagData"
+                        "$ref": "#/definitions/ent.Tag"
                     }
+                },
+                "total_page": {
+                    "type": "integer"
                 }
             }
         },
@@ -513,20 +562,6 @@ const docTemplate = `{
                 },
                 "request": {
                     "$ref": "#/definitions/tag.setFavoriteRequest"
-                }
-            }
-        },
-        "tag.tagData": {
-            "type": "object",
-            "properties": {
-                "favorite": {
-                    "type": "boolean"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },

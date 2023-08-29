@@ -16,7 +16,7 @@ func (Tag) Fields() []ent.Field {
 		field.String("name").Unique().NotEmpty(),
 		field.Bool("favorite").Default(false),
 		field.Bool("hidden").Default(false),
-		field.Bytes("thumbnail").Optional(),
+		field.Bytes("thumbnail").Optional().Sensitive(),
 	}
 }
 

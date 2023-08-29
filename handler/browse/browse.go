@@ -1,7 +1,6 @@
 package browse
 
 import (
-	"hash/fnv"
 	"net/http"
 	"time"
 
@@ -31,7 +30,7 @@ type browseResponse struct {
 	Request     browseRequest `json:"request"`
 	TagFavorite bool          `json:"tag_favorite"`
 	TotalPage   int           `json:"total_page"`
-	Items       []item        `json:"items"`
+	Items       []*ent.Meta   `json:"items"`
 }
 
 type item struct {
@@ -40,25 +39,6 @@ type item struct {
 	CreateTime time.Time `json:"create_time"`
 	Favorite   bool      `json:"favorite"`
 	IsRead     bool      `json:"is_read"`
-}
-
-func createItems(allMeta []*ent.Meta) (allItems []item, err error) {
-	allItems = make([]item, len(allMeta))
-
-	for i, m := range allMeta {
-		hash := fnv.New64()
-		hash.Write([]byte(m.Name))
-		id := hash.Sum64()
-
-		allItems[i] = item{
-			ID:         id,
-			Name:       m.Name,
-			CreateTime: m.CreateTime,
-			Favorite:   m.Favorite,
-			IsRead:     m.Read,
-		}
-	}
-	return
 }
 
 func createDefaultBrowseRequest() browseRequest {
@@ -114,12 +94,6 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	items, err := createItems(allMeta)
-	if err != nil {
-		handler.WriteResponse(w, err)
-		return
-	}
-
 	count, err := meta.Count(r.Context(), searchCriteria)
 	if err != nil {
 		handler.WriteResponse(w, err)
@@ -141,7 +115,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	data := browseResponse{
 		Request:   req,
-		Items:     items,
+		Items:     allMeta,
 		TotalPage: pageCount,
 	}
 

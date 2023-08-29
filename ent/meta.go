@@ -27,7 +27,7 @@ type Meta struct {
 	// FileIndices holds the value of the "file_indices" field.
 	FileIndices []int `json:"file_indices,omitempty"`
 	// Thumbnail holds the value of the "thumbnail" field.
-	Thumbnail []byte `json:"thumbnail,omitempty"`
+	Thumbnail []byte `json:"-"`
 	// Read holds the value of the "read" field.
 	Read bool `json:"read,omitempty"`
 	// Tags holds the value of the "tags" field.
@@ -165,8 +165,7 @@ func (m *Meta) String() string {
 	builder.WriteString("file_indices=")
 	builder.WriteString(fmt.Sprintf("%v", m.FileIndices))
 	builder.WriteString(", ")
-	builder.WriteString("thumbnail=")
-	builder.WriteString(fmt.Sprintf("%v", m.Thumbnail))
+	builder.WriteString("thumbnail=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("read=")
 	builder.WriteString(fmt.Sprintf("%v", m.Read))

@@ -23,7 +23,7 @@ type Tag struct {
 	// Hidden holds the value of the "hidden" field.
 	Hidden bool `json:"hidden,omitempty"`
 	// Thumbnail holds the value of the "thumbnail" field.
-	Thumbnail    []byte `json:"thumbnail,omitempty"`
+	Thumbnail    []byte `json:"-"`
 	selectValues sql.SelectValues
 }
 
@@ -130,8 +130,7 @@ func (t *Tag) String() string {
 	builder.WriteString("hidden=")
 	builder.WriteString(fmt.Sprintf("%v", t.Hidden))
 	builder.WriteString(", ")
-	builder.WriteString("thumbnail=")
-	builder.WriteString(fmt.Sprintf("%v", t.Thumbnail))
+	builder.WriteString("thumbnail=<sensitive>")
 	builder.WriteByte(')')
 	return builder.String()
 }
