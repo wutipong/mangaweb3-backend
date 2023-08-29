@@ -1,7 +1,0 @@
-POST http://localhost:8972/update_cover HTTP/1.1
-content-type: application/json
-
-{
-    "name": "[成年コミック] [Artist 蒟吉人]\\[成年コミック] [蒟吉人] ミダラBooks [WebP].zip",
-    "index": 6
-}
