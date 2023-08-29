@@ -2,7 +2,6 @@ package browse
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
@@ -31,14 +30,6 @@ type browseResponse struct {
 	TagFavorite bool          `json:"tag_favorite"`
 	TotalPage   int           `json:"total_page"`
 	Items       []*ent.Meta   `json:"items"`
-}
-
-type item struct {
-	ID         uint64    `json:"id"`
-	Name       string    `json:"name"`
-	CreateTime time.Time `json:"create_time"`
-	Favorite   bool      `json:"favorite"`
-	IsRead     bool      `json:"is_read"`
 }
 
 func createDefaultBrowseRequest() browseRequest {
