@@ -1,9 +1,7 @@
 package tag
 
 import (
-	"hash/fnv"
 	"net/http"
-	"sort"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
@@ -12,55 +10,24 @@ import (
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
 
-const (
-	ItemPerPage = 40
-)
-
 type listRequest struct {
 	FavoriteOnly bool `json:"favorite_only"`
+	Page         int  `json:"page"`
+	ItemPerPage  int  `json:"item_per_page"`
 }
 
 type listResponse struct {
-	Request listRequest `json:"request"`
-	Tags    []tagData   `json:"tags"`
-}
-
-type tagData struct {
-	ID       uint64 `json:"id"`
-	Name     string `json:"name"`
-	Favorite bool   `json:"favorite"`
-}
-
-func createItems(allTags []*ent.Tag, favoriteOnly bool) []tagData {
-	allItems := make([]tagData, len(allTags))
-
-	for i, t := range allTags {
-		isAdding := true
-		if favoriteOnly {
-			isAdding = t.Favorite
-		}
-
-		if isAdding {
-			hash := fnv.New64()
-			hash.Write([]byte(t.Name))
-			id := hash.Sum64()
-
-			allItems[i] = tagData{
-				ID:       id,
-				Name:     t.Name,
-				Favorite: t.Favorite,
-			}
-		}
-	}
-
-	sort.Slice(allItems, func(i, j int) bool {
-		return allItems[i].Name < allItems[j].Name
-	})
-	return allItems
+	Request   listRequest `json:"request"`
+	Tags      []*ent.Tag  `json:"tags"`
+	TotalPage int         `json:"total_page"`
 }
 
 const (
 	PathList = "/tag/list"
+)
+
+const (
+	DefaultItemPerPage = 30
 )
 
 // @accept json
@@ -71,6 +38,8 @@ const (
 func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	req := listRequest{
 		FavoriteOnly: false,
+		Page:         0,
+		ItemPerPage:  DefaultItemPerPage,
 	}
 
 	if err := handler.ParseInput(r.Body, &req); err != nil {
@@ -80,16 +49,22 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 
 	log.Info().Interface("request", req).Msg("Tag list")
 
-	allTags, err := tag.ReadAll(r.Context())
+	allTags, err := tag.ReadPage(r.Context(), req.FavoriteOnly, req.Page, req.ItemPerPage)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
 
-	tagData := createItems(allTags, req.FavoriteOnly)
+	total, err := tag.Count(r.Context(), req.FavoriteOnly)
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
 
 	data := listResponse{
-		Tags: tagData,
+		Request:   req,
+		Tags:      allTags,
+		TotalPage: (total / req.ItemPerPage) + 1,
 	}
 
 	handler.WriteResponse(w, data)

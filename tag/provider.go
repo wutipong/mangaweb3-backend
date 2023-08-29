@@ -32,7 +32,30 @@ func Read(ctx context.Context, name string) (t *ent.Tag, err error) {
 }
 
 func ReadAll(ctx context.Context) (tags []*ent.Tag, err error) {
-	return client.Tag.Query().All(ctx)
+	return client.Tag.Query().Order(tag.ByName()).All(ctx)
+}
+
+func ReadPage(ctx context.Context, favoriteOnly bool,
+	page int, itemPerPage int) (tags []*ent.Tag, err error) {
+	query := client.Tag.Query().
+		Offset(page * itemPerPage).
+		Limit(itemPerPage).
+		Order(tag.ByName())
+
+	if favoriteOnly {
+		query = query.Where(tag.Favorite(favoriteOnly))
+	}
+
+	return query.All(ctx)
+}
+
+func Count(ctx context.Context, favoriteOnly bool) (count int, err error) {
+	query := client.Tag.Query()
+	if favoriteOnly {
+		query = query.Where(tag.Favorite(favoriteOnly))
+	}
+
+	return query.Count(ctx)
 }
 
 func Write(ctx context.Context, t *ent.Tag) error {
