@@ -23,7 +23,7 @@ type TagQuery struct {
 	order      []tag.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Tag
-	withUsers  *MetaQuery
+	withMeta   *MetaQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -61,8 +61,8 @@ func (tq *TagQuery) Order(o ...tag.OrderOption) *TagQuery {
 	return tq
 }
 
-// QueryUsers chains the current query on the "users" edge.
-func (tq *TagQuery) QueryUsers() *MetaQuery {
+// QueryMeta chains the current query on the "meta" edge.
+func (tq *TagQuery) QueryMeta() *MetaQuery {
 	query := (&MetaClient{config: tq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tq.prepareQuery(ctx); err != nil {
@@ -75,7 +75,7 @@ func (tq *TagQuery) QueryUsers() *MetaQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tag.Table, tag.FieldID, selector),
 			sqlgraph.To(meta.Table, meta.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, tag.UsersTable, tag.UsersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, tag.MetaTable, tag.MetaColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -275,21 +275,21 @@ func (tq *TagQuery) Clone() *TagQuery {
 		order:      append([]tag.OrderOption{}, tq.order...),
 		inters:     append([]Interceptor{}, tq.inters...),
 		predicates: append([]predicate.Tag{}, tq.predicates...),
-		withUsers:  tq.withUsers.Clone(),
+		withMeta:   tq.withMeta.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
 	}
 }
 
-// WithUsers tells the query-builder to eager-load the nodes that are connected to
-// the "users" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TagQuery) WithUsers(opts ...func(*MetaQuery)) *TagQuery {
+// WithMeta tells the query-builder to eager-load the nodes that are connected to
+// the "meta" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TagQuery) WithMeta(opts ...func(*MetaQuery)) *TagQuery {
 	query := (&MetaClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	tq.withUsers = query
+	tq.withMeta = query
 	return tq
 }
 
@@ -373,7 +373,7 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 		withFKs     = tq.withFKs
 		_spec       = tq.querySpec()
 		loadedTypes = [1]bool{
-			tq.withUsers != nil,
+			tq.withMeta != nil,
 		}
 	)
 	if withFKs {
@@ -397,17 +397,17 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := tq.withUsers; query != nil {
-		if err := tq.loadUsers(ctx, query, nodes,
-			func(n *Tag) { n.Edges.Users = []*Meta{} },
-			func(n *Tag, e *Meta) { n.Edges.Users = append(n.Edges.Users, e) }); err != nil {
+	if query := tq.withMeta; query != nil {
+		if err := tq.loadMeta(ctx, query, nodes,
+			func(n *Tag) { n.Edges.Meta = []*Meta{} },
+			func(n *Tag, e *Meta) { n.Edges.Meta = append(n.Edges.Meta, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (tq *TagQuery) loadUsers(ctx context.Context, query *MetaQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *Meta)) error {
+func (tq *TagQuery) loadMeta(ctx context.Context, query *MetaQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *Meta)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Tag)
 	for i := range nodes {
@@ -419,20 +419,20 @@ func (tq *TagQuery) loadUsers(ctx context.Context, query *MetaQuery, nodes []*Ta
 	}
 	query.withFKs = true
 	query.Where(predicate.Meta(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(tag.UsersColumn), fks...))
+		s.Where(sql.InValues(s.C(tag.MetaColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.tag_users
+		fk := n.tag_meta
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "tag_users" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "tag_meta" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "tag_users" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "tag_meta" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -767,9 +767,9 @@ type TagMutation struct {
 	hidden        *bool
 	thumbnail     *[]byte
 	clearedFields map[string]struct{}
-	users         map[int]struct{}
-	removedusers  map[int]struct{}
-	clearedusers  bool
+	meta          map[int]struct{}
+	removedmeta   map[int]struct{}
+	clearedmeta   bool
 	done          bool
 	oldValue      func(context.Context) (*Tag, error)
 	predicates    []predicate.Tag
@@ -1030,58 +1030,58 @@ func (m *TagMutation) ResetThumbnail() {
 	delete(m.clearedFields, tag.FieldThumbnail)
 }
 
-// AddUserIDs adds the "users" edge to the Meta entity by ids.
-func (m *TagMutation) AddUserIDs(ids ...int) {
-	if m.users == nil {
-		m.users = make(map[int]struct{})
+// AddMetumIDs adds the "meta" edge to the Meta entity by ids.
+func (m *TagMutation) AddMetumIDs(ids ...int) {
+	if m.meta == nil {
+		m.meta = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.users[ids[i]] = struct{}{}
+		m.meta[ids[i]] = struct{}{}
 	}
 }
 
-// ClearUsers clears the "users" edge to the Meta entity.
-func (m *TagMutation) ClearUsers() {
-	m.clearedusers = true
+// ClearMeta clears the "meta" edge to the Meta entity.
+func (m *TagMutation) ClearMeta() {
+	m.clearedmeta = true
 }
 
-// UsersCleared reports if the "users" edge to the Meta entity was cleared.
-func (m *TagMutation) UsersCleared() bool {
-	return m.clearedusers
+// MetaCleared reports if the "meta" edge to the Meta entity was cleared.
+func (m *TagMutation) MetaCleared() bool {
+	return m.clearedmeta
 }
 
-// RemoveUserIDs removes the "users" edge to the Meta entity by IDs.
-func (m *TagMutation) RemoveUserIDs(ids ...int) {
-	if m.removedusers == nil {
-		m.removedusers = make(map[int]struct{})
+// RemoveMetumIDs removes the "meta" edge to the Meta entity by IDs.
+func (m *TagMutation) RemoveMetumIDs(ids ...int) {
+	if m.removedmeta == nil {
+		m.removedmeta = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.users, ids[i])
-		m.removedusers[ids[i]] = struct{}{}
+		delete(m.meta, ids[i])
+		m.removedmeta[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedUsers returns the removed IDs of the "users" edge to the Meta entity.
-func (m *TagMutation) RemovedUsersIDs() (ids []int) {
-	for id := range m.removedusers {
+// RemovedMeta returns the removed IDs of the "meta" edge to the Meta entity.
+func (m *TagMutation) RemovedMetaIDs() (ids []int) {
+	for id := range m.removedmeta {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// UsersIDs returns the "users" edge IDs in the mutation.
-func (m *TagMutation) UsersIDs() (ids []int) {
-	for id := range m.users {
+// MetaIDs returns the "meta" edge IDs in the mutation.
+func (m *TagMutation) MetaIDs() (ids []int) {
+	for id := range m.meta {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetUsers resets all changes to the "users" edge.
-func (m *TagMutation) ResetUsers() {
-	m.users = nil
-	m.clearedusers = false
-	m.removedusers = nil
+// ResetMeta resets all changes to the "meta" edge.
+func (m *TagMutation) ResetMeta() {
+	m.meta = nil
+	m.clearedmeta = false
+	m.removedmeta = nil
 }
 
 // Where appends a list predicates to the TagMutation builder.
@@ -1278,8 +1278,8 @@ func (m *TagMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TagMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.users != nil {
-		edges = append(edges, tag.EdgeUsers)
+	if m.meta != nil {
+		edges = append(edges, tag.EdgeMeta)
 	}
 	return edges
 }
@@ -1288,9 +1288,9 @@ func (m *TagMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *TagMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case tag.EdgeUsers:
-		ids := make([]ent.Value, 0, len(m.users))
-		for id := range m.users {
+	case tag.EdgeMeta:
+		ids := make([]ent.Value, 0, len(m.meta))
+		for id := range m.meta {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1301,8 +1301,8 @@ func (m *TagMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TagMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedusers != nil {
-		edges = append(edges, tag.EdgeUsers)
+	if m.removedmeta != nil {
+		edges = append(edges, tag.EdgeMeta)
 	}
 	return edges
 }
@@ -1311,9 +1311,9 @@ func (m *TagMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *TagMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case tag.EdgeUsers:
-		ids := make([]ent.Value, 0, len(m.removedusers))
-		for id := range m.removedusers {
+	case tag.EdgeMeta:
+		ids := make([]ent.Value, 0, len(m.removedmeta))
+		for id := range m.removedmeta {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1324,8 +1324,8 @@ func (m *TagMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TagMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedusers {
-		edges = append(edges, tag.EdgeUsers)
+	if m.clearedmeta {
+		edges = append(edges, tag.EdgeMeta)
 	}
 	return edges
 }
@@ -1334,8 +1334,8 @@ func (m *TagMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *TagMutation) EdgeCleared(name string) bool {
 	switch name {
-	case tag.EdgeUsers:
-		return m.clearedusers
+	case tag.EdgeMeta:
+		return m.clearedmeta
 	}
 	return false
 }
@@ -1352,8 +1352,8 @@ func (m *TagMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *TagMutation) ResetEdge(name string) error {
 	switch name {
-	case tag.EdgeUsers:
-		m.ResetUsers()
+	case tag.EdgeMeta:
+		m.ResetMeta()
 		return nil
 	}
 	return fmt.Errorf("unknown Tag edge %s", name)

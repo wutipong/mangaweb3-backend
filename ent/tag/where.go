@@ -208,21 +208,21 @@ func ThumbnailNotNil() predicate.Tag {
 	return predicate.Tag(sql.FieldNotNull(FieldThumbnail))
 }
 
-// HasUsers applies the HasEdge predicate on the "users" edge.
-func HasUsers() predicate.Tag {
+// HasMeta applies the HasEdge predicate on the "meta" edge.
+func HasMeta() predicate.Tag {
 	return predicate.Tag(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, UsersTable, UsersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, MetaTable, MetaColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUsersWith applies the HasEdge predicate on the "users" edge with a given conditions (other predicates).
-func HasUsersWith(preds ...predicate.Meta) predicate.Tag {
+// HasMetaWith applies the HasEdge predicate on the "meta" edge with a given conditions (other predicates).
+func HasMetaWith(preds ...predicate.Meta) predicate.Tag {
 	return predicate.Tag(func(s *sql.Selector) {
-		step := newUsersStep()
+		step := newMetaStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

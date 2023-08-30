@@ -51,7 +51,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "meta"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"tag_users",
+	"tag_meta",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

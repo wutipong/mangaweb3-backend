@@ -17,7 +17,7 @@ var (
 		{Name: "file_indices", Type: field.TypeJSON},
 		{Name: "thumbnail", Type: field.TypeBytes, Nullable: true},
 		{Name: "read", Type: field.TypeBool},
-		{Name: "tag_users", Type: field.TypeInt, Nullable: true},
+		{Name: "tag_meta", Type: field.TypeInt, Nullable: true},
 	}
 	// MetaTable holds the schema information for the "meta" table.
 	MetaTable = &schema.Table{
@@ -26,7 +26,7 @@ var (
 		PrimaryKey: []*schema.Column{MetaColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "meta_tags_users",
+				Symbol:     "meta_tags_meta",
 				Columns:    []*schema.Column{MetaColumns[7]},
 				RefColumns: []*schema.Column{TagsColumns[0]},
 				OnDelete:   schema.SetNull,

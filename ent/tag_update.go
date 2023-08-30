@@ -74,19 +74,19 @@ func (tu *TagUpdate) ClearThumbnail() *TagUpdate {
 	return tu
 }
 
-// AddUserIDs adds the "users" edge to the Meta entity by IDs.
-func (tu *TagUpdate) AddUserIDs(ids ...int) *TagUpdate {
-	tu.mutation.AddUserIDs(ids...)
+// AddMetumIDs adds the "meta" edge to the Meta entity by IDs.
+func (tu *TagUpdate) AddMetumIDs(ids ...int) *TagUpdate {
+	tu.mutation.AddMetumIDs(ids...)
 	return tu
 }
 
-// AddUsers adds the "users" edges to the Meta entity.
-func (tu *TagUpdate) AddUsers(m ...*Meta) *TagUpdate {
+// AddMeta adds the "meta" edges to the Meta entity.
+func (tu *TagUpdate) AddMeta(m ...*Meta) *TagUpdate {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
-	return tu.AddUserIDs(ids...)
+	return tu.AddMetumIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
@@ -94,25 +94,25 @@ func (tu *TagUpdate) Mutation() *TagMutation {
 	return tu.mutation
 }
 
-// ClearUsers clears all "users" edges to the Meta entity.
-func (tu *TagUpdate) ClearUsers() *TagUpdate {
-	tu.mutation.ClearUsers()
+// ClearMeta clears all "meta" edges to the Meta entity.
+func (tu *TagUpdate) ClearMeta() *TagUpdate {
+	tu.mutation.ClearMeta()
 	return tu
 }
 
-// RemoveUserIDs removes the "users" edge to Meta entities by IDs.
-func (tu *TagUpdate) RemoveUserIDs(ids ...int) *TagUpdate {
-	tu.mutation.RemoveUserIDs(ids...)
+// RemoveMetumIDs removes the "meta" edge to Meta entities by IDs.
+func (tu *TagUpdate) RemoveMetumIDs(ids ...int) *TagUpdate {
+	tu.mutation.RemoveMetumIDs(ids...)
 	return tu
 }
 
-// RemoveUsers removes "users" edges to Meta entities.
-func (tu *TagUpdate) RemoveUsers(m ...*Meta) *TagUpdate {
+// RemoveMeta removes "meta" edges to Meta entities.
+func (tu *TagUpdate) RemoveMeta(m ...*Meta) *TagUpdate {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
-	return tu.RemoveUserIDs(ids...)
+	return tu.RemoveMetumIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -179,12 +179,12 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if tu.mutation.ThumbnailCleared() {
 		_spec.ClearField(tag.FieldThumbnail, field.TypeBytes)
 	}
-	if tu.mutation.UsersCleared() {
+	if tu.mutation.MetaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tag.UsersTable,
-			Columns: []string{tag.UsersColumn},
+			Table:   tag.MetaTable,
+			Columns: []string{tag.MetaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
@@ -192,12 +192,12 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedUsersIDs(); len(nodes) > 0 && !tu.mutation.UsersCleared() {
+	if nodes := tu.mutation.RemovedMetaIDs(); len(nodes) > 0 && !tu.mutation.MetaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tag.UsersTable,
-			Columns: []string{tag.UsersColumn},
+			Table:   tag.MetaTable,
+			Columns: []string{tag.MetaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
@@ -208,12 +208,12 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := tu.mutation.MetaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tag.UsersTable,
-			Columns: []string{tag.UsersColumn},
+			Table:   tag.MetaTable,
+			Columns: []string{tag.MetaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
@@ -290,19 +290,19 @@ func (tuo *TagUpdateOne) ClearThumbnail() *TagUpdateOne {
 	return tuo
 }
 
-// AddUserIDs adds the "users" edge to the Meta entity by IDs.
-func (tuo *TagUpdateOne) AddUserIDs(ids ...int) *TagUpdateOne {
-	tuo.mutation.AddUserIDs(ids...)
+// AddMetumIDs adds the "meta" edge to the Meta entity by IDs.
+func (tuo *TagUpdateOne) AddMetumIDs(ids ...int) *TagUpdateOne {
+	tuo.mutation.AddMetumIDs(ids...)
 	return tuo
 }
 
-// AddUsers adds the "users" edges to the Meta entity.
-func (tuo *TagUpdateOne) AddUsers(m ...*Meta) *TagUpdateOne {
+// AddMeta adds the "meta" edges to the Meta entity.
+func (tuo *TagUpdateOne) AddMeta(m ...*Meta) *TagUpdateOne {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
-	return tuo.AddUserIDs(ids...)
+	return tuo.AddMetumIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
@@ -310,25 +310,25 @@ func (tuo *TagUpdateOne) Mutation() *TagMutation {
 	return tuo.mutation
 }
 
-// ClearUsers clears all "users" edges to the Meta entity.
-func (tuo *TagUpdateOne) ClearUsers() *TagUpdateOne {
-	tuo.mutation.ClearUsers()
+// ClearMeta clears all "meta" edges to the Meta entity.
+func (tuo *TagUpdateOne) ClearMeta() *TagUpdateOne {
+	tuo.mutation.ClearMeta()
 	return tuo
 }
 
-// RemoveUserIDs removes the "users" edge to Meta entities by IDs.
-func (tuo *TagUpdateOne) RemoveUserIDs(ids ...int) *TagUpdateOne {
-	tuo.mutation.RemoveUserIDs(ids...)
+// RemoveMetumIDs removes the "meta" edge to Meta entities by IDs.
+func (tuo *TagUpdateOne) RemoveMetumIDs(ids ...int) *TagUpdateOne {
+	tuo.mutation.RemoveMetumIDs(ids...)
 	return tuo
 }
 
-// RemoveUsers removes "users" edges to Meta entities.
-func (tuo *TagUpdateOne) RemoveUsers(m ...*Meta) *TagUpdateOne {
+// RemoveMeta removes "meta" edges to Meta entities.
+func (tuo *TagUpdateOne) RemoveMeta(m ...*Meta) *TagUpdateOne {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
-	return tuo.RemoveUserIDs(ids...)
+	return tuo.RemoveMetumIDs(ids...)
 }
 
 // Where appends a list predicates to the TagUpdate builder.
@@ -425,12 +425,12 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 	if tuo.mutation.ThumbnailCleared() {
 		_spec.ClearField(tag.FieldThumbnail, field.TypeBytes)
 	}
-	if tuo.mutation.UsersCleared() {
+	if tuo.mutation.MetaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tag.UsersTable,
-			Columns: []string{tag.UsersColumn},
+			Table:   tag.MetaTable,
+			Columns: []string{tag.MetaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
@@ -438,12 +438,12 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedUsersIDs(); len(nodes) > 0 && !tuo.mutation.UsersCleared() {
+	if nodes := tuo.mutation.RemovedMetaIDs(); len(nodes) > 0 && !tuo.mutation.MetaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tag.UsersTable,
-			Columns: []string{tag.UsersColumn},
+			Table:   tag.MetaTable,
+			Columns: []string{tag.MetaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
@@ -454,12 +454,12 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := tuo.mutation.MetaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tag.UsersTable,
-			Columns: []string{tag.UsersColumn},
+			Table:   tag.MetaTable,
+			Columns: []string{tag.MetaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),

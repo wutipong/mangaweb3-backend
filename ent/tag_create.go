@@ -62,19 +62,19 @@ func (tc *TagCreate) SetThumbnail(b []byte) *TagCreate {
 	return tc
 }
 
-// AddUserIDs adds the "users" edge to the Meta entity by IDs.
-func (tc *TagCreate) AddUserIDs(ids ...int) *TagCreate {
-	tc.mutation.AddUserIDs(ids...)
+// AddMetumIDs adds the "meta" edge to the Meta entity by IDs.
+func (tc *TagCreate) AddMetumIDs(ids ...int) *TagCreate {
+	tc.mutation.AddMetumIDs(ids...)
 	return tc
 }
 
-// AddUsers adds the "users" edges to the Meta entity.
-func (tc *TagCreate) AddUsers(m ...*Meta) *TagCreate {
+// AddMeta adds the "meta" edges to the Meta entity.
+func (tc *TagCreate) AddMeta(m ...*Meta) *TagCreate {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
-	return tc.AddUserIDs(ids...)
+	return tc.AddMetumIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
@@ -181,12 +181,12 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 		_spec.SetField(tag.FieldThumbnail, field.TypeBytes, value)
 		_node.Thumbnail = value
 	}
-	if nodes := tc.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := tc.mutation.MetaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   tag.UsersTable,
-			Columns: []string{tag.UsersColumn},
+			Table:   tag.MetaTable,
+			Columns: []string{tag.MetaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),

@@ -425,15 +425,15 @@ func (c *TagClient) GetX(ctx context.Context, id int) *Tag {
 	return obj
 }
 
-// QueryUsers queries the users edge of a Tag.
-func (c *TagClient) QueryUsers(t *Tag) *MetaQuery {
+// QueryMeta queries the meta edge of a Tag.
+func (c *TagClient) QueryMeta(t *Tag) *MetaQuery {
 	query := (&MetaClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tag.Table, tag.FieldID, id),
 			sqlgraph.To(meta.Table, meta.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, tag.UsersTable, tag.UsersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, tag.MetaTable, tag.MetaColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil

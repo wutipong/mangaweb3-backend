@@ -33,20 +33,20 @@ type Tag struct {
 
 // TagEdges holds the relations/edges for other nodes in the graph.
 type TagEdges struct {
-	// Users holds the value of the users edge.
-	Users []*Meta `json:"users,omitempty"`
+	// Meta holds the value of the meta edge.
+	Meta []*Meta `json:"meta,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// UsersOrErr returns the Users value or an error if the edge
+// MetaOrErr returns the Meta value or an error if the edge
 // was not loaded in eager-loading.
-func (e TagEdges) UsersOrErr() ([]*Meta, error) {
+func (e TagEdges) MetaOrErr() ([]*Meta, error) {
 	if e.loadedTypes[0] {
-		return e.Users, nil
+		return e.Meta, nil
 	}
-	return nil, &NotLoadedError{edge: "users"}
+	return nil, &NotLoadedError{edge: "meta"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -129,9 +129,9 @@ func (t *Tag) Value(name string) (ent.Value, error) {
 	return t.selectValues.Get(name)
 }
 
-// QueryUsers queries the "users" edge of the Tag entity.
-func (t *Tag) QueryUsers() *MetaQuery {
-	return NewTagClient(t.config).QueryUsers(t)
+// QueryMeta queries the "meta" edge of the Tag entity.
+func (t *Tag) QueryMeta() *MetaQuery {
+	return NewTagClient(t.config).QueryMeta(t)
 }
 
 // Update returns a builder for updating this Tag.
