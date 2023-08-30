@@ -184,7 +184,7 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 	if nodes := tc.mutation.MetaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   tag.MetaTable,
 			Columns: tag.MetaPrimaryKey,
 			Bidi:    false,

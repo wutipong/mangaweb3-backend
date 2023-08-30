@@ -4,16 +4,10 @@ import (
 	"context"
 
 	"github.com/rs/zerolog/log"
-	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
 
 func RebuildTagThumbnail() error {
-	allMeta, err := meta.ReadAll(context.Background())
-	if err != nil {
-		return err
-	}
-
 	allTags, err := tag.ReadAll(context.Background())
 	if err != nil {
 		return err
@@ -21,18 +15,15 @@ func RebuildTagThumbnail() error {
 
 	for _, t := range allTags {
 		log.Info().Str("tag", t.Name).Msg("Updating tag thumbnail.")
-		for _, m := range allMeta {
-			if true { // !slices.Contains(m.Tags, t.Name) {
-				continue
-			}
-
-			t.Thumbnail = m.Thumbnail
-			if err := tag.Write(context.Background(), t); err != nil {
-				return err
-			}
-
-			break
+		m, err := t.QueryMeta().
+			First(context.TODO())
+		if err != nil {
+			log.Err(err).Msg("update fails")
+			continue
 		}
+
+		t.Thumbnail = m.Thumbnail
+		t.Update().Save(context.TODO())
 	}
 
 	return nil

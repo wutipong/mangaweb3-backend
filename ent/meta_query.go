@@ -74,7 +74,7 @@ func (mq *MetaQuery) QueryTags() *TagQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(meta.Table, meta.FieldID, selector),
 			sqlgraph.To(tag.Table, tag.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, meta.TagsTable, meta.TagsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, meta.TagsTable, meta.TagsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -415,10 +415,10 @@ func (mq *MetaQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Met
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(meta.TagsTable)
-		s.Join(joinT).On(s.C(tag.FieldID), joinT.C(meta.TagsPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(meta.TagsPrimaryKey[1]), edgeIDs...))
+		s.Join(joinT).On(s.C(tag.FieldID), joinT.C(meta.TagsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(meta.TagsPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(meta.TagsPrimaryKey[1]))
+		s.Select(joinT.C(meta.TagsPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})

@@ -25,7 +25,7 @@ const (
 	// Table holds the table name of the tag in the database.
 	Table = "tags"
 	// MetaTable is the table that holds the meta relation/edge. The primary key declared below.
-	MetaTable = "tag_meta"
+	MetaTable = "meta_tags"
 	// MetaInverseTable is the table name for the Meta entity.
 	// It exists in this package in order to avoid circular dependency with the "meta" package.
 	MetaInverseTable = "meta"
@@ -43,7 +43,7 @@ var Columns = []string{
 var (
 	// MetaPrimaryKey and MetaColumn2 are the table columns denoting the
 	// primary key for the meta relation (M2M).
-	MetaPrimaryKey = []string{"tag_id", "meta_id"}
+	MetaPrimaryKey = []string{"meta_id", "tag_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -105,6 +105,6 @@ func newMetaStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MetaInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, MetaTable, MetaPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2M, true, MetaTable, MetaPrimaryKey...),
 	)
 }

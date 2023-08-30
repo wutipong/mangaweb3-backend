@@ -48,6 +48,13 @@ func ScanLibrary() error {
 				AnErr("error", err).
 				Msg("Failed to write meta data.")
 		}
+
+		_, err = meta.PopulateTags(item)
+		if err != nil {
+			log.Error().
+				AnErr("error", err).
+				Msg("Failed to write meta data.")
+		}
 	}
 
 	for _, m := range allMeta {

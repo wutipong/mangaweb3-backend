@@ -52,7 +52,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/browse.recreateThumbnailsResponse"
+                            "$ref": "#/definitions/browse.rescanLibraryResponse"
                         }
                     },
                     "500": {
@@ -112,6 +112,24 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/tag.listResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/tag/recreate_thumbnails": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/browse.recreateThumbnailsResponse"
                         }
                     },
                     "500": {

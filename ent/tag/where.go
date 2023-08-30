@@ -213,7 +213,7 @@ func HasMeta() predicate.Tag {
 	return predicate.Tag(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, MetaTable, MetaPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, MetaTable, MetaPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

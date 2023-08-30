@@ -49,7 +49,6 @@ func NewItem(name string) (i *ent.Meta, err error) {
 		return
 	}
 
-	PopulateTags(i)
 	return
 }
 

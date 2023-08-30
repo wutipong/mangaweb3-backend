@@ -205,7 +205,7 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if mu.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   meta.TagsTable,
 			Columns: meta.TagsPrimaryKey,
 			Bidi:    false,
@@ -218,7 +218,7 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := mu.mutation.RemovedTagsIDs(); len(nodes) > 0 && !mu.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   meta.TagsTable,
 			Columns: meta.TagsPrimaryKey,
 			Bidi:    false,
@@ -234,7 +234,7 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := mu.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   meta.TagsTable,
 			Columns: meta.TagsPrimaryKey,
 			Bidi:    false,
@@ -472,7 +472,7 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	if muo.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   meta.TagsTable,
 			Columns: meta.TagsPrimaryKey,
 			Bidi:    false,
@@ -485,7 +485,7 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	if nodes := muo.mutation.RemovedTagsIDs(); len(nodes) > 0 && !muo.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   meta.TagsTable,
 			Columns: meta.TagsPrimaryKey,
 			Bidi:    false,
@@ -501,7 +501,7 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	if nodes := muo.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   meta.TagsTable,
 			Columns: meta.TagsPrimaryKey,
 			Bidi:    false,

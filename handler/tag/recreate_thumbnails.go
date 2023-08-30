@@ -19,7 +19,7 @@ const (
 
 // @Success      200  {object}  browse.recreateThumbnailsResponse
 // @Failure      500  {object}  errors.Error
-// @Router /browse/rescan_library [get]
+// @Router /tag/recreate_thumbnails [get]
 func RecreateThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Info().Msg("Rescan library")
 

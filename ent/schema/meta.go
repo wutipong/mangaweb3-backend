@@ -27,6 +27,6 @@ func (Meta) Fields() []ent.Field {
 // Edges of the Meta.
 func (Meta) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("tags", Tag.Type).Ref("meta"),
+		edge.To("tags", Tag.Type),
 	}
 }
