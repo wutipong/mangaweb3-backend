@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
@@ -290,6 +291,22 @@ func (c *MetaClient) GetX(ctx context.Context, id int) *Meta {
 	return obj
 }
 
+// QueryTags queries the tags edge of a Meta.
+func (c *MetaClient) QueryTags(m *Meta) *TagQuery {
+	query := (&TagClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(meta.Table, meta.FieldID, id),
+			sqlgraph.To(tag.Table, tag.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, meta.TagsTable, meta.TagsColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *MetaClient) Hooks() []Hook {
 	return c.hooks.Meta
@@ -406,6 +423,22 @@ func (c *TagClient) GetX(ctx context.Context, id int) *Tag {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryUsers queries the users edge of a Tag.
+func (c *TagClient) QueryUsers(t *Tag) *MetaQuery {
+	query := (&MetaClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tag.Table, tag.FieldID, id),
+			sqlgraph.To(meta.Table, meta.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, tag.UsersTable, tag.UsersColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

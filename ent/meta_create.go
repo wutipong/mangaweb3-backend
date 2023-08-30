@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
+	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
 
 // MetaCreate is the builder for creating a Meta entity.
@@ -66,10 +67,19 @@ func (mc *MetaCreate) SetRead(b bool) *MetaCreate {
 	return mc
 }
 
-// SetTags sets the "tags" field.
-func (mc *MetaCreate) SetTags(s []string) *MetaCreate {
-	mc.mutation.SetTags(s)
+// AddTagIDs adds the "tags" edge to the Tag entity by IDs.
+func (mc *MetaCreate) AddTagIDs(ids ...int) *MetaCreate {
+	mc.mutation.AddTagIDs(ids...)
 	return mc
+}
+
+// AddTags adds the "tags" edges to the Tag entity.
+func (mc *MetaCreate) AddTags(t ...*Tag) *MetaCreate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return mc.AddTagIDs(ids...)
 }
 
 // Mutation returns the MetaMutation object of the builder.
@@ -135,9 +145,6 @@ func (mc *MetaCreate) check() error {
 	if _, ok := mc.mutation.Read(); !ok {
 		return &ValidationError{Name: "read", err: errors.New(`ent: missing required field "Meta.read"`)}
 	}
-	if _, ok := mc.mutation.Tags(); !ok {
-		return &ValidationError{Name: "tags", err: errors.New(`ent: missing required field "Meta.tags"`)}
-	}
 	return nil
 }
 
@@ -189,9 +196,21 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 		_spec.SetField(meta.FieldRead, field.TypeBool, value)
 		_node.Read = value
 	}
-	if value, ok := mc.mutation.Tags(); ok {
-		_spec.SetField(meta.FieldTags, field.TypeJSON, value)
-		_node.Tags = value
+	if nodes := mc.mutation.TagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.TagsTable,
+			Columns: []string{meta.TagsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
@@ -323,18 +342,6 @@ func (u *MetaUpsert) UpdateRead() *MetaUpsert {
 	return u
 }
 
-// SetTags sets the "tags" field.
-func (u *MetaUpsert) SetTags(v []string) *MetaUpsert {
-	u.Set(meta.FieldTags, v)
-	return u
-}
-
-// UpdateTags sets the "tags" field to the value that was provided on create.
-func (u *MetaUpsert) UpdateTags() *MetaUpsert {
-	u.SetExcluded(meta.FieldTags)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -463,20 +470,6 @@ func (u *MetaUpsertOne) SetRead(v bool) *MetaUpsertOne {
 func (u *MetaUpsertOne) UpdateRead() *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateRead()
-	})
-}
-
-// SetTags sets the "tags" field.
-func (u *MetaUpsertOne) SetTags(v []string) *MetaUpsertOne {
-	return u.Update(func(s *MetaUpsert) {
-		s.SetTags(v)
-	})
-}
-
-// UpdateTags sets the "tags" field to the value that was provided on create.
-func (u *MetaUpsertOne) UpdateTags() *MetaUpsertOne {
-	return u.Update(func(s *MetaUpsert) {
-		s.UpdateTags()
 	})
 }
 
@@ -768,20 +761,6 @@ func (u *MetaUpsertBulk) SetRead(v bool) *MetaUpsertBulk {
 func (u *MetaUpsertBulk) UpdateRead() *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateRead()
-	})
-}
-
-// SetTags sets the "tags" field.
-func (u *MetaUpsertBulk) SetTags(v []string) *MetaUpsertBulk {
-	return u.Update(func(s *MetaUpsert) {
-		s.SetTags(v)
-	})
-}
-
-// UpdateTags sets the "tags" field to the value that was provided on create.
-func (u *MetaUpsertBulk) UpdateTags() *MetaUpsertBulk {
-	return u.Update(func(s *MetaUpsert) {
-		s.UpdateTags()
 	})
 }
 

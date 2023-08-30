@@ -5,6 +5,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
@@ -19,7 +20,7 @@ type viewResponse struct {
 	Version  string      `json:"version"`
 	Favorite bool        `json:"favorite"`
 	Indices  []int       `json:"indices"`
-	Tags     []string    `json:"tags"`
+	Tags     []*ent.Tag  `json:"tags"`
 }
 
 const (
@@ -61,7 +62,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		Name:     item,
 		Version:  handler.CreateVersionString(),
 		Favorite: m.Favorite,
-		Tags:     m.Tags,
+		Tags:     m.Edges.Tags,
 		Indices:  m.FileIndices,
 	}
 

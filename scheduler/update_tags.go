@@ -37,14 +37,15 @@ func UpdateTags() error {
 	}
 
 	findMetaWithTag := func(tag string) *ent.Meta {
-		for _, m := range allMeta {
-			for _, t := range m.Tags {
-				if t == tag {
+		/*
+			for _, m := range allMeta {
+				for _, t := range m.Tags {
+					if t == tag {
 					return m
+					}
 				}
 			}
-		}
-
+		*/
 		return &ent.Meta{}
 	}
 

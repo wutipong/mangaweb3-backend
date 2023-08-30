@@ -23,8 +23,30 @@ type Tag struct {
 	// Hidden holds the value of the "hidden" field.
 	Hidden bool `json:"hidden,omitempty"`
 	// Thumbnail holds the value of the "thumbnail" field.
-	Thumbnail    []byte `json:"-"`
+	Thumbnail []byte `json:"-"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the TagQuery when eager-loading is set.
+	Edges        TagEdges `json:"edges"`
+	meta_tags    *int
 	selectValues sql.SelectValues
+}
+
+// TagEdges holds the relations/edges for other nodes in the graph.
+type TagEdges struct {
+	// Users holds the value of the users edge.
+	Users []*Meta `json:"users,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UsersOrErr returns the Users value or an error if the edge
+// was not loaded in eager-loading.
+func (e TagEdges) UsersOrErr() ([]*Meta, error) {
+	if e.loadedTypes[0] {
+		return e.Users, nil
+	}
+	return nil, &NotLoadedError{edge: "users"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -40,6 +62,8 @@ func (*Tag) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case tag.FieldName:
 			values[i] = new(sql.NullString)
+		case tag.ForeignKeys[0]: // meta_tags
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -85,6 +109,13 @@ func (t *Tag) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				t.Thumbnail = *value
 			}
+		case tag.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field meta_tags", value)
+			} else if value.Valid {
+				t.meta_tags = new(int)
+				*t.meta_tags = int(value.Int64)
+			}
 		default:
 			t.selectValues.Set(columns[i], values[i])
 		}
@@ -96,6 +127,11 @@ func (t *Tag) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (t *Tag) Value(name string) (ent.Value, error) {
 	return t.selectValues.Get(name)
+}
+
+// QueryUsers queries the "users" edge of the Tag entity.
+func (t *Tag) QueryUsers() *MetaQuery {
+	return NewTagClient(t.config).QueryUsers(t)
 }
 
 // Update returns a builder for updating this Tag.

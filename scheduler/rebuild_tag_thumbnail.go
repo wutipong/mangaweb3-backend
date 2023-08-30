@@ -6,7 +6,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/tag"
-	"golang.org/x/exp/slices"
 )
 
 func RebuildTagThumbnail() error {
@@ -23,7 +22,7 @@ func RebuildTagThumbnail() error {
 	for _, t := range allTags {
 		log.Info().Str("tag", t.Name).Msg("Updating tag thumbnail.")
 		for _, m := range allMeta {
-			if !slices.Contains(m.Tags, t.Name) {
+			if true { // !slices.Contains(m.Tags, t.Name) {
 				continue
 			}
 

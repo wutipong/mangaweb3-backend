@@ -3,6 +3,7 @@ package meta
 import (
 	"archive/zip"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"io/fs"
@@ -15,7 +16,7 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/facette/natsort"
 	"github.com/wutipong/mangaweb3-backend/ent"
-	"github.com/wutipong/mangaweb3-backend/tag"
+	tag_util "github.com/wutipong/mangaweb3-backend/tag"
 
 	_ "golang.org/x/image/webp"
 )
@@ -146,5 +147,19 @@ func GenerateImageIndices(m *ent.Meta) error {
 }
 
 func PopulateTags(m *ent.Meta) {
-	m.Tags = tag.ParseTag(m.Name)
+	tagStrs := tag_util.ParseTag(m.Name)
+	for _, t := range tagStrs {
+		var tag *ent.Tag
+		if temp, err := tag_util.Read(context.TODO(), t); err != nil {
+			tag = &ent.Tag{
+				Name: t,
+			}
+			tag_util.Write(context.TODO(), tag)
+		} else {
+			tag = temp
+		}
+
+		m.Edges.Tags = append(m.Edges.Tags, tag)
+		tag.Edges.Users = append(tag.Edges.Users, m)
+	}
 }

@@ -4,6 +4,7 @@ package tag
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -19,8 +20,17 @@ const (
 	FieldHidden = "hidden"
 	// FieldThumbnail holds the string denoting the thumbnail field in the database.
 	FieldThumbnail = "thumbnail"
+	// EdgeUsers holds the string denoting the users edge name in mutations.
+	EdgeUsers = "users"
 	// Table holds the table name of the tag in the database.
 	Table = "tags"
+	// UsersTable is the table that holds the users relation/edge.
+	UsersTable = "meta"
+	// UsersInverseTable is the table name for the Meta entity.
+	// It exists in this package in order to avoid circular dependency with the "meta" package.
+	UsersInverseTable = "meta"
+	// UsersColumn is the table column denoting the users relation/edge.
+	UsersColumn = "tag_users"
 )
 
 // Columns holds all SQL columns for tag fields.
@@ -32,10 +42,21 @@ var Columns = []string{
 	FieldThumbnail,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "tags"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"meta_tags",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -72,4 +93,25 @@ func ByFavorite(opts ...sql.OrderTermOption) OrderOption {
 // ByHidden orders the results by the hidden field.
 func ByHidden(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldHidden, opts...).ToFunc()
+}
+
+// ByUsersCount orders the results by users count.
+func ByUsersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUsersStep(), opts...)
+	}
+}
+
+// ByUsers orders the results by users terms.
+func ByUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newUsersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UsersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, UsersTable, UsersColumn),
+	)
 }

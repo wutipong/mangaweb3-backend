@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
@@ -73,9 +74,45 @@ func (tu *TagUpdate) ClearThumbnail() *TagUpdate {
 	return tu
 }
 
+// AddUserIDs adds the "users" edge to the Meta entity by IDs.
+func (tu *TagUpdate) AddUserIDs(ids ...int) *TagUpdate {
+	tu.mutation.AddUserIDs(ids...)
+	return tu
+}
+
+// AddUsers adds the "users" edges to the Meta entity.
+func (tu *TagUpdate) AddUsers(m ...*Meta) *TagUpdate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return tu.AddUserIDs(ids...)
+}
+
 // Mutation returns the TagMutation object of the builder.
 func (tu *TagUpdate) Mutation() *TagMutation {
 	return tu.mutation
+}
+
+// ClearUsers clears all "users" edges to the Meta entity.
+func (tu *TagUpdate) ClearUsers() *TagUpdate {
+	tu.mutation.ClearUsers()
+	return tu
+}
+
+// RemoveUserIDs removes the "users" edge to Meta entities by IDs.
+func (tu *TagUpdate) RemoveUserIDs(ids ...int) *TagUpdate {
+	tu.mutation.RemoveUserIDs(ids...)
+	return tu
+}
+
+// RemoveUsers removes "users" edges to Meta entities.
+func (tu *TagUpdate) RemoveUsers(m ...*Meta) *TagUpdate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return tu.RemoveUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -141,6 +178,51 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if tu.mutation.ThumbnailCleared() {
 		_spec.ClearField(tag.FieldThumbnail, field.TypeBytes)
+	}
+	if tu.mutation.UsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tag.UsersTable,
+			Columns: []string{tag.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.RemovedUsersIDs(); len(nodes) > 0 && !tu.mutation.UsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tag.UsersTable,
+			Columns: []string{tag.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.UsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tag.UsersTable,
+			Columns: []string{tag.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -208,9 +290,45 @@ func (tuo *TagUpdateOne) ClearThumbnail() *TagUpdateOne {
 	return tuo
 }
 
+// AddUserIDs adds the "users" edge to the Meta entity by IDs.
+func (tuo *TagUpdateOne) AddUserIDs(ids ...int) *TagUpdateOne {
+	tuo.mutation.AddUserIDs(ids...)
+	return tuo
+}
+
+// AddUsers adds the "users" edges to the Meta entity.
+func (tuo *TagUpdateOne) AddUsers(m ...*Meta) *TagUpdateOne {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return tuo.AddUserIDs(ids...)
+}
+
 // Mutation returns the TagMutation object of the builder.
 func (tuo *TagUpdateOne) Mutation() *TagMutation {
 	return tuo.mutation
+}
+
+// ClearUsers clears all "users" edges to the Meta entity.
+func (tuo *TagUpdateOne) ClearUsers() *TagUpdateOne {
+	tuo.mutation.ClearUsers()
+	return tuo
+}
+
+// RemoveUserIDs removes the "users" edge to Meta entities by IDs.
+func (tuo *TagUpdateOne) RemoveUserIDs(ids ...int) *TagUpdateOne {
+	tuo.mutation.RemoveUserIDs(ids...)
+	return tuo
+}
+
+// RemoveUsers removes "users" edges to Meta entities.
+func (tuo *TagUpdateOne) RemoveUsers(m ...*Meta) *TagUpdateOne {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return tuo.RemoveUserIDs(ids...)
 }
 
 // Where appends a list predicates to the TagUpdate builder.
@@ -306,6 +424,51 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 	}
 	if tuo.mutation.ThumbnailCleared() {
 		_spec.ClearField(tag.FieldThumbnail, field.TypeBytes)
+	}
+	if tuo.mutation.UsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tag.UsersTable,
+			Columns: []string{tag.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.RemovedUsersIDs(); len(nodes) > 0 && !tuo.mutation.UsersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tag.UsersTable,
+			Columns: []string{tag.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.UsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tag.UsersTable,
+			Columns: []string{tag.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Tag{config: tuo.config}
 	_spec.Assign = _node.assignValues

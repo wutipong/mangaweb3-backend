@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqljson"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
@@ -26,7 +25,7 @@ func Write(ctx context.Context, i *ent.Meta) error {
 		SetFileIndices(i.FileIndices).
 		SetThumbnail(i.Thumbnail).
 		SetRead(i.Read).
-		SetTags(i.Tags).
+		// SetTags(i.Tags).
 		OnConflict(sql.ConflictColumns(meta.FieldName)).
 		UpdateNewValues().Exec(ctx)
 }
@@ -81,10 +80,11 @@ func populatePredicates(criteria []SearchCriteria, predicates []predicate.Meta) 
 		case SearchFieldFavorite:
 			predicates = append(predicates, meta.Favorite(c.Value.(bool)))
 
-		case SearchFieldTag:
-			predicates = append(predicates, func(s *sql.Selector) {
-				s.Where(sqljson.ValueContains(meta.FieldTags, c.Value.(string)))
-			})
+			/*
+				case SearchFieldTag:
+					predicates = append(predicates, func(s *sql.Selector) {
+						s.Where(sqljson.ValueContains(meta.FieldTags, c.Value.(string)))
+					})*/
 		}
 	}
 	return predicates
