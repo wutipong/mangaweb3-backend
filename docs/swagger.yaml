@@ -99,8 +99,8 @@ definitions:
     type: object
   ent.TagEdges:
     properties:
-      users:
-        description: Users holds the value of the users edge.
+      meta:
+        description: Meta holds the value of the meta edge.
         items:
           $ref: '#/definitions/ent.Meta'
         type: array
@@ -164,6 +164,30 @@ definitions:
         type: boolean
       request:
         $ref: '#/definitions/tag.setFavoriteRequest'
+    type: object
+  view.populateTagsRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  view.populateTagsResponse:
+    properties:
+      favorite:
+        type: boolean
+      indices:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      request:
+        $ref: '#/definitions/view.populateTagsRequest'
+      tags:
+        items:
+          $ref: '#/definitions/ent.Tag'
+        type: array
+      version:
+        type: string
     type: object
   view.setFavoriteRequest:
     properties:
@@ -393,6 +417,26 @@ paths:
           description: OK
           schema:
             type: body
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+  /view/populate_tags:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/view.populateTagsRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/view.populateTagsResponse'
         "500":
           description: Internal Server Error
           schema:

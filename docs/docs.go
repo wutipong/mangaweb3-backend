@@ -287,6 +287,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/view/populate_tags": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/view.populateTagsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/view.populateTagsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/view/set_favorite": {
             "post": {
                 "consumes": [
@@ -499,8 +531,8 @@ const docTemplate = `{
         "ent.TagEdges": {
             "type": "object",
             "properties": {
-                "users": {
-                    "description": "Users holds the value of the users edge.",
+                "meta": {
+                    "description": "Meta holds the value of the meta edge.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ent.Meta"
@@ -594,6 +626,43 @@ const docTemplate = `{
                 },
                 "request": {
                     "$ref": "#/definitions/tag.setFavoriteRequest"
+                }
+            }
+        },
+        "view.populateTagsRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "view.populateTagsResponse": {
+            "type": "object",
+            "properties": {
+                "favorite": {
+                    "type": "boolean"
+                },
+                "indices": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "request": {
+                    "$ref": "#/definitions/view.populateTagsRequest"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Tag"
+                    }
+                },
+                "version": {
+                    "type": "string"
                 }
             }
         },

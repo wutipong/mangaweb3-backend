@@ -27,7 +27,6 @@ type Tag struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TagQuery when eager-loading is set.
 	Edges        TagEdges `json:"edges"`
-	meta_tags    *int
 	selectValues sql.SelectValues
 }
 
@@ -62,8 +61,6 @@ func (*Tag) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case tag.FieldName:
 			values[i] = new(sql.NullString)
-		case tag.ForeignKeys[0]: // meta_tags
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -108,13 +105,6 @@ func (t *Tag) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field thumbnail", values[i])
 			} else if value != nil {
 				t.Thumbnail = *value
-			}
-		case tag.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field meta_tags", value)
-			} else if value.Valid {
-				t.meta_tags = new(int)
-				*t.meta_tags = int(value.Int64)
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])

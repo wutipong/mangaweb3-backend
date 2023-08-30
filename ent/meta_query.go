@@ -24,7 +24,6 @@ type MetaQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Meta
 	withTags   *TagQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -75,7 +74,7 @@ func (mq *MetaQuery) QueryTags() *TagQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(meta.Table, meta.FieldID, selector),
 			sqlgraph.To(tag.Table, tag.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, meta.TagsTable, meta.TagsColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, meta.TagsTable, meta.TagsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -370,15 +369,11 @@ func (mq *MetaQuery) prepareQuery(ctx context.Context) error {
 func (mq *MetaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Meta, error) {
 	var (
 		nodes       = []*Meta{}
-		withFKs     = mq.withFKs
 		_spec       = mq.querySpec()
 		loadedTypes = [1]bool{
 			mq.withTags != nil,
 		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, meta.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Meta).scanValues(nil, columns)
 	}
@@ -408,33 +403,63 @@ func (mq *MetaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Meta, e
 }
 
 func (mq *MetaQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Meta, init func(*Meta), assign func(*Meta, *Tag)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Meta)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Meta)
+	nids := make(map[int]map[*Meta]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
 		if init != nil {
-			init(nodes[i])
+			init(node)
 		}
 	}
-	query.withFKs = true
-	query.Where(predicate.Tag(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(meta.TagsColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(meta.TagsTable)
+		s.Join(joinT).On(s.C(tag.FieldID), joinT.C(meta.TagsPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(meta.TagsPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(meta.TagsPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Meta]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Tag](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.meta_tags
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "meta_tags" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "meta_tags" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected "tags" node returned %v`, n.ID)
 		}
-		assign(node, n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

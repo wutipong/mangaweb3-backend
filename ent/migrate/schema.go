@@ -17,21 +17,12 @@ var (
 		{Name: "file_indices", Type: field.TypeJSON},
 		{Name: "thumbnail", Type: field.TypeBytes, Nullable: true},
 		{Name: "read", Type: field.TypeBool},
-		{Name: "tag_meta", Type: field.TypeInt, Nullable: true},
 	}
 	// MetaTable holds the schema information for the "meta" table.
 	MetaTable = &schema.Table{
 		Name:       "meta",
 		Columns:    MetaColumns,
 		PrimaryKey: []*schema.Column{MetaColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "meta_tags_meta",
-				Columns:    []*schema.Column{MetaColumns[7]},
-				RefColumns: []*schema.Column{TagsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// TagsColumns holds the columns for the "tags" table.
 	TagsColumns = []*schema.Column{
@@ -40,19 +31,35 @@ var (
 		{Name: "favorite", Type: field.TypeBool, Default: false},
 		{Name: "hidden", Type: field.TypeBool, Default: false},
 		{Name: "thumbnail", Type: field.TypeBytes, Nullable: true},
-		{Name: "meta_tags", Type: field.TypeInt, Nullable: true},
 	}
 	// TagsTable holds the schema information for the "tags" table.
 	TagsTable = &schema.Table{
 		Name:       "tags",
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
+	}
+	// TagMetaColumns holds the columns for the "tag_meta" table.
+	TagMetaColumns = []*schema.Column{
+		{Name: "tag_id", Type: field.TypeInt},
+		{Name: "meta_id", Type: field.TypeInt},
+	}
+	// TagMetaTable holds the schema information for the "tag_meta" table.
+	TagMetaTable = &schema.Table{
+		Name:       "tag_meta",
+		Columns:    TagMetaColumns,
+		PrimaryKey: []*schema.Column{TagMetaColumns[0], TagMetaColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "tags_meta_tags",
-				Columns:    []*schema.Column{TagsColumns[5]},
+				Symbol:     "tag_meta_tag_id",
+				Columns:    []*schema.Column{TagMetaColumns[0]},
+				RefColumns: []*schema.Column{TagsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "tag_meta_meta_id",
+				Columns:    []*schema.Column{TagMetaColumns[1]},
 				RefColumns: []*schema.Column{MetaColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -60,10 +67,11 @@ var (
 	Tables = []*schema.Table{
 		MetaTable,
 		TagsTable,
+		TagMetaTable,
 	}
 )
 
 func init() {
-	MetaTable.ForeignKeys[0].RefTable = TagsTable
-	TagsTable.ForeignKeys[0].RefTable = MetaTable
+	TagMetaTable.ForeignKeys[0].RefTable = TagsTable
+	TagMetaTable.ForeignKeys[1].RefTable = MetaTable
 }

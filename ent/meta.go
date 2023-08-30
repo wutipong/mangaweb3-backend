@@ -33,7 +33,6 @@ type Meta struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MetaQuery when eager-loading is set.
 	Edges        MetaEdges `json:"edges"`
-	tag_meta     *int
 	selectValues sql.SelectValues
 }
 
@@ -70,8 +69,6 @@ func (*Meta) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case meta.FieldCreateTime:
 			values[i] = new(sql.NullTime)
-		case meta.ForeignKeys[0]: // tag_meta
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -130,13 +127,6 @@ func (m *Meta) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field read", values[i])
 			} else if value.Valid {
 				m.Read = value.Bool
-			}
-		case meta.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field tag_meta", value)
-			} else if value.Valid {
-				m.tag_meta = new(int)
-				*m.tag_meta = int(value.Int64)
 			}
 		default:
 			m.selectValues.Set(columns[i], values[i])

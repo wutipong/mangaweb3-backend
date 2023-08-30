@@ -18,6 +18,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent"
 	tag_util "github.com/wutipong/mangaweb3-backend/tag"
 
+	"golang.org/x/exp/slices"
 	_ "golang.org/x/image/webp"
 )
 
@@ -146,20 +147,46 @@ func GenerateImageIndices(m *ent.Meta) error {
 	return nil
 }
 
-func PopulateTags(m *ent.Meta) {
+func PopulateTags(m *ent.Meta) (out *ent.Meta, err error) {
 	tagStrs := tag_util.ParseTag(m.Name)
+	currentTags, _ := m.QueryTags().All(context.TODO())
+
+	newTags := make([]*ent.Tag, 0)
 	for _, t := range tagStrs {
+
+		if slices.ContainsFunc(currentTags, func(tag *ent.Tag) bool {
+			return tag.Name == t
+		}) {
+			continue
+		}
+
 		var tag *ent.Tag
 		if temp, err := tag_util.Read(context.TODO(), t); err != nil {
 			tag = &ent.Tag{
 				Name: t,
 			}
-			tag_util.Write(context.TODO(), tag)
+
+			tag, _ = client.Tag.Create().
+				SetName(tag.Name).
+				SetFavorite(tag.Favorite).
+				SetHidden(tag.Hidden).
+				Save(context.TODO())
+
 		} else {
 			tag = temp
 		}
-
-		m.Edges.Tags = append(m.Edges.Tags, tag)
-		tag.Edges.Users = append(tag.Edges.Users, m)
+		newTags = append(newTags, tag)
 	}
+
+	m, _ = m.Update().
+		AddTags(currentTags...).
+		Save(context.TODO())
+
+	for _, t := range newTags {
+		t.Update().AddMeta(m).Save(context.TODO())
+	}
+
+	out = m
+
+	return
 }

@@ -299,7 +299,7 @@ func (c *MetaClient) QueryTags(m *Meta) *TagQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(meta.Table, meta.FieldID, id),
 			sqlgraph.To(tag.Table, tag.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, meta.TagsTable, meta.TagsColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, meta.TagsTable, meta.TagsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -433,7 +433,7 @@ func (c *TagClient) QueryMeta(t *Tag) *MetaQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tag.Table, tag.FieldID, id),
 			sqlgraph.To(meta.Table, meta.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, tag.MetaTable, tag.MetaColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, tag.MetaTable, tag.MetaPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
