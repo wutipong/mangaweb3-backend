@@ -57,12 +57,18 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		Interface("request", req).
 		Msg("View Item")
 
+	tags, err := m.QueryTags().All(r.Context())
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
+
 	data := viewResponse{
 		Request:  req,
 		Name:     item,
 		Version:  handler.CreateVersionString(),
 		Favorite: m.Favorite,
-		Tags:     m.Edges.Tags,
+		Tags:     tags,
 		Indices:  m.FileIndices,
 	}
 
