@@ -23,7 +23,7 @@ func RebuildTagThumbnail() error {
 		}
 
 		t.Thumbnail = m.Thumbnail
-		t.Update().Save(context.TODO())
+		t.Update().SetThumbnail(t.Thumbnail).Save(context.TODO())
 	}
 
 	return nil

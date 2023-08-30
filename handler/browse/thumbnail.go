@@ -1,8 +1,6 @@
 package browse
 
 import (
-	"database/sql"
-	"errors"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -27,15 +25,7 @@ func GetThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprout
 		Msg("Thumbnail")
 
 	m, err := meta.Read(r.Context(), item)
-	if errors.Is(err, sql.ErrNoRows) {
-		m, _ = meta.NewItem(item)
-		err = meta.Write(r.Context(), m)
-		if err != nil {
-			handler.WriteResponse(w, err)
-			return
-		}
-
-	} else if err != nil {
+	if err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}

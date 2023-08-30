@@ -28,7 +28,7 @@ func Init(c *ent.Client) {
 	client = c
 }
 
-func NewItem(name string) (i *ent.Meta, err error) {
+func NewItem(ctx context.Context, name string) (i *ent.Meta, err error) {
 	createTime := time.Now()
 
 	if stat, e := fs.Stat(os.DirFS(BaseDirectory), name); e == nil {
@@ -49,7 +49,13 @@ func NewItem(name string) (i *ent.Meta, err error) {
 		return
 	}
 
-	return
+	return client.Meta.Create().
+		SetName(i.Name).
+		SetCreateTime(i.CreateTime).
+		SetFavorite(i.Favorite).
+		SetFileIndices(i.FileIndices).
+		SetRead(false).
+		SetThumbnail(i.Thumbnail).Save(ctx)
 }
 
 func Open(m *ent.Meta) (reader io.ReadCloser, err error) {
@@ -146,9 +152,9 @@ func GenerateImageIndices(m *ent.Meta) error {
 	return nil
 }
 
-func PopulateTags(m *ent.Meta) (out *ent.Meta, err error) {
+func PopulateTags(ctx context.Context, m *ent.Meta) (out *ent.Meta, err error) {
 	tagStrs := tag_util.ParseTag(m.Name)
-	currentTags, _ := m.QueryTags().All(context.TODO())
+	currentTags, _ := m.QueryTags().All(ctx)
 
 	newTags := make([]*ent.Tag, 0)
 	for _, t := range tagStrs {
@@ -160,7 +166,7 @@ func PopulateTags(m *ent.Meta) (out *ent.Meta, err error) {
 		}
 
 		var tag *ent.Tag
-		if temp, err := tag_util.Read(context.TODO(), t); err != nil {
+		if temp, err := tag_util.Read(ctx, t); err != nil {
 			tag = &ent.Tag{
 				Name: t,
 			}
@@ -169,7 +175,8 @@ func PopulateTags(m *ent.Meta) (out *ent.Meta, err error) {
 				SetName(tag.Name).
 				SetFavorite(tag.Favorite).
 				SetHidden(tag.Hidden).
-				Save(context.TODO())
+				SetThumbnail(m.Thumbnail).
+				Save(ctx)
 
 		} else {
 			tag = temp
@@ -178,12 +185,8 @@ func PopulateTags(m *ent.Meta) (out *ent.Meta, err error) {
 	}
 
 	m, _ = m.Update().
-		AddTags(currentTags...).
-		Save(context.TODO())
-
-	for _, t := range newTags {
-		t.Update().AddMeta(m).Save(context.TODO())
-	}
+		AddTags(newTags...).
+		Save(ctx)
 
 	out = m
 
