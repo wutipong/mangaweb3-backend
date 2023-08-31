@@ -62,19 +62,20 @@ func SearchFilter(ctx context.Context,
 	}
 
 	query = query.Where(predicates...)
+
+	field := ""
 	switch sortBy {
 	case SortFieldName:
-		query = query.Order(meta.ByName())
-
+		field = meta.FieldName
 	case SortFieldCreateTime:
-		query = query.Order(meta.ByCreateTime())
+		field = meta.FieldCreateTime
 	}
 
 	switch sortOrder {
 	case SortOrderAscending:
-		query = query.Order(ent.Asc())
+		query = query.Order(ent.Asc(string(field)))
 	case SortOrderDescending:
-		query = query.Order(ent.Desc())
+		query = query.Order(ent.Desc(string(field)))
 	}
 
 	if itemPerPage > 0 {
