@@ -43,10 +43,8 @@ func NewItem(ctx context.Context, name string) (i *ent.Meta, err error) {
 
 	if err = GenerateImageIndices(i); err != nil {
 		return
-	}
-
-	if err = GenerateThumbnail(i, 0); err != nil {
-		return
+	} else {
+		GenerateThumbnail(i, 0)
 	}
 
 	return client.Meta.Create().
