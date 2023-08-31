@@ -1,5 +1,5 @@
 mangaweb.exe
-.vscode/launch.json
+.vscode
 mangaweb
 __debug_bin*
 node_modules
@@ -9,3 +9,4 @@ data-private
 .idea
 static
 act.secret
+.DS_Store
