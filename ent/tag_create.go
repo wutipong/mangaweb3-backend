@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
 
@@ -59,6 +60,21 @@ func (tc *TagCreate) SetNillableHidden(b *bool) *TagCreate {
 func (tc *TagCreate) SetThumbnail(b []byte) *TagCreate {
 	tc.mutation.SetThumbnail(b)
 	return tc
+}
+
+// AddMetumIDs adds the "meta" edge to the Meta entity by IDs.
+func (tc *TagCreate) AddMetumIDs(ids ...int) *TagCreate {
+	tc.mutation.AddMetumIDs(ids...)
+	return tc
+}
+
+// AddMeta adds the "meta" edges to the Meta entity.
+func (tc *TagCreate) AddMeta(m ...*Meta) *TagCreate {
+	ids := make([]int, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return tc.AddMetumIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
@@ -164,6 +180,22 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.Thumbnail(); ok {
 		_spec.SetField(tag.FieldThumbnail, field.TypeBytes, value)
 		_node.Thumbnail = value
+	}
+	if nodes := tc.mutation.MetaIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.MetaTable,
+			Columns: tag.MetaPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

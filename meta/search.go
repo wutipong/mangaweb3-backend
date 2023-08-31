@@ -1,5 +1,14 @@
 package meta
 
+import (
+	"context"
+
+	"github.com/wutipong/mangaweb3-backend/ent"
+	"github.com/wutipong/mangaweb3-backend/ent/meta"
+	"github.com/wutipong/mangaweb3-backend/ent/predicate"
+	"github.com/wutipong/mangaweb3-backend/ent/tag"
+)
+
 type SearchField string
 type SortField string
 type SortOrder string
@@ -19,4 +28,92 @@ const (
 type SearchCriteria struct {
 	Field SearchField
 	Value interface{}
+}
+
+func SearchFilter(ctx context.Context,
+	name string,
+	favoriteOnly bool,
+	searchTag string,
+	sortBy SortField,
+	sortOrder SortOrder,
+	page int,
+	itemPerPage int) (query *ent.MetaQuery, err error) {
+
+	if searchTag != "" {
+		t, e := client.Tag.Query().Where(tag.Name(searchTag)).Only(ctx)
+		if e != nil {
+			err = e
+			return
+		}
+
+		query = t.QueryMeta()
+	} else {
+		query = client.Meta.Query()
+	}
+
+	predicates := []predicate.Meta{}
+
+	if name != "" {
+		predicates = append(predicates, meta.NameContains(name))
+	}
+
+	if favoriteOnly {
+		predicates = append(predicates, meta.Favorite(true))
+	}
+
+	query = query.Where(predicates...)
+	switch sortBy {
+	case SortFieldName:
+		query = query.Order(meta.ByName())
+
+	case SortFieldCreateTime:
+		query = query.Order(meta.ByCreateTime())
+	}
+
+	switch sortOrder {
+	case SortOrderAscending:
+		query = query.Order(ent.Asc())
+	case SortOrderDescending:
+		query = query.Order(ent.Desc())
+	}
+
+	if itemPerPage > 0 {
+		query = query.Limit(itemPerPage).Offset(itemPerPage * page)
+	}
+
+	return
+}
+
+func SearchItems(ctx context.Context,
+	name string,
+	favoriteOnly bool,
+	searchTag string,
+	sortBy SortField,
+	sortOrder SortOrder,
+	page int,
+	itemPerPage int,
+) (items []*ent.Meta, err error) {
+
+	query, err := SearchFilter(ctx, name, favoriteOnly, searchTag, sortBy, sortOrder, page, itemPerPage)
+	if err != nil {
+		return
+	}
+
+	return query.All(ctx)
+}
+
+func CountItems(ctx context.Context,
+	name string,
+	favoriteOnly bool,
+	searchTag string,
+	sortBy SortField,
+	sortOrder SortOrder,
+) (count int, err error) {
+
+	query, err := SearchFilter(ctx, name, favoriteOnly, searchTag, sortBy, sortOrder, 0, 0)
+	if err != nil {
+		return
+	}
+
+	return query.Count(ctx)
 }

@@ -8,4 +8,5 @@ func Register(router *httprouter.Router) {
 	router.POST(PathFavorite, SetFavoriteHandler)
 	router.POST(PathUpdateCover, UpdateCover)
 	router.POST(PathView, Handler)
+	router.POST(PathPopulateTags, PopulateTagsHandler)
 }

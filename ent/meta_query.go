@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -12,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
+	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
 
 // MetaQuery is the builder for querying Meta entities.
@@ -21,6 +23,7 @@ type MetaQuery struct {
 	order      []meta.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Meta
+	withTags   *TagQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -55,6 +58,28 @@ func (mq *MetaQuery) Unique(unique bool) *MetaQuery {
 func (mq *MetaQuery) Order(o ...meta.OrderOption) *MetaQuery {
 	mq.order = append(mq.order, o...)
 	return mq
+}
+
+// QueryTags chains the current query on the "tags" edge.
+func (mq *MetaQuery) QueryTags() *TagQuery {
+	query := (&TagClient{config: mq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(meta.Table, meta.FieldID, selector),
+			sqlgraph.To(tag.Table, tag.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, meta.TagsTable, meta.TagsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Meta entity from the query.
@@ -249,10 +274,22 @@ func (mq *MetaQuery) Clone() *MetaQuery {
 		order:      append([]meta.OrderOption{}, mq.order...),
 		inters:     append([]Interceptor{}, mq.inters...),
 		predicates: append([]predicate.Meta{}, mq.predicates...),
+		withTags:   mq.withTags.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
 	}
+}
+
+// WithTags tells the query-builder to eager-load the nodes that are connected to
+// the "tags" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MetaQuery) WithTags(opts ...func(*TagQuery)) *MetaQuery {
+	query := (&TagClient{config: mq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	mq.withTags = query
+	return mq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -331,8 +368,11 @@ func (mq *MetaQuery) prepareQuery(ctx context.Context) error {
 
 func (mq *MetaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Meta, error) {
 	var (
-		nodes = []*Meta{}
-		_spec = mq.querySpec()
+		nodes       = []*Meta{}
+		_spec       = mq.querySpec()
+		loadedTypes = [1]bool{
+			mq.withTags != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Meta).scanValues(nil, columns)
@@ -340,6 +380,7 @@ func (mq *MetaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Meta, e
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Meta{config: mq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +392,76 @@ func (mq *MetaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Meta, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := mq.withTags; query != nil {
+		if err := mq.loadTags(ctx, query, nodes,
+			func(n *Meta) { n.Edges.Tags = []*Tag{} },
+			func(n *Meta, e *Tag) { n.Edges.Tags = append(n.Edges.Tags, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (mq *MetaQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Meta, init func(*Meta), assign func(*Meta, *Tag)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Meta)
+	nids := make(map[int]map[*Meta]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(meta.TagsTable)
+		s.Join(joinT).On(s.C(tag.FieldID), joinT.C(meta.TagsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(meta.TagsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(meta.TagsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Meta]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Tag](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "tags" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
 }
 
 func (mq *MetaQuery) sqlCount(ctx context.Context) (int, error) {

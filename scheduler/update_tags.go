@@ -4,9 +4,7 @@ import (
 	"context"
 
 	"github.com/rs/zerolog/log"
-	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/meta"
-	"github.com/wutipong/mangaweb3-backend/tag"
 )
 
 func UpdateTags() error {
@@ -15,57 +13,13 @@ func UpdateTags() error {
 		return err
 	}
 
-	tagSet := make(map[string]bool)
 	for _, m := range allMeta {
-		tags := tag.ParseTag(m.Name)
-		for _, t := range tags {
-			tagSet[t] = true
+		log.Info().Str("item", m.Name).Msg("Populate tags.")
+		_, err := meta.PopulateTags(context.Background(), m)
+		if err != nil {
+			log.Err(err).Msg("fails to populate tags.")
 		}
 	}
-
-	allTag, err := tag.ReadAll(context.Background())
-	if err != nil {
-		log.Error().
-			AnErr("error", err).
-			Msg("Cannot read metadata.")
-		return err
-	}
-
-	allTagSet := make(map[string]bool)
-	for _, t := range allTag {
-		allTagSet[t.Name] = true
-	}
-
-	findMetaWithTag := func(tag string) *ent.Meta {
-		for _, m := range allMeta {
-			for _, t := range m.Tags {
-				if t == tag {
-					return m
-				}
-			}
-		}
-
-		return &ent.Meta{}
-	}
-
-	for tagStr := range tagSet {
-		if _, found := allTagSet[tagStr]; !found {
-			t := ent.Tag{
-				Name:     tagStr,
-				Favorite: false,
-				Hidden:   false,
-			}
-			m := findMetaWithTag(tagStr)
-			t.Thumbnail = m.Thumbnail
-
-			err = tag.Write(context.Background(), &t)
-
-			if err != nil {
-				return err
-			}
-		}
-	}
-
 	return nil
 }
 

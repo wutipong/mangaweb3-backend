@@ -44,6 +44,12 @@ definitions:
       create_time:
         description: CreateTime holds the value of the "create_time" field.
         type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.MetaEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the MetaQuery when eager-loading is set.
       favorite:
         description: Favorite holds the value of the "favorite" field.
         type: boolean
@@ -61,14 +67,23 @@ definitions:
       read:
         description: Read holds the value of the "read" field.
         type: boolean
+    type: object
+  ent.MetaEdges:
+    properties:
       tags:
-        description: Tags holds the value of the "tags" field.
+        description: Tags holds the value of the tags edge.
         items:
-          type: string
+          $ref: '#/definitions/ent.Tag'
         type: array
     type: object
   ent.Tag:
     properties:
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.TagEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the TagQuery when eager-loading is set.
       favorite:
         description: Favorite holds the value of the "favorite" field.
         type: boolean
@@ -81,6 +96,14 @@ definitions:
       name:
         description: Name holds the value of the "name" field.
         type: string
+    type: object
+  ent.TagEdges:
+    properties:
+      meta:
+        description: Meta holds the value of the meta edge.
+        items:
+          $ref: '#/definitions/ent.Meta'
+        type: array
     type: object
   errors.Error:
     properties:
@@ -142,6 +165,30 @@ definitions:
       request:
         $ref: '#/definitions/tag.setFavoriteRequest'
     type: object
+  view.populateTagsRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  view.populateTagsResponse:
+    properties:
+      favorite:
+        type: boolean
+      indices:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      request:
+        $ref: '#/definitions/view.populateTagsRequest'
+      tags:
+        items:
+          $ref: '#/definitions/ent.Tag'
+        type: array
+      version:
+        type: string
+    type: object
   view.setFavoriteRequest:
     properties:
       favorite:
@@ -189,7 +236,7 @@ definitions:
         $ref: '#/definitions/view.viewRequest'
       tags:
         items:
-          type: string
+          $ref: '#/definitions/ent.Tag'
         type: array
       version:
         type: string
@@ -228,7 +275,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/browse.recreateThumbnailsResponse'
+            $ref: '#/definitions/browse.rescanLibraryResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -266,6 +313,17 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/tag.listResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+  /tag/recreate_thumbnails:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/browse.recreateThumbnailsResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -370,6 +428,26 @@ paths:
           description: OK
           schema:
             type: body
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+  /view/populate_tags:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/view.populateTagsRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/view.populateTagsResponse'
         "500":
           description: Internal Server Error
           schema:

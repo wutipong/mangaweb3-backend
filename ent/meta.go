@@ -30,9 +30,28 @@ type Meta struct {
 	Thumbnail []byte `json:"-"`
 	// Read holds the value of the "read" field.
 	Read bool `json:"read,omitempty"`
-	// Tags holds the value of the "tags" field.
-	Tags         []string `json:"tags,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the MetaQuery when eager-loading is set.
+	Edges        MetaEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// MetaEdges holds the relations/edges for other nodes in the graph.
+type MetaEdges struct {
+	// Tags holds the value of the tags edge.
+	Tags []*Tag `json:"tags,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// TagsOrErr returns the Tags value or an error if the edge
+// was not loaded in eager-loading.
+func (e MetaEdges) TagsOrErr() ([]*Tag, error) {
+	if e.loadedTypes[0] {
+		return e.Tags, nil
+	}
+	return nil, &NotLoadedError{edge: "tags"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -40,7 +59,7 @@ func (*Meta) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case meta.FieldFileIndices, meta.FieldThumbnail, meta.FieldTags:
+		case meta.FieldFileIndices, meta.FieldThumbnail:
 			values[i] = new([]byte)
 		case meta.FieldFavorite, meta.FieldRead:
 			values[i] = new(sql.NullBool)
@@ -109,14 +128,6 @@ func (m *Meta) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.Read = value.Bool
 			}
-		case meta.FieldTags:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field tags", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &m.Tags); err != nil {
-					return fmt.Errorf("unmarshal field tags: %w", err)
-				}
-			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
 		}
@@ -128,6 +139,11 @@ func (m *Meta) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (m *Meta) Value(name string) (ent.Value, error) {
 	return m.selectValues.Get(name)
+}
+
+// QueryTags queries the "tags" edge of the Meta entity.
+func (m *Meta) QueryTags() *TagQuery {
+	return NewMetaClient(m.config).QueryTags(m)
 }
 
 // Update returns a builder for updating this Meta.
@@ -169,9 +185,6 @@ func (m *Meta) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("read=")
 	builder.WriteString(fmt.Sprintf("%v", m.Read))
-	builder.WriteString(", ")
-	builder.WriteString("tags=")
-	builder.WriteString(fmt.Sprintf("%v", m.Tags))
 	builder.WriteByte(')')
 	return builder.String()
 }

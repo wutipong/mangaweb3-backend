@@ -34,7 +34,7 @@ func ScanLibrary() error {
 			Str("file", file).
 			Msg("Creating metadata.")
 
-		item, err := meta.NewItem(file)
+		item, err := meta.NewItem(context.Background(), file)
 		if err != nil {
 			log.
 				Error().
@@ -42,7 +42,7 @@ func ScanLibrary() error {
 				Msg("Failed to create meta data.")
 		}
 
-		err = meta.Write(context.Background(), item)
+		_, err = meta.PopulateTags(context.Background(), item)
 		if err != nil {
 			log.Error().
 				AnErr("error", err).

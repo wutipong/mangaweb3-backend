@@ -10,30 +10,30 @@ import (
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
-type viewRequest struct {
+type populateTagsRequest struct {
 	Name string `json:"name"`
 }
 
-type viewResponse struct {
-	Request  viewRequest `json:"request"`
-	Name     string      `json:"name"`
-	Version  string      `json:"version"`
-	Favorite bool        `json:"favorite"`
-	Indices  []int       `json:"indices"`
-	Tags     []*ent.Tag  `json:"tags"`
+type populateTagsResponse struct {
+	Request  populateTagsRequest `json:"request"`
+	Name     string              `json:"name"`
+	Version  string              `json:"version"`
+	Favorite bool                `json:"favorite"`
+	Indices  []int               `json:"indices"`
+	Tags     []*ent.Tag          `json:"tags"`
 }
 
 const (
-	PathView = "/view"
+	PathPopulateTags = "/view/populate_tags"
 )
 
 // @accept json
-// @Param request body view.viewRequest true "request"
-// @Success      200  {object}  view.viewResponse
+// @Param request body view.populateTagsRequest true "request"
+// @Success      200  {object}  view.populateTagsResponse
 // @Failure      500  {object}  errors.Error
-// @Router /view [post]
-func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	req := viewRequest{}
+// @Router /view/populate_tags [post]
+func PopulateTagsHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	req := populateTagsRequest{}
 
 	if err := handler.ParseInput(r.Body, &req); err != nil {
 		handler.WriteResponse(w, err)
@@ -48,14 +48,15 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	if !m.Read {
-		m.Read = true
-		meta.Write(r.Context(), m)
-	}
-
 	log.Info().
 		Interface("request", req).
 		Msg("View Item")
+
+	m, err = meta.PopulateTags(r.Context(), m)
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
 
 	tags, err := m.QueryTags().All(r.Context())
 	if err != nil {
@@ -63,7 +64,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	data := viewResponse{
+	data := populateTagsResponse{
 		Request:  req,
 		Name:     item,
 		Version:  handler.CreateVersionString(),

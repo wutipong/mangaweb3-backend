@@ -56,36 +56,25 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		handler.WriteResponse(w, err)
 	}
 
-	search := req.Search
-	searchCriteria := make([]meta.SearchCriteria, 0)
-	if search != "" {
-		searchCriteria = append(searchCriteria, meta.SearchCriteria{
-			Field: meta.SearchFieldName,
-			Value: search,
-		})
-	}
-
-	if req.FavoriteOnly {
-		searchCriteria = append(searchCriteria, meta.SearchCriteria{
-			Field: meta.SearchFieldFavorite,
-			Value: true,
-		})
-	}
-
-	if req.Tag != "" {
-		searchCriteria = append(searchCriteria, meta.SearchCriteria{
-			Field: meta.SearchFieldTag,
-			Value: req.Tag,
-		})
-	}
-
-	allMeta, err := meta.Search(r.Context(), searchCriteria, req.Sort, req.Order, req.ItemPerPage, req.Page)
+	allMeta, err := meta.SearchItems(r.Context(),
+		req.Search,
+		req.FavoriteOnly,
+		req.Tag,
+		req.Sort,
+		req.Order,
+		req.Page,
+		req.ItemPerPage)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
 
-	count, err := meta.Count(r.Context(), searchCriteria)
+	count, err := meta.CountItems(r.Context(),
+		req.Search,
+		req.FavoriteOnly,
+		req.Tag,
+		req.Sort,
+		req.Order)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

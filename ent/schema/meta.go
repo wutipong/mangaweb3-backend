@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -19,11 +20,13 @@ func (Meta) Fields() []ent.Field {
 		field.Ints("file_indices"),
 		field.Bytes("thumbnail").Optional().Sensitive(),
 		field.Bool("read"),
-		field.Strings("tags"),
+		// field.Strings("tags"),
 	}
 }
 
 // Edges of the Meta.
 func (Meta) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("tags", Tag.Type),
+	}
 }

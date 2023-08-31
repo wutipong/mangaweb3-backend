@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
+	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
 
 // MetaUpdate is the builder for updating Meta entities.
@@ -85,21 +86,45 @@ func (mu *MetaUpdate) SetRead(b bool) *MetaUpdate {
 	return mu
 }
 
-// SetTags sets the "tags" field.
-func (mu *MetaUpdate) SetTags(s []string) *MetaUpdate {
-	mu.mutation.SetTags(s)
+// AddTagIDs adds the "tags" edge to the Tag entity by IDs.
+func (mu *MetaUpdate) AddTagIDs(ids ...int) *MetaUpdate {
+	mu.mutation.AddTagIDs(ids...)
 	return mu
 }
 
-// AppendTags appends s to the "tags" field.
-func (mu *MetaUpdate) AppendTags(s []string) *MetaUpdate {
-	mu.mutation.AppendTags(s)
-	return mu
+// AddTags adds the "tags" edges to the Tag entity.
+func (mu *MetaUpdate) AddTags(t ...*Tag) *MetaUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return mu.AddTagIDs(ids...)
 }
 
 // Mutation returns the MetaMutation object of the builder.
 func (mu *MetaUpdate) Mutation() *MetaMutation {
 	return mu.mutation
+}
+
+// ClearTags clears all "tags" edges to the Tag entity.
+func (mu *MetaUpdate) ClearTags() *MetaUpdate {
+	mu.mutation.ClearTags()
+	return mu
+}
+
+// RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
+func (mu *MetaUpdate) RemoveTagIDs(ids ...int) *MetaUpdate {
+	mu.mutation.RemoveTagIDs(ids...)
+	return mu
+}
+
+// RemoveTags removes "tags" edges to Tag entities.
+func (mu *MetaUpdate) RemoveTags(t ...*Tag) *MetaUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return mu.RemoveTagIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -177,13 +202,50 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.Read(); ok {
 		_spec.SetField(meta.FieldRead, field.TypeBool, value)
 	}
-	if value, ok := mu.mutation.Tags(); ok {
-		_spec.SetField(meta.FieldTags, field.TypeJSON, value)
+	if mu.mutation.TagsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   meta.TagsTable,
+			Columns: meta.TagsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := mu.mutation.AppendedTags(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, meta.FieldTags, value)
-		})
+	if nodes := mu.mutation.RemovedTagsIDs(); len(nodes) > 0 && !mu.mutation.TagsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   meta.TagsTable,
+			Columns: meta.TagsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.TagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   meta.TagsTable,
+			Columns: meta.TagsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -261,21 +323,45 @@ func (muo *MetaUpdateOne) SetRead(b bool) *MetaUpdateOne {
 	return muo
 }
 
-// SetTags sets the "tags" field.
-func (muo *MetaUpdateOne) SetTags(s []string) *MetaUpdateOne {
-	muo.mutation.SetTags(s)
+// AddTagIDs adds the "tags" edge to the Tag entity by IDs.
+func (muo *MetaUpdateOne) AddTagIDs(ids ...int) *MetaUpdateOne {
+	muo.mutation.AddTagIDs(ids...)
 	return muo
 }
 
-// AppendTags appends s to the "tags" field.
-func (muo *MetaUpdateOne) AppendTags(s []string) *MetaUpdateOne {
-	muo.mutation.AppendTags(s)
-	return muo
+// AddTags adds the "tags" edges to the Tag entity.
+func (muo *MetaUpdateOne) AddTags(t ...*Tag) *MetaUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return muo.AddTagIDs(ids...)
 }
 
 // Mutation returns the MetaMutation object of the builder.
 func (muo *MetaUpdateOne) Mutation() *MetaMutation {
 	return muo.mutation
+}
+
+// ClearTags clears all "tags" edges to the Tag entity.
+func (muo *MetaUpdateOne) ClearTags() *MetaUpdateOne {
+	muo.mutation.ClearTags()
+	return muo
+}
+
+// RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
+func (muo *MetaUpdateOne) RemoveTagIDs(ids ...int) *MetaUpdateOne {
+	muo.mutation.RemoveTagIDs(ids...)
+	return muo
+}
+
+// RemoveTags removes "tags" edges to Tag entities.
+func (muo *MetaUpdateOne) RemoveTags(t ...*Tag) *MetaUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return muo.RemoveTagIDs(ids...)
 }
 
 // Where appends a list predicates to the MetaUpdate builder.
@@ -383,13 +469,50 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	if value, ok := muo.mutation.Read(); ok {
 		_spec.SetField(meta.FieldRead, field.TypeBool, value)
 	}
-	if value, ok := muo.mutation.Tags(); ok {
-		_spec.SetField(meta.FieldTags, field.TypeJSON, value)
+	if muo.mutation.TagsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   meta.TagsTable,
+			Columns: meta.TagsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if value, ok := muo.mutation.AppendedTags(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, meta.FieldTags, value)
-		})
+	if nodes := muo.mutation.RemovedTagsIDs(); len(nodes) > 0 && !muo.mutation.TagsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   meta.TagsTable,
+			Columns: meta.TagsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.TagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   meta.TagsTable,
+			Columns: meta.TagsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Meta{config: muo.config}
 	_spec.Assign = _node.assignValues

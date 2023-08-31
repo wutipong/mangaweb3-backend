@@ -23,8 +23,29 @@ type Tag struct {
 	// Hidden holds the value of the "hidden" field.
 	Hidden bool `json:"hidden,omitempty"`
 	// Thumbnail holds the value of the "thumbnail" field.
-	Thumbnail    []byte `json:"-"`
+	Thumbnail []byte `json:"-"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the TagQuery when eager-loading is set.
+	Edges        TagEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// TagEdges holds the relations/edges for other nodes in the graph.
+type TagEdges struct {
+	// Meta holds the value of the meta edge.
+	Meta []*Meta `json:"meta,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// MetaOrErr returns the Meta value or an error if the edge
+// was not loaded in eager-loading.
+func (e TagEdges) MetaOrErr() ([]*Meta, error) {
+	if e.loadedTypes[0] {
+		return e.Meta, nil
+	}
+	return nil, &NotLoadedError{edge: "meta"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -96,6 +117,11 @@ func (t *Tag) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (t *Tag) Value(name string) (ent.Value, error) {
 	return t.selectValues.Get(name)
+}
+
+// QueryMeta queries the "meta" edge of the Tag entity.
+func (t *Tag) QueryMeta() *MetaQuery {
+	return NewTagClient(t.config).QueryMeta(t)
 }
 
 // Update returns a builder for updating this Tag.

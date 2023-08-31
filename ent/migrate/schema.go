@@ -17,7 +17,6 @@ var (
 		{Name: "file_indices", Type: field.TypeJSON},
 		{Name: "thumbnail", Type: field.TypeBytes, Nullable: true},
 		{Name: "read", Type: field.TypeBool},
-		{Name: "tags", Type: field.TypeJSON},
 	}
 	// MetaTable holds the schema information for the "meta" table.
 	MetaTable = &schema.Table{
@@ -39,12 +38,40 @@ var (
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
 	}
+	// MetaTagsColumns holds the columns for the "meta_tags" table.
+	MetaTagsColumns = []*schema.Column{
+		{Name: "meta_id", Type: field.TypeInt},
+		{Name: "tag_id", Type: field.TypeInt},
+	}
+	// MetaTagsTable holds the schema information for the "meta_tags" table.
+	MetaTagsTable = &schema.Table{
+		Name:       "meta_tags",
+		Columns:    MetaTagsColumns,
+		PrimaryKey: []*schema.Column{MetaTagsColumns[0], MetaTagsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "meta_tags_meta_id",
+				Columns:    []*schema.Column{MetaTagsColumns[0]},
+				RefColumns: []*schema.Column{MetaColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "meta_tags_tag_id",
+				Columns:    []*schema.Column{MetaTagsColumns[1]},
+				RefColumns: []*schema.Column{TagsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		MetaTable,
 		TagsTable,
+		MetaTagsTable,
 	}
 )
 
 func init() {
+	MetaTagsTable.ForeignKeys[0].RefTable = MetaTable
+	MetaTagsTable.ForeignKeys[1].RefTable = TagsTable
 }

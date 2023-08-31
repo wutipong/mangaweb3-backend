@@ -4,6 +4,7 @@ package tag
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
 )
 
@@ -205,6 +206,29 @@ func ThumbnailIsNil() predicate.Tag {
 // ThumbnailNotNil applies the NotNil predicate on the "thumbnail" field.
 func ThumbnailNotNil() predicate.Tag {
 	return predicate.Tag(sql.FieldNotNull(FieldThumbnail))
+}
+
+// HasMeta applies the HasEdge predicate on the "meta" edge.
+func HasMeta() predicate.Tag {
+	return predicate.Tag(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, MetaTable, MetaPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMetaWith applies the HasEdge predicate on the "meta" edge with a given conditions (other predicates).
+func HasMetaWith(preds ...predicate.Meta) predicate.Tag {
+	return predicate.Tag(func(s *sql.Selector) {
+		step := newMetaStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.
