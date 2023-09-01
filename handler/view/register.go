@@ -9,4 +9,5 @@ func Register(router *httprouter.Router) {
 	router.POST(PathUpdateCover, UpdateCover)
 	router.POST(PathView, Handler)
 	router.POST(PathPopulateTags, PopulateTagsHandler)
+	router.POST(PathFixMeta, FixMeta)
 }

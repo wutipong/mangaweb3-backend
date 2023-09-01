@@ -259,6 +259,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/view/fix_meta": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/view.fixMetaRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/view.fixMetaResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/view/get_image": {
             "get": {
                 "parameters": [
@@ -647,6 +679,25 @@ const docTemplate = `{
                 }
             }
         },
+        "view.fixMetaRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "view.fixMetaResponse": {
+            "type": "object",
+            "properties": {
+                "request": {
+                    "$ref": "#/definitions/view.fixMetaRequest"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "view.populateTagsRequest": {
             "type": "object",
             "properties": {
@@ -742,14 +793,11 @@ const docTemplate = `{
                 "favorite": {
                     "type": "boolean"
                 },
-                "indices": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
                 "name": {
                     "type": "string"
+                },
+                "page_count": {
+                    "type": "integer"
                 },
                 "request": {
                     "$ref": "#/definitions/view.viewRequest"
