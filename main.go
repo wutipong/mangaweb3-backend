@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"net/http"
 	"os"
+	"strings"
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
@@ -55,9 +56,11 @@ func main() {
 		connectionStr = v
 	}
 
-	if _, b := os.LookupEnv("MANGAWEB_DEVELOPMENT"); b {
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).
-			Level(zerolog.DebugLevel)
+	if v, b := os.LookupEnv("MANGAWEB_ENVIRONMENT"); b {
+		if strings.ToLower(strings.TrimSpace(v)) == "development" {
+			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).
+				Level(zerolog.DebugLevel)
+		}
 	}
 
 	meta.BaseDirectory = dataPath
