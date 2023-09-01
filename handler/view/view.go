@@ -15,12 +15,12 @@ type viewRequest struct {
 }
 
 type viewResponse struct {
-	Request  viewRequest `json:"request"`
-	Name     string      `json:"name"`
-	Version  string      `json:"version"`
-	Favorite bool        `json:"favorite"`
-	Indices  []int       `json:"indices"`
-	Tags     []*ent.Tag  `json:"tags"`
+	Request   viewRequest `json:"request"`
+	Name      string      `json:"name"`
+	Version   string      `json:"version"`
+	Favorite  bool        `json:"favorite"`
+	PageCount int         `json:"page_count"`
+	Tags      []*ent.Tag  `json:"tags"`
 }
 
 const (
@@ -64,12 +64,12 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	}
 
 	data := viewResponse{
-		Request:  req,
-		Name:     item,
-		Version:  handler.CreateVersionString(),
-		Favorite: m.Favorite,
-		Tags:     tags,
-		Indices:  m.FileIndices,
+		Request:   req,
+		Name:      item,
+		Version:   handler.CreateVersionString(),
+		Favorite:  m.Favorite,
+		Tags:      tags,
+		PageCount: len(m.FileIndices),
 	}
 
 	handler.WriteResponse(w, data)
