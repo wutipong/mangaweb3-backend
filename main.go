@@ -56,10 +56,13 @@ func main() {
 		connectionStr = v
 	}
 
+	debugMode := false
 	if v, b := os.LookupEnv("MANGAWEB_ENVIRONMENT"); b {
 		if strings.ToLower(strings.TrimSpace(v)) == "development" {
 			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).
 				Level(zerolog.DebugLevel)
+
+			debugMode = true
 		}
 	}
 
@@ -79,7 +82,17 @@ func main() {
 		drv := entsql.OpenDB(dialect.Postgres, db)
 		defer db.Close()
 
-		client = ent.NewClient(ent.Driver(drv))
+		options := []ent.Option{
+			ent.Driver(drv),
+			ent.Log(func(params ...any) {
+				log.Debug().Any("params", params).Msg("Ent Debug")
+			}),
+		}
+		if debugMode {
+			options = append(options, ent.Debug())
+		}
+
+		client = ent.NewClient(options...)
 		defer client.Close()
 	}
 
