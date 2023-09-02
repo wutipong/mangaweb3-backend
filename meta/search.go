@@ -51,7 +51,9 @@ func SearchFilter(ctx context.Context,
 		query = client.Meta.Query()
 	}
 
-	predicates := []predicate.Meta{}
+	predicates := []predicate.Meta{
+		meta.Active(true),
+	}
 
 	if name != "" {
 		predicates = append(predicates, meta.NameContains(name))
