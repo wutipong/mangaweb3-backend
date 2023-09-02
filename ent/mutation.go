@@ -42,6 +42,7 @@ type MetaMutation struct {
 	appendfile_indices []int
 	thumbnail          *[]byte
 	read               *bool
+	active             *bool
 	clearedFields      map[string]struct{}
 	tags               map[int]struct{}
 	removedtags        map[int]struct{}
@@ -393,6 +394,42 @@ func (m *MetaMutation) ResetRead() {
 	m.read = nil
 }
 
+// SetActive sets the "active" field.
+func (m *MetaMutation) SetActive(b bool) {
+	m.active = &b
+}
+
+// Active returns the value of the "active" field in the mutation.
+func (m *MetaMutation) Active() (r bool, exists bool) {
+	v := m.active
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActive returns the old "active" field's value of the Meta entity.
+// If the Meta object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MetaMutation) OldActive(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActive is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActive requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActive: %w", err)
+	}
+	return oldValue.Active, nil
+}
+
+// ResetActive resets all changes to the "active" field.
+func (m *MetaMutation) ResetActive() {
+	m.active = nil
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by ids.
 func (m *MetaMutation) AddTagIDs(ids ...int) {
 	if m.tags == nil {
@@ -481,7 +518,7 @@ func (m *MetaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MetaMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.name != nil {
 		fields = append(fields, meta.FieldName)
 	}
@@ -499,6 +536,9 @@ func (m *MetaMutation) Fields() []string {
 	}
 	if m.read != nil {
 		fields = append(fields, meta.FieldRead)
+	}
+	if m.active != nil {
+		fields = append(fields, meta.FieldActive)
 	}
 	return fields
 }
@@ -520,6 +560,8 @@ func (m *MetaMutation) Field(name string) (ent.Value, bool) {
 		return m.Thumbnail()
 	case meta.FieldRead:
 		return m.Read()
+	case meta.FieldActive:
+		return m.Active()
 	}
 	return nil, false
 }
@@ -541,6 +583,8 @@ func (m *MetaMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldThumbnail(ctx)
 	case meta.FieldRead:
 		return m.OldRead(ctx)
+	case meta.FieldActive:
+		return m.OldActive(ctx)
 	}
 	return nil, fmt.Errorf("unknown Meta field %s", name)
 }
@@ -591,6 +635,13 @@ func (m *MetaMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRead(v)
+		return nil
+	case meta.FieldActive:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActive(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Meta field %s", name)
@@ -667,6 +718,9 @@ func (m *MetaMutation) ResetField(name string) error {
 		return nil
 	case meta.FieldRead:
 		m.ResetRead()
+		return nil
+	case meta.FieldActive:
+		m.ResetActive()
 		return nil
 	}
 	return fmt.Errorf("unknown Meta field %s", name)

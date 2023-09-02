@@ -20,7 +20,7 @@ func (Meta) Fields() []ent.Field {
 		field.Ints("file_indices"),
 		field.Bytes("thumbnail").Optional().Sensitive(),
 		field.Bool("read"),
-		// field.Strings("tags"),
+		field.Bool("active").Default(true),
 	}
 }
 

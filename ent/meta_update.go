@@ -86,6 +86,20 @@ func (mu *MetaUpdate) SetRead(b bool) *MetaUpdate {
 	return mu
 }
 
+// SetActive sets the "active" field.
+func (mu *MetaUpdate) SetActive(b bool) *MetaUpdate {
+	mu.mutation.SetActive(b)
+	return mu
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableActive(b *bool) *MetaUpdate {
+	if b != nil {
+		mu.SetActive(*b)
+	}
+	return mu
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (mu *MetaUpdate) AddTagIDs(ids ...int) *MetaUpdate {
 	mu.mutation.AddTagIDs(ids...)
@@ -201,6 +215,9 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := mu.mutation.Read(); ok {
 		_spec.SetField(meta.FieldRead, field.TypeBool, value)
+	}
+	if value, ok := mu.mutation.Active(); ok {
+		_spec.SetField(meta.FieldActive, field.TypeBool, value)
 	}
 	if mu.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -320,6 +337,20 @@ func (muo *MetaUpdateOne) ClearThumbnail() *MetaUpdateOne {
 // SetRead sets the "read" field.
 func (muo *MetaUpdateOne) SetRead(b bool) *MetaUpdateOne {
 	muo.mutation.SetRead(b)
+	return muo
+}
+
+// SetActive sets the "active" field.
+func (muo *MetaUpdateOne) SetActive(b bool) *MetaUpdateOne {
+	muo.mutation.SetActive(b)
+	return muo
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableActive(b *bool) *MetaUpdateOne {
+	if b != nil {
+		muo.SetActive(*b)
+	}
 	return muo
 }
 
@@ -468,6 +499,9 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	}
 	if value, ok := muo.mutation.Read(); ok {
 		_spec.SetField(meta.FieldRead, field.TypeBool, value)
+	}
+	if value, ok := muo.mutation.Active(); ok {
+		_spec.SetField(meta.FieldActive, field.TypeBool, value)
 	}
 	if muo.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{

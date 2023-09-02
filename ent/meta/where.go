@@ -80,6 +80,11 @@ func Read(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldEQ(FieldRead, v))
 }
 
+// Active applies equality check predicate on the "active" field. It's identical to ActiveEQ.
+func Active(v bool) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldActive, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Meta {
 	return predicate.Meta(sql.FieldEQ(FieldName, v))
@@ -253,6 +258,16 @@ func ReadEQ(v bool) predicate.Meta {
 // ReadNEQ applies the NEQ predicate on the "read" field.
 func ReadNEQ(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldNEQ(FieldRead, v))
+}
+
+// ActiveEQ applies the EQ predicate on the "active" field.
+func ActiveEQ(v bool) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldActive, v))
+}
+
+// ActiveNEQ applies the NEQ predicate on the "active" field.
+func ActiveNEQ(v bool) predicate.Meta {
+	return predicate.Meta(sql.FieldNEQ(FieldActive, v))
 }
 
 // HasTags applies the HasEdge predicate on the "tags" edge.

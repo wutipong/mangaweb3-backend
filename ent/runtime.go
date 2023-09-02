@@ -22,6 +22,10 @@ func init() {
 	metaDescFavorite := metaFields[2].Descriptor()
 	// meta.DefaultFavorite holds the default value on creation for the favorite field.
 	meta.DefaultFavorite = metaDescFavorite.Default.(bool)
+	// metaDescActive is the schema descriptor for active field.
+	metaDescActive := metaFields[6].Descriptor()
+	// meta.DefaultActive holds the default value on creation for the active field.
+	meta.DefaultActive = metaDescActive.Default.(bool)
 	tagFields := schema.Tag{}.Fields()
 	_ = tagFields
 	// tagDescName is the schema descriptor for name field.

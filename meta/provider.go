@@ -28,10 +28,6 @@ func Write(ctx context.Context, i *ent.Meta) error {
 		UpdateNewValues().Exec(ctx)
 }
 
-func Delete(ctx context.Context, i *ent.Meta) error {
-	return client.Meta.DeleteOne(i).Exec(ctx)
-}
-
 func Read(ctx context.Context, name string) (i *ent.Meta, err error) {
 	return client.Meta.Query().Where(meta.Name(name)).Only(ctx)
 }

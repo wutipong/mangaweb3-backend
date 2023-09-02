@@ -23,12 +23,24 @@ func ScanLibrary() error {
 		for _, m := range allMeta {
 			if m.Name == file {
 				found = true
+
+				if m.Active {
+					break
+				}
+
+				m.Active = true
+				if err := meta.Write(context.Background(), m); err != nil {
+					log.Error().
+						Str("name", m.Name).
+						AnErr("error", err).
+						Msg("Failed to re-activate meta")
+				}
 				break
 			}
 		}
 		if found {
 			continue
-		}
+		}3
 
 		log.Info().
 			Str("file", file).
@@ -62,14 +74,15 @@ func ScanLibrary() error {
 			continue
 		}
 
-		log.Info().Str("file", m.Name).Msg("Deleting metadata.")
-		if err := meta.Delete(context.Background(), m); err != nil {
+		log.Info().Str("file", m.Name).Msg("Inactivate metadata.")
+		m.Active = false
+
+		if err := meta.Write(context.Background(), m); err != nil {
 			log.Error().
 				Str("name", m.Name).
 				AnErr("error", err).
-				Msg("Failed to delete meta")
+				Msg("Failed to inactivate meta")
 		}
-
 	}
 
 	return nil
