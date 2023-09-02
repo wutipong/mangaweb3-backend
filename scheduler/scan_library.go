@@ -40,7 +40,7 @@ func ScanLibrary() error {
 		}
 		if found {
 			continue
-		}3
+		}
 
 		log.Info().
 			Str("file", file).
