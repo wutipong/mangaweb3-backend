@@ -27,15 +27,6 @@ func ScanLibrary() error {
 				if m.Active {
 					break
 				}
-
-				m.Active = true
-				if err := meta.Write(context.Background(), m); err != nil {
-					log.Error().
-						Str("name", m.Name).
-						AnErr("error", err).
-						Msg("Failed to re-activate meta")
-				}
-				break
 			}
 		}
 		if found {
@@ -46,19 +37,29 @@ func ScanLibrary() error {
 			Str("file", file).
 			Msg("Creating metadata.")
 
-		item, err := meta.NewItem(context.Background(), file)
-		if err != nil {
-			log.
-				Error().
-				AnErr("error", err).
-				Msg("Failed to create meta data.")
-		}
+		if item, err := meta.Read(context.Background(), file); err == nil {
+			item.Active = true
+			if err := meta.Write(context.Background(), item); err != nil {
+				log.Error().
+					Str("name", item.Name).
+					AnErr("error", err).
+					Msg("Failed to re-activate meta")
+			}
+		} else {
+			item, err := meta.NewItem(context.Background(), file)
+			if err != nil {
+				log.
+					Error().
+					AnErr("error", err).
+					Msg("Failed to create meta data.")
+			}
 
-		_, err = meta.PopulateTags(context.Background(), item)
-		if err != nil {
-			log.Error().
-				AnErr("error", err).
-				Msg("Failed to write meta data.")
+			_, err = meta.PopulateTags(context.Background(), item)
+			if err != nil {
+				log.Error().
+					AnErr("error", err).
+					Msg("Failed to write meta data.")
+			}
 		}
 	}
 

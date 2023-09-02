@@ -24,6 +24,7 @@ func Write(ctx context.Context, i *ent.Meta) error {
 		SetFileIndices(i.FileIndices).
 		SetThumbnail(i.Thumbnail).
 		SetRead(i.Read).
+		SetActive(i.Active).
 		OnConflict(sql.ConflictColumns(meta.FieldName)).
 		UpdateNewValues().Exec(ctx)
 }
@@ -33,5 +34,5 @@ func Read(ctx context.Context, name string) (i *ent.Meta, err error) {
 }
 
 func ReadAll(ctx context.Context) (items []*ent.Meta, err error) {
-	return client.Meta.Query().All(ctx)
+	return client.Meta.Query().Where(meta.Active(true)).All(ctx)
 }
