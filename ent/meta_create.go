@@ -67,6 +67,20 @@ func (mc *MetaCreate) SetRead(b bool) *MetaCreate {
 	return mc
 }
 
+// SetActive sets the "active" field.
+func (mc *MetaCreate) SetActive(b bool) *MetaCreate {
+	mc.mutation.SetActive(b)
+	return mc
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableActive(b *bool) *MetaCreate {
+	if b != nil {
+		mc.SetActive(*b)
+	}
+	return mc
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (mc *MetaCreate) AddTagIDs(ids ...int) *MetaCreate {
 	mc.mutation.AddTagIDs(ids...)
@@ -121,6 +135,10 @@ func (mc *MetaCreate) defaults() {
 		v := meta.DefaultFavorite
 		mc.mutation.SetFavorite(v)
 	}
+	if _, ok := mc.mutation.Active(); !ok {
+		v := meta.DefaultActive
+		mc.mutation.SetActive(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -144,6 +162,9 @@ func (mc *MetaCreate) check() error {
 	}
 	if _, ok := mc.mutation.Read(); !ok {
 		return &ValidationError{Name: "read", err: errors.New(`ent: missing required field "Meta.read"`)}
+	}
+	if _, ok := mc.mutation.Active(); !ok {
+		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "Meta.active"`)}
 	}
 	return nil
 }
@@ -195,6 +216,10 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.Read(); ok {
 		_spec.SetField(meta.FieldRead, field.TypeBool, value)
 		_node.Read = value
+	}
+	if value, ok := mc.mutation.Active(); ok {
+		_spec.SetField(meta.FieldActive, field.TypeBool, value)
+		_node.Active = value
 	}
 	if nodes := mc.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -342,6 +367,18 @@ func (u *MetaUpsert) UpdateRead() *MetaUpsert {
 	return u
 }
 
+// SetActive sets the "active" field.
+func (u *MetaUpsert) SetActive(v bool) *MetaUpsert {
+	u.Set(meta.FieldActive, v)
+	return u
+}
+
+// UpdateActive sets the "active" field to the value that was provided on create.
+func (u *MetaUpsert) UpdateActive() *MetaUpsert {
+	u.SetExcluded(meta.FieldActive)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -470,6 +507,20 @@ func (u *MetaUpsertOne) SetRead(v bool) *MetaUpsertOne {
 func (u *MetaUpsertOne) UpdateRead() *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateRead()
+	})
+}
+
+// SetActive sets the "active" field.
+func (u *MetaUpsertOne) SetActive(v bool) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetActive(v)
+	})
+}
+
+// UpdateActive sets the "active" field to the value that was provided on create.
+func (u *MetaUpsertOne) UpdateActive() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateActive()
 	})
 }
 
@@ -761,6 +812,20 @@ func (u *MetaUpsertBulk) SetRead(v bool) *MetaUpsertBulk {
 func (u *MetaUpsertBulk) UpdateRead() *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateRead()
+	})
+}
+
+// SetActive sets the "active" field.
+func (u *MetaUpsertBulk) SetActive(v bool) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetActive(v)
+	})
+}
+
+// UpdateActive sets the "active" field to the value that was provided on create.
+func (u *MetaUpsertBulk) UpdateActive() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateActive()
 	})
 }
 

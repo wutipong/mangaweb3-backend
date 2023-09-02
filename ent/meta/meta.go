@@ -24,6 +24,8 @@ const (
 	FieldThumbnail = "thumbnail"
 	// FieldRead holds the string denoting the read field in the database.
 	FieldRead = "read"
+	// FieldActive holds the string denoting the active field in the database.
+	FieldActive = "active"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
 	EdgeTags = "tags"
 	// Table holds the table name of the meta in the database.
@@ -44,6 +46,7 @@ var Columns = []string{
 	FieldFileIndices,
 	FieldThumbnail,
 	FieldRead,
+	FieldActive,
 }
 
 var (
@@ -67,6 +70,8 @@ var (
 	NameValidator func(string) error
 	// DefaultFavorite holds the default value on creation for the "favorite" field.
 	DefaultFavorite bool
+	// DefaultActive holds the default value on creation for the "active" field.
+	DefaultActive bool
 )
 
 // OrderOption defines the ordering options for the Meta queries.
@@ -95,6 +100,11 @@ func ByFavorite(opts ...sql.OrderTermOption) OrderOption {
 // ByRead orders the results by the read field.
 func ByRead(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRead, opts...).ToFunc()
+}
+
+// ByActive orders the results by the active field.
+func ByActive(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldActive, opts...).ToFunc()
 }
 
 // ByTagsCount orders the results by tags count.

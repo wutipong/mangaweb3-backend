@@ -14,10 +14,6 @@ func Init(c *ent.Client) {
 	client = c
 }
 
-func Delete(ctx context.Context, t ent.Tag) error {
-	return client.Tag.DeleteOne(&t).Exec(ctx)
-}
-
 func IsTagExist(ctx context.Context, name string) bool {
 	count, err := client.Tag.Query().Where(tag.Name(name)).Count(ctx)
 	if err != nil {

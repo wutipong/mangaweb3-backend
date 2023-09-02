@@ -30,6 +30,8 @@ type Meta struct {
 	Thumbnail []byte `json:"-"`
 	// Read holds the value of the "read" field.
 	Read bool `json:"read,omitempty"`
+	// Active holds the value of the "active" field.
+	Active bool `json:"active,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MetaQuery when eager-loading is set.
 	Edges        MetaEdges `json:"edges"`
@@ -61,7 +63,7 @@ func (*Meta) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case meta.FieldFileIndices, meta.FieldThumbnail:
 			values[i] = new([]byte)
-		case meta.FieldFavorite, meta.FieldRead:
+		case meta.FieldFavorite, meta.FieldRead, meta.FieldActive:
 			values[i] = new(sql.NullBool)
 		case meta.FieldID:
 			values[i] = new(sql.NullInt64)
@@ -128,6 +130,12 @@ func (m *Meta) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.Read = value.Bool
 			}
+		case meta.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
+			} else if value.Valid {
+				m.Active = value.Bool
+			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
 		}
@@ -185,6 +193,9 @@ func (m *Meta) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("read=")
 	builder.WriteString(fmt.Sprintf("%v", m.Read))
+	builder.WriteString(", ")
+	builder.WriteString("active=")
+	builder.WriteString(fmt.Sprintf("%v", m.Active))
 	builder.WriteByte(')')
 	return builder.String()
 }
