@@ -46,6 +46,24 @@ const docTemplate = `{
                 }
             }
         },
+        "/browse/recreate_thumbnails": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/browse.recreateThumbnailsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/browse/rescan_library": {
             "get": {
                 "responses": {
@@ -500,6 +518,10 @@ const docTemplate = `{
         "ent.Meta": {
             "type": "object",
             "properties": {
+                "active": {
+                    "description": "Active holds the value of the \"active\" field.",
+                    "type": "boolean"
+                },
                 "create_time": {
                     "description": "CreateTime holds the value of the \"create_time\" field.",
                     "type": "string"
@@ -601,6 +623,23 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "unknown error."
+                }
+            }
+        },
+        "meta.CropDetails": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer"
+                },
+                "width": {
+                    "type": "integer"
+                },
+                "x": {
+                    "type": "integer"
+                },
+                "y": {
+                    "type": "integer"
                 }
             }
         },
@@ -760,6 +799,9 @@ const docTemplate = `{
         "view.updateCoverRequest": {
             "type": "object",
             "properties": {
+                "crop_details": {
+                    "$ref": "#/definitions/meta.CropDetails"
+                },
                 "index": {
                     "type": "integer"
                 },
