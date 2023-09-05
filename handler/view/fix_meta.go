@@ -56,7 +56,7 @@ func FixMeta(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	if err = meta.GenerateThumbnail(m, 0); err != nil {
+	if err = meta.GenerateThumbnail(m, 0, meta.CropDetails{}); err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}

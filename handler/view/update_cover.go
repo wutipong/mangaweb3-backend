@@ -11,8 +11,9 @@ import (
 )
 
 type updateCoverRequest struct {
-	Name  string `json:"name"`
-	Index int    `json:"index"`
+	Name    string           `json:"name"`
+	Index   int              `json:"index"`
+	Details meta.CropDetails `json:"crop_details"`
 }
 
 type updateCoverResponse struct {
@@ -47,9 +48,7 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		return
 	}
 
-	entryIndex := m.FileIndices[req.Index]
-
-	err = meta.GenerateThumbnail(m, entryIndex)
+	err = meta.GenerateThumbnail(m, req.Index, req.Details)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

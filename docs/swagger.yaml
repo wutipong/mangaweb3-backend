@@ -41,6 +41,9 @@ definitions:
     type: object
   ent.Meta:
     properties:
+      active:
+        description: Active holds the value of the "active" field.
+        type: boolean
       create_time:
         description: CreateTime holds the value of the "create_time" field.
         type: string
@@ -114,6 +117,17 @@ definitions:
       message:
         example: unknown error.
         type: string
+    type: object
+  meta.CropDetails:
+    properties:
+      height:
+        type: integer
+      width:
+        type: integer
+      x:
+        type: integer
+      "y":
+        type: integer
     type: object
   meta.SortField:
     enum:
@@ -217,6 +231,8 @@ definitions:
     type: object
   view.updateCoverRequest:
     properties:
+      crop_details:
+        $ref: '#/definitions/meta.CropDetails'
       index:
         type: integer
       name:
@@ -275,6 +291,17 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/browse.browseResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+  /browse/recreate_thumbnails:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/browse.recreateThumbnailsResponse'
         "500":
           description: Internal Server Error
           schema:

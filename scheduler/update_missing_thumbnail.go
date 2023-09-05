@@ -18,7 +18,7 @@ func UpdateMissingThumbnail() error {
 		if len(m.Thumbnail) != 0 {
 			continue
 		}
-		e := meta.GenerateThumbnail(m, 0)
+		e := meta.GenerateThumbnail(m, 0, meta.CropDetails{})
 
 		log.Info().
 			Str("name", m.Name).

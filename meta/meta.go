@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"image"
 	"io"
 	"io/fs"
 	"os"
@@ -44,7 +45,7 @@ func NewItem(ctx context.Context, name string) (i *ent.Meta, err error) {
 	if err = GenerateImageIndices(i); err != nil {
 		return
 	} else {
-		GenerateThumbnail(i, 0)
+		GenerateThumbnail(i, 0, CropDetails{})
 	}
 
 	return client.Meta.Create().
@@ -67,7 +68,14 @@ func Open(m *ent.Meta) (reader io.ReadCloser, err error) {
 	return
 }
 
-func GenerateThumbnail(m *ent.Meta, fileIndex int) error {
+type CropDetails struct {
+	X      int `json:"x"`
+	Y      int `json:"y"`
+	Width  int `json:"width"`
+	Height int `json:"height"`
+}
+
+func GenerateThumbnail(m *ent.Meta, fileIndex int, details CropDetails) error {
 	mutex := new(sync.Mutex)
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -94,6 +102,19 @@ func GenerateThumbnail(m *ent.Meta, fileIndex int) error {
 	img, err := imaging.Decode(stream, imaging.AutoOrientation(true))
 	if err != nil {
 		return err
+	}
+
+	if details.Width > 0 && details.Height > 0 {
+		img = imaging.Crop(img, image.Rectangle{
+			Min: image.Point{
+				X: details.X,
+				Y: details.Y,
+			},
+			Max: image.Point{
+				X: details.X + details.Width,
+				Y: details.Y + details.Height,
+			},
+		})
 	}
 
 	const thumbnailSize = 360
