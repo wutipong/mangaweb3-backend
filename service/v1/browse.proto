@@ -1,0 +1,30 @@
+enum SORT_BY {
+  SORT_BY_CREATE_TIME = 0;
+  SORT_BY_NAME = 1;
+}
+
+enum ORDER {
+  ORDER_ASCENDING = 0;
+  ORDER_DESCENDING = 1;
+}
+
+message BrowseRequest {
+  string Tag = 1;
+  bool FavoriteOnly = 2;
+  int Page = 3;
+  int ItemPerPage = 4;
+  string Search = 5;
+  SORT_BY Sort = 6;
+  ORDER Order = 7;
+}
+
+message BrowseResponse {
+  bool TagFavorite = 1;
+  int TotalPage = 2;
+  Meta
+  [] Items = 3;
+}
+
+service BrowseMeta {
+  rpc Browse(BrowseRequest) returns (BrowseResponse) {}
+}

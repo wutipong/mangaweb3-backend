@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -25,6 +26,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/scheduler"
 	"github.com/wutipong/mangaweb3-backend/tag"
+	"google.golang.org/grpc"
 )
 
 var versionString string = "development"
@@ -113,10 +115,29 @@ func main() {
 	log.Info().Msg("Server starts.")
 
 	handler := cors.Default().Handler(router)
-	if err := http.ListenAndServe(address, handler); err != nil {
-		log.Error().AnErr("error", err).Msg("Starting server fails")
-		return
+
+	listener, err := net.Listen("tcp", ":9000")
+	if err != nil {
+		log.Error().AnErr("error", err).Msg("Listen gRPC error.")
 	}
+
+	grpcServer := grpc.NewServer()
+
+	ch := make(chan error, 2)
+
+	go func() {
+		log.Info().Msg("listening REST API")
+		ch <- http.ListenAndServe(address, handler)
+	}()
+
+	go func() {
+		log.Info().Msg("listening gRPC")
+		ch <- grpcServer.Serve(listener)
+	}()
+
+	err = <-ch
+
+	log.Error().AnErr("error", err).Msg("Error")
 
 	log.Info().Msg("shutting down the server")
 	scheduler.Stop()
