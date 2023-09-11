@@ -7,6 +7,7 @@ require github.com/go-co-op/gocron v1.33.1
 require github.com/joho/godotenv v1.5.1
 
 require (
+	entgo.io/contrib v0.4.5
 	entgo.io/ent v0.12.3
 	github.com/disintegration/imaging v1.6.2
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
@@ -16,14 +17,13 @@ require (
 	github.com/rs/zerolog v1.30.0
 	github.com/swaggo/swag v1.16.2
 	golang.org/x/image v0.12.0
+	google.golang.org/grpc v1.58.0
 )
 
 require (
 	ariga.io/atlas v0.14.0 // indirect
-	entgo.io/contrib v0.4.5 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
-	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/bufbuild/protocompile v0.6.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -55,7 +55,6 @@ require (
 	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230711160842-782d3b101e98 // indirect
-	google.golang.org/grpc v1.58.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
