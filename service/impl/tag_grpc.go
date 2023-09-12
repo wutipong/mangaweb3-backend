@@ -5,6 +5,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/ent"
+	entTag "github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/service"
 	"github.com/wutipong/mangaweb3-backend/tag"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -48,6 +49,23 @@ func (s *TagServer) List(ctx context.Context, req *service.TagListRequest) (resp
 			Favorite:  t.Favorite,
 			Thumbnail: wrapperspb.Bytes(t.Thumbnail),
 		})
+	}
+
+	return
+}
+
+func (s *TagServer) SetFavorite(ctx context.Context, req *service.SetFavoriteRequest) (resp *service.SetFavoriteResponse, err error) {
+	err = s.EntClient.Tag.Update().
+		Where(entTag.ID(int(req.Id))).
+		SetFavorite(req.Favorite).
+		Exec(ctx)
+
+	if err != nil {
+		return
+	}
+
+	resp = &service.SetFavoriteResponse{
+		Favorite: req.Favorite,
 	}
 
 	return

@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type MetaServiceClient interface {
 	List(ctx context.Context, in *MetaListRequest, opts ...grpc.CallOption) (*MetaListResponse, error)
 	Get(ctx context.Context, in *MetaGetRequest, opts ...grpc.CallOption) (*MetaGetResponse, error)
+	SetFavorite(ctx context.Context, in *SetFavoriteRequest, opts ...grpc.CallOption) (*SetFavoriteResponse, error)
 }
 
 type metaServiceClient struct {
@@ -48,12 +49,22 @@ func (c *metaServiceClient) Get(ctx context.Context, in *MetaGetRequest, opts ..
 	return out, nil
 }
 
+func (c *metaServiceClient) SetFavorite(ctx context.Context, in *SetFavoriteRequest, opts ...grpc.CallOption) (*SetFavoriteResponse, error) {
+	out := new(SetFavoriteResponse)
+	err := c.cc.Invoke(ctx, "/MetaService/SetFavorite", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MetaServiceServer is the server API for MetaService service.
 // All implementations must embed UnimplementedMetaServiceServer
 // for forward compatibility
 type MetaServiceServer interface {
 	List(context.Context, *MetaListRequest) (*MetaListResponse, error)
 	Get(context.Context, *MetaGetRequest) (*MetaGetResponse, error)
+	SetFavorite(context.Context, *SetFavoriteRequest) (*SetFavoriteResponse, error)
 	mustEmbedUnimplementedMetaServiceServer()
 }
 
@@ -66,6 +77,9 @@ func (UnimplementedMetaServiceServer) List(context.Context, *MetaListRequest) (*
 }
 func (UnimplementedMetaServiceServer) Get(context.Context, *MetaGetRequest) (*MetaGetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (UnimplementedMetaServiceServer) SetFavorite(context.Context, *SetFavoriteRequest) (*SetFavoriteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetFavorite not implemented")
 }
 func (UnimplementedMetaServiceServer) mustEmbedUnimplementedMetaServiceServer() {}
 
@@ -116,6 +130,24 @@ func _MetaService_Get_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MetaService_SetFavorite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetFavoriteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MetaServiceServer).SetFavorite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/MetaService/SetFavorite",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetaServiceServer).SetFavorite(ctx, req.(*SetFavoriteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MetaService_ServiceDesc is the grpc.ServiceDesc for MetaService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -131,6 +163,10 @@ var MetaService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Get",
 			Handler:    _MetaService_Get_Handler,
 		},
+		{
+			MethodName: "SetFavorite",
+			Handler:    _MetaService_SetFavorite_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "service.proto",
@@ -141,6 +177,7 @@ var MetaService_ServiceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TagServiceClient interface {
 	List(ctx context.Context, in *TagListRequest, opts ...grpc.CallOption) (*TagListResponse, error)
+	SetFavorite(ctx context.Context, in *SetFavoriteRequest, opts ...grpc.CallOption) (*SetFavoriteResponse, error)
 }
 
 type tagServiceClient struct {
@@ -160,11 +197,21 @@ func (c *tagServiceClient) List(ctx context.Context, in *TagListRequest, opts ..
 	return out, nil
 }
 
+func (c *tagServiceClient) SetFavorite(ctx context.Context, in *SetFavoriteRequest, opts ...grpc.CallOption) (*SetFavoriteResponse, error) {
+	out := new(SetFavoriteResponse)
+	err := c.cc.Invoke(ctx, "/TagService/SetFavorite", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TagServiceServer is the server API for TagService service.
 // All implementations must embed UnimplementedTagServiceServer
 // for forward compatibility
 type TagServiceServer interface {
 	List(context.Context, *TagListRequest) (*TagListResponse, error)
+	SetFavorite(context.Context, *SetFavoriteRequest) (*SetFavoriteResponse, error)
 	mustEmbedUnimplementedTagServiceServer()
 }
 
@@ -174,6 +221,9 @@ type UnimplementedTagServiceServer struct {
 
 func (UnimplementedTagServiceServer) List(context.Context, *TagListRequest) (*TagListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedTagServiceServer) SetFavorite(context.Context, *SetFavoriteRequest) (*SetFavoriteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetFavorite not implemented")
 }
 func (UnimplementedTagServiceServer) mustEmbedUnimplementedTagServiceServer() {}
 
@@ -206,6 +256,24 @@ func _TagService_List_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TagService_SetFavorite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetFavoriteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TagServiceServer).SetFavorite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TagService/SetFavorite",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TagServiceServer).SetFavorite(ctx, req.(*SetFavoriteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TagService_ServiceDesc is the grpc.ServiceDesc for TagService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -216,6 +284,10 @@ var TagService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "List",
 			Handler:    _TagService_List_Handler,
+		},
+		{
+			MethodName: "SetFavorite",
+			Handler:    _TagService_SetFavorite_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

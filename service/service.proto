@@ -1,6 +1,6 @@
-syntax="proto3";
+syntax = "proto3";
 
-option go_package="github.com/wutipong/mangaweb3-backend/service";
+option go_package = "github.com/wutipong/mangaweb3-backend/service";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
@@ -22,7 +22,6 @@ message Tag {
   bool hidden = 4;
   google.protobuf.BytesValue thumbnail = 5;
 }
-
 
 enum SORT_BY {
   SORT_BY_CREATE_TIME = 0;
@@ -50,25 +49,31 @@ message MetaListResponse {
   repeated Meta items = 3;
 }
 
-message MetaGetRequest {
-  int64 id = 1;
-}
+message MetaGetRequest { int64 id = 1; }
 
 message MetaGetResponse {
   Meta item = 1;
   int32 page_count = 2;
-	repeated Tag tags = 3;
+  repeated Tag tags = 3;
 }
+
+message SetFavoriteRequest {
+  int64 id = 1;
+  bool favorite = 2;
+}
+
+message SetFavoriteResponse { bool favorite = 1; }
 
 service MetaService {
   rpc List(MetaListRequest) returns (MetaListResponse) {}
-  rpc Get(MetaGetRequest) returns (MetaGetResponse){}
+  rpc Get(MetaGetRequest) returns (MetaGetResponse) {}
+  rpc SetFavorite(SetFavoriteRequest) returns (SetFavoriteResponse) {}
 }
 
 message TagListRequest {
   bool favorite_only = 1;
-	int32 page=2;
-	int32 item_per_page=3;
+  int32 page = 2;
+  int32 item_per_page = 3;
 }
 
 message TagListResponse {
@@ -77,5 +82,6 @@ message TagListResponse {
 }
 
 service TagService {
-  rpc List(TagListRequest) returns (TagListResponse){}
+  rpc List(TagListRequest) returns (TagListResponse) {}
+  rpc SetFavorite(SetFavoriteRequest) returns (SetFavoriteResponse) {}
 }

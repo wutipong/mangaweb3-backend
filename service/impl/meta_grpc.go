@@ -5,6 +5,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/ent"
+	ent_meta "github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/service"
 	"github.com/wutipong/mangaweb3-backend/tag"
@@ -147,6 +148,23 @@ func (s *MetaServer) Get(ctx context.Context, req *service.MetaGetRequest) (resp
 			Name:     t.Name,
 			Favorite: t.Favorite,
 		})
+	}
+
+	return
+}
+
+func (s *MetaServer) SetFavorite(ctx context.Context, req *service.SetFavoriteRequest) (resp *service.SetFavoriteResponse, err error) {
+	err = s.EntClient.Meta.Update().
+		Where(ent_meta.ID(int(req.Id))).
+		SetFavorite(req.Favorite).
+		Exec(ctx)
+
+	if err != nil {
+		return
+	}
+
+	resp = &service.SetFavoriteResponse{
+		Favorite: req.Favorite,
 	}
 
 	return
