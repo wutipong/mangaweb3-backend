@@ -25,8 +25,11 @@ import (
 	"github.com/wutipong/mangaweb3-backend/handler/view"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/scheduler"
+	"github.com/wutipong/mangaweb3-backend/service"
+	"github.com/wutipong/mangaweb3-backend/service/impl"
 	"github.com/wutipong/mangaweb3-backend/tag"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 var versionString string = "development"
@@ -122,6 +125,13 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
+	service.RegisterMetaServiceServer(
+		grpcServer,
+		&impl.MetaServer{
+			EntClient: client,
+		})
+
+	reflection.Register(grpcServer)
 
 	ch := make(chan error, 2)
 

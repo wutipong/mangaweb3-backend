@@ -5,16 +5,16 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/ent"
-	"github.com/wutipong/mangaweb3-backend/ent/proto/entpb"
 	"github.com/wutipong/mangaweb3-backend/meta"
-	service "github.com/wutipong/mangaweb3-backend/service/v1"
+	"github.com/wutipong/mangaweb3-backend/service"
 	"github.com/wutipong/mangaweb3-backend/tag"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type MetaServer struct {
-	ent *ent.Client
+	service.UnimplementedMetaServiceServer
+	EntClient *ent.Client
 }
 
 func (s *MetaServer) List(ctx context.Context, req *service.ListRequest) (resp *service.ListResponse, err error) {
@@ -76,10 +76,10 @@ func (s *MetaServer) List(ctx context.Context, req *service.ListRequest) (resp *
 	resp = &service.ListResponse{
 		TotalPage: pageCount,
 	}
-	resp.Items = make([]*entpb.Meta, len(allMeta))
+	resp.Items = make([]*service.Meta, len(allMeta))
 
 	for i := range resp.Items {
-		resp.Items[i] = &entpb.Meta{
+		resp.Items[i] = &service.Meta{
 			Id:         int64(allMeta[i].ID),
 			Name:       allMeta[i].Name,
 			CreateTime: timestamppb.New(allMeta[i].CreateTime),
@@ -103,7 +103,7 @@ func (s *MetaServer) List(ctx context.Context, req *service.ListRequest) (resp *
 }
 
 func (s *MetaServer) Get(ctx context.Context, req *service.GetRequest) (resp *service.GetResponse, err error) {
-	m, err := s.ent.Meta.Get(ctx, int(req.Id))
+	m, err := s.EntClient.Meta.Get(ctx, int(req.Id))
 	if err != nil {
 		return
 	}
@@ -123,7 +123,7 @@ func (s *MetaServer) Get(ctx context.Context, req *service.GetRequest) (resp *se
 	}
 
 	resp = &service.GetResponse{
-		Item: &entpb.Meta{
+		Item: &service.Meta{
 			Id:         int64(m.ID),
 			Name:       m.Name,
 			CreateTime: timestamppb.New(m.CreateTime),
@@ -135,7 +135,7 @@ func (s *MetaServer) Get(ctx context.Context, req *service.GetRequest) (resp *se
 	}
 
 	for _, t := range tags {
-		resp.Tags = append(resp.Tags, &entpb.Tag{
+		resp.Tags = append(resp.Tags, &service.Tag{
 			Name:     t.Name,
 			Favorite: t.Favorite,
 		})
