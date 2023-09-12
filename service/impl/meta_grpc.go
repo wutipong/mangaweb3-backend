@@ -17,6 +17,10 @@ type MetaServer struct {
 	EntClient *ent.Client
 }
 
+const (
+	DEFAULT_ITEM_PER_PAGE = 30
+)
+
 func (s *MetaServer) List(ctx context.Context, req *service.ListRequest) (resp *service.ListResponse, err error) {
 	var sortBy meta.SortField
 	switch req.Sort {
@@ -60,6 +64,10 @@ func (s *MetaServer) List(ctx context.Context, req *service.ListRequest) (resp *
 		return
 	}
 
+	itemPerPage := req.ItemPerPage
+	if itemPerPage == 0 {
+		itemPerPage = DEFAULT_ITEM_PER_PAGE
+	}
 	pageCount := int32(count) / req.ItemPerPage
 	if int32(count)%req.ItemPerPage > 0 {
 		pageCount++
