@@ -26,7 +26,7 @@ message ListRequest {
 message ListResponse {
   bool TagFavorite = 1;
   int32 TotalPage = 2;
-  entpb.Meta Items = 3;
+  repeated entpb.Meta Items = 3;
 }
 
 message GetRequest {
