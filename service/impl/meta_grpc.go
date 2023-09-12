@@ -18,10 +18,10 @@ type MetaServer struct {
 }
 
 const (
-	DEFAULT_ITEM_PER_PAGE = 30
+	DefaultItemPerPage = 30
 )
 
-func (s *MetaServer) List(ctx context.Context, req *service.ListRequest) (resp *service.ListResponse, err error) {
+func (s *MetaServer) List(ctx context.Context, req *service.MetaListRequest) (resp *service.MetaListResponse, err error) {
 	var sortBy meta.SortField
 	switch req.Sort {
 	case service.SORT_BY_SORT_BY_NAME:
@@ -66,7 +66,7 @@ func (s *MetaServer) List(ctx context.Context, req *service.ListRequest) (resp *
 
 	itemPerPage := req.ItemPerPage
 	if itemPerPage == 0 {
-		itemPerPage = DEFAULT_ITEM_PER_PAGE
+		itemPerPage = DefaultItemPerPage
 	}
 	pageCount := int32(count) / req.ItemPerPage
 	if int32(count)%req.ItemPerPage > 0 {
@@ -81,7 +81,7 @@ func (s *MetaServer) List(ctx context.Context, req *service.ListRequest) (resp *
 		Interface("request", req).
 		Msg("Browse")
 
-	resp = &service.ListResponse{
+	resp = &service.MetaListResponse{
 		TotalPage: pageCount,
 	}
 	resp.Items = make([]*service.Meta, len(allMeta))
@@ -110,7 +110,7 @@ func (s *MetaServer) List(ctx context.Context, req *service.ListRequest) (resp *
 	return
 }
 
-func (s *MetaServer) Get(ctx context.Context, req *service.GetRequest) (resp *service.GetResponse, err error) {
+func (s *MetaServer) Get(ctx context.Context, req *service.MetaGetRequest) (resp *service.MetaGetResponse, err error) {
 	m, err := s.EntClient.Meta.Get(ctx, int(req.Id))
 	if err != nil {
 		return
@@ -130,7 +130,7 @@ func (s *MetaServer) Get(ctx context.Context, req *service.GetRequest) (resp *se
 		return
 	}
 
-	resp = &service.GetResponse{
+	resp = &service.MetaGetResponse{
 		Item: &service.Meta{
 			Id:         int64(m.ID),
 			Name:       m.Name,

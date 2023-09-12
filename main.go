@@ -131,6 +131,12 @@ func main() {
 			EntClient: client,
 		})
 
+	service.RegisterTagServiceServer(
+		grpcServer,
+		&impl.TagServer{
+			EntClient: client,
+		})
+
 	reflection.Register(grpcServer)
 
 	ch := make(chan error, 2)

@@ -34,33 +34,48 @@ enum ORDER {
   ORDER_DESCENDING = 1;
 }
 
-message ListRequest {
-  string Tag = 1;
-  bool FavoriteOnly = 2;
-  int32 Page = 3;
-  int32 ItemPerPage = 4;
-  string Search = 5;
-  SORT_BY Sort = 6;
-  ORDER Order = 7;
+message MetaListRequest {
+  string tag = 1;
+  bool favorite_only = 2;
+  int32 page = 3;
+  int32 item_per_page = 4;
+  string search = 5;
+  SORT_BY sort = 6;
+  ORDER order = 7;
 }
 
-message ListResponse {
-  bool TagFavorite = 1;
-  int32 TotalPage = 2;
-  repeated Meta Items = 3;
+message MetaListResponse {
+  bool tag_favorite = 1;
+  int32 total_page = 2;
+  repeated Meta items = 3;
 }
 
-message GetRequest {
-  int32 Id = 1;
+message MetaGetRequest {
+  int64 id = 1;
 }
 
-message GetResponse {
-  Meta Item = 1;
-  int32 PageCount = 2;
-	repeated Tag Tags = 3;
+message MetaGetResponse {
+  Meta item = 1;
+  int32 page_count = 2;
+	repeated Tag tags = 3;
 }
 
 service MetaService {
-  rpc List(ListRequest) returns (ListResponse) {}
-  rpc Get(GetRequest) returns (GetResponse){}
+  rpc List(MetaListRequest) returns (MetaListResponse) {}
+  rpc Get(MetaGetRequest) returns (MetaGetResponse){}
+}
+
+message TagListRequest {
+  bool favorite_only = 1;
+	int32 page=2;
+	int32 item_per_page=3;
+}
+
+message TagListResponse {
+  int32 total_page = 1;
+  repeated Tag tags = 2;
+}
+
+service TagService {
+  rpc List(TagListRequest) returns (TagListResponse){}
 }

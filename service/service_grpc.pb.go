@@ -18,8 +18,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MetaServiceClient interface {
-	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
-	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
+	List(ctx context.Context, in *MetaListRequest, opts ...grpc.CallOption) (*MetaListResponse, error)
+	Get(ctx context.Context, in *MetaGetRequest, opts ...grpc.CallOption) (*MetaGetResponse, error)
 }
 
 type metaServiceClient struct {
@@ -30,8 +30,8 @@ func NewMetaServiceClient(cc grpc.ClientConnInterface) MetaServiceClient {
 	return &metaServiceClient{cc}
 }
 
-func (c *metaServiceClient) List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error) {
-	out := new(ListResponse)
+func (c *metaServiceClient) List(ctx context.Context, in *MetaListRequest, opts ...grpc.CallOption) (*MetaListResponse, error) {
+	out := new(MetaListResponse)
 	err := c.cc.Invoke(ctx, "/MetaService/List", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -39,8 +39,8 @@ func (c *metaServiceClient) List(ctx context.Context, in *ListRequest, opts ...g
 	return out, nil
 }
 
-func (c *metaServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
-	out := new(GetResponse)
+func (c *metaServiceClient) Get(ctx context.Context, in *MetaGetRequest, opts ...grpc.CallOption) (*MetaGetResponse, error) {
+	out := new(MetaGetResponse)
 	err := c.cc.Invoke(ctx, "/MetaService/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -52,8 +52,8 @@ func (c *metaServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grp
 // All implementations must embed UnimplementedMetaServiceServer
 // for forward compatibility
 type MetaServiceServer interface {
-	List(context.Context, *ListRequest) (*ListResponse, error)
-	Get(context.Context, *GetRequest) (*GetResponse, error)
+	List(context.Context, *MetaListRequest) (*MetaListResponse, error)
+	Get(context.Context, *MetaGetRequest) (*MetaGetResponse, error)
 	mustEmbedUnimplementedMetaServiceServer()
 }
 
@@ -61,10 +61,10 @@ type MetaServiceServer interface {
 type UnimplementedMetaServiceServer struct {
 }
 
-func (UnimplementedMetaServiceServer) List(context.Context, *ListRequest) (*ListResponse, error) {
+func (UnimplementedMetaServiceServer) List(context.Context, *MetaListRequest) (*MetaListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedMetaServiceServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
+func (UnimplementedMetaServiceServer) Get(context.Context, *MetaGetRequest) (*MetaGetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedMetaServiceServer) mustEmbedUnimplementedMetaServiceServer() {}
@@ -81,7 +81,7 @@ func RegisterMetaServiceServer(s grpc.ServiceRegistrar, srv MetaServiceServer) {
 }
 
 func _MetaService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListRequest)
+	in := new(MetaListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -93,13 +93,13 @@ func _MetaService_List_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: "/MetaService/List",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MetaServiceServer).List(ctx, req.(*ListRequest))
+		return srv.(MetaServiceServer).List(ctx, req.(*MetaListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _MetaService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRequest)
+	in := new(MetaGetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func _MetaService_Get_Handler(srv interface{}, ctx context.Context, dec func(int
 		FullMethod: "/MetaService/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MetaServiceServer).Get(ctx, req.(*GetRequest))
+		return srv.(MetaServiceServer).Get(ctx, req.(*MetaGetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -130,6 +130,92 @@ var MetaService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Get",
 			Handler:    _MetaService_Get_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "service.proto",
+}
+
+// TagServiceClient is the client API for TagService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type TagServiceClient interface {
+	List(ctx context.Context, in *TagListRequest, opts ...grpc.CallOption) (*TagListResponse, error)
+}
+
+type tagServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewTagServiceClient(cc grpc.ClientConnInterface) TagServiceClient {
+	return &tagServiceClient{cc}
+}
+
+func (c *tagServiceClient) List(ctx context.Context, in *TagListRequest, opts ...grpc.CallOption) (*TagListResponse, error) {
+	out := new(TagListResponse)
+	err := c.cc.Invoke(ctx, "/TagService/List", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// TagServiceServer is the server API for TagService service.
+// All implementations must embed UnimplementedTagServiceServer
+// for forward compatibility
+type TagServiceServer interface {
+	List(context.Context, *TagListRequest) (*TagListResponse, error)
+	mustEmbedUnimplementedTagServiceServer()
+}
+
+// UnimplementedTagServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedTagServiceServer struct {
+}
+
+func (UnimplementedTagServiceServer) List(context.Context, *TagListRequest) (*TagListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedTagServiceServer) mustEmbedUnimplementedTagServiceServer() {}
+
+// UnsafeTagServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to TagServiceServer will
+// result in compilation errors.
+type UnsafeTagServiceServer interface {
+	mustEmbedUnimplementedTagServiceServer()
+}
+
+func RegisterTagServiceServer(s grpc.ServiceRegistrar, srv TagServiceServer) {
+	s.RegisterService(&TagService_ServiceDesc, srv)
+}
+
+func _TagService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TagListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TagServiceServer).List(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TagService/List",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TagServiceServer).List(ctx, req.(*TagListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// TagService_ServiceDesc is the grpc.ServiceDesc for TagService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var TagService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "TagService",
+	HandlerType: (*TagServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "List",
+			Handler:    _TagService_List_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
