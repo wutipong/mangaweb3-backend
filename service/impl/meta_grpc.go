@@ -1,7 +1,12 @@
 package impl
 
 import (
+	"archive/zip"
 	"context"
+	"fmt"
+	"io"
+	"path/filepath"
+	"strings"
 
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/ent"
@@ -167,5 +172,65 @@ func (s *MetaServer) SetFavorite(ctx context.Context, req *service.SetFavoriteRe
 		Favorite: req.Favorite,
 	}
 
+	return
+}
+
+func (s *MetaServer) GetPage(ctx context.Context, req *service.GetPageRequest) (resp *service.GetPageResponse, err error) {
+	m, err := s.EntClient.Meta.Get(ctx, int(req.Id))
+	if err != nil {
+		return
+	}
+
+	data, f, err := OpenZipEntry(m, int(req.Page))
+	if err != nil {
+		return
+	}
+
+	resp = &service.GetPageResponse{
+		ImageData: wrapperspb.Bytes(data),
+	}
+
+	switch filepath.Ext(strings.ToLower(f)) {
+	case ".jpg", ".jpeg":
+		resp.ContentType = "image/jpeg"
+	case ".png":
+		resp.ContentType = "image/png"
+	case ".webp":
+		resp.ContentType = "image/webp"
+	}
+
+	return
+}
+
+func OpenZipEntry(m *ent.Meta, index int) (content []byte, filename string, err error) {
+	if len(m.FileIndices) == 0 {
+		err = fmt.Errorf("image file not found")
+	}
+
+	fullpath := filepath.Join(meta.BaseDirectory, m.Name)
+	r, err := zip.OpenReader(fullpath)
+	if err != nil {
+		return
+	}
+
+	defer r.Close()
+
+	zf := r.File[m.FileIndices[index]]
+
+	if zf == nil {
+		err = fmt.Errorf("file not found : %v", index)
+		return
+	}
+
+	filename = zf.Name
+	reader, err := zf.Open()
+	if err != nil {
+		return
+	}
+	defer reader.Close()
+	if content, err = io.ReadAll(reader); err != nil {
+		content = nil
+		return
+	}
 	return
 }

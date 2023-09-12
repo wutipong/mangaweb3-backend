@@ -21,6 +21,7 @@ type MetaServiceClient interface {
 	List(ctx context.Context, in *MetaListRequest, opts ...grpc.CallOption) (*MetaListResponse, error)
 	Get(ctx context.Context, in *MetaGetRequest, opts ...grpc.CallOption) (*MetaGetResponse, error)
 	SetFavorite(ctx context.Context, in *SetFavoriteRequest, opts ...grpc.CallOption) (*SetFavoriteResponse, error)
+	GetPage(ctx context.Context, in *GetPageRequest, opts ...grpc.CallOption) (*GetPageResponse, error)
 }
 
 type metaServiceClient struct {
@@ -58,6 +59,15 @@ func (c *metaServiceClient) SetFavorite(ctx context.Context, in *SetFavoriteRequ
 	return out, nil
 }
 
+func (c *metaServiceClient) GetPage(ctx context.Context, in *GetPageRequest, opts ...grpc.CallOption) (*GetPageResponse, error) {
+	out := new(GetPageResponse)
+	err := c.cc.Invoke(ctx, "/MetaService/GetPage", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MetaServiceServer is the server API for MetaService service.
 // All implementations must embed UnimplementedMetaServiceServer
 // for forward compatibility
@@ -65,6 +75,7 @@ type MetaServiceServer interface {
 	List(context.Context, *MetaListRequest) (*MetaListResponse, error)
 	Get(context.Context, *MetaGetRequest) (*MetaGetResponse, error)
 	SetFavorite(context.Context, *SetFavoriteRequest) (*SetFavoriteResponse, error)
+	GetPage(context.Context, *GetPageRequest) (*GetPageResponse, error)
 	mustEmbedUnimplementedMetaServiceServer()
 }
 
@@ -80,6 +91,9 @@ func (UnimplementedMetaServiceServer) Get(context.Context, *MetaGetRequest) (*Me
 }
 func (UnimplementedMetaServiceServer) SetFavorite(context.Context, *SetFavoriteRequest) (*SetFavoriteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetFavorite not implemented")
+}
+func (UnimplementedMetaServiceServer) GetPage(context.Context, *GetPageRequest) (*GetPageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPage not implemented")
 }
 func (UnimplementedMetaServiceServer) mustEmbedUnimplementedMetaServiceServer() {}
 
@@ -148,6 +162,24 @@ func _MetaService_SetFavorite_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MetaService_GetPage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MetaServiceServer).GetPage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/MetaService/GetPage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetaServiceServer).GetPage(ctx, req.(*GetPageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MetaService_ServiceDesc is the grpc.ServiceDesc for MetaService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +198,10 @@ var MetaService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetFavorite",
 			Handler:    _MetaService_SetFavorite_Handler,
+		},
+		{
+			MethodName: "GetPage",
+			Handler:    _MetaService_GetPage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

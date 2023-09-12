@@ -64,10 +64,21 @@ message SetFavoriteRequest {
 
 message SetFavoriteResponse { bool favorite = 1; }
 
+message GetPageRequest {
+  int64 id = 1;
+  int32 page = 2;
+}
+
+message GetPageResponse {
+  google.protobuf.BytesValue image_data = 1;
+  string content_type = 2;
+}
+
 service MetaService {
   rpc List(MetaListRequest) returns (MetaListResponse) {}
   rpc Get(MetaGetRequest) returns (MetaGetResponse) {}
   rpc SetFavorite(SetFavoriteRequest) returns (SetFavoriteResponse) {}
+  rpc GetPage(GetPageRequest) returns (GetPageResponse) {}
 }
 
 message TagListRequest {
