@@ -62,6 +62,7 @@ func main() {
 			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).
 				Level(zerolog.DebugLevel)
 
+			log.Info().Msg("development environment")
 			debugMode = true
 		}
 	}

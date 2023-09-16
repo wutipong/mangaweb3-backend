@@ -52,6 +52,8 @@ func ScanLibrary() error {
 					Error().
 					AnErr("error", err).
 					Msg("Failed to create meta data.")
+
+				continue
 			}
 
 			_, err = meta.PopulateTags(context.Background(), item)
