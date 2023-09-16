@@ -112,7 +112,7 @@ func main() {
 
 	log.Info().Msg("Server starts.")
 
-	handler := cors.Default().Handler(router)
+	handler := cors.AllowAll().Handler(router)
 	if err := http.ListenAndServe(address, handler); err != nil {
 		log.Error().AnErr("error", err).Msg("Starting server fails")
 		return
