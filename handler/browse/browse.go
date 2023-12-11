@@ -5,7 +5,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
-	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/tag"
@@ -29,7 +28,18 @@ type browseResponse struct {
 	Request     browseRequest `json:"request"`
 	TagFavorite bool          `json:"tag_favorite"`
 	TotalPage   int           `json:"total_page"`
-	Items       []*ent.Meta   `json:"items"`
+	Items       []browseItem  `json:"items"`
+}
+
+type browseItem struct {
+	// ID of the ent.
+	ID int `json:"id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Favorite holds the value of the "favorite" field.
+	Favorite bool `json:"favorite,omitempty"`
+	// Read holds the value of the "read" field.
+	Read bool `json:"read,omitempty"`
 }
 
 func createDefaultBrowseRequest() browseRequest {
@@ -69,6 +79,16 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
+	items := make([]browseItem, len(allMeta))
+	for i, m := range allMeta {
+		items[i] = browseItem{
+			ID:       m.ID,
+			Name:     m.Name,
+			Favorite: m.Favorite,
+			Read:     m.Read,
+		}
+	}
+
 	count, err := meta.CountItems(r.Context(),
 		req.Search,
 		req.FavoriteOnly,
@@ -95,7 +115,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	data := browseResponse{
 		Request:   req,
-		Items:     allMeta,
+		Items:     items,
 		TotalPage: pageCount,
 	}
 
