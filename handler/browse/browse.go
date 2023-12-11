@@ -32,14 +32,16 @@ type browseResponse struct {
 }
 
 type browseItem struct {
-	// ID of the ent.
+	// ID of the item
 	ID int `json:"id,omitempty"`
-	// Name holds the value of the "name" field.
+	// Name of the item
 	Name string `json:"name,omitempty"`
-	// Favorite holds the value of the "favorite" field.
+	// Favorite this item is a favorite
 	Favorite bool `json:"favorite,omitempty"`
-	// Read holds the value of the "read" field.
+	// Read this item has been read before.
 	Read bool `json:"read,omitempty"`
+	// PageCount the number of pages.
+	PageCount int `json:"page_count,omitempty"`
 }
 
 func createDefaultBrowseRequest() browseRequest {
@@ -82,10 +84,11 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	items := make([]browseItem, len(allMeta))
 	for i, m := range allMeta {
 		items[i] = browseItem{
-			ID:       m.ID,
-			Name:     m.Name,
-			Favorite: m.Favorite,
-			Read:     m.Read,
+			ID:        m.ID,
+			Name:      m.Name,
+			Favorite:  m.Favorite,
+			Read:      m.Read,
+			PageCount: len(m.FileIndices),
 		}
 	}
 
