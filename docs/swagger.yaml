@@ -1,4 +1,22 @@
 definitions:
+  browse.browseItem:
+    properties:
+      favorite:
+        description: Favorite this item is a favorite
+        type: boolean
+      id:
+        description: ID of the item
+        type: integer
+      name:
+        description: Name of the item
+        type: string
+      page_count:
+        description: PageCount the number of pages.
+        type: integer
+      read:
+        description: Read this item has been read before.
+        type: boolean
+    type: object
   browse.browseRequest:
     properties:
       favorite_only:
@@ -20,7 +38,7 @@ definitions:
     properties:
       items:
         items:
-          $ref: '#/definitions/ent.Meta'
+          $ref: '#/definitions/browse.browseItem'
         type: array
       request:
         $ref: '#/definitions/browse.browseRequest'

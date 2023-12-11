@@ -560,12 +560,16 @@ func (u *MetaUpsertOne) IDX(ctx context.Context) int {
 // MetaCreateBulk is the builder for creating many Meta entities in bulk.
 type MetaCreateBulk struct {
 	config
+	err      error
 	builders []*MetaCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Meta entities in the database.
 func (mcb *MetaCreateBulk) Save(ctx context.Context) ([]*Meta, error) {
+	if mcb.err != nil {
+		return nil, mcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mcb.builders))
 	nodes := make([]*Meta, len(mcb.builders))
 	mutators := make([]Mutator, len(mcb.builders))
@@ -831,6 +835,9 @@ func (u *MetaUpsertBulk) UpdateActive() *MetaUpsertBulk {
 
 // Exec executes the query.
 func (u *MetaUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MetaCreateBulk instead", i)

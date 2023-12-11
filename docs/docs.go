@@ -453,6 +453,31 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "browse.browseItem": {
+            "type": "object",
+            "properties": {
+                "favorite": {
+                    "description": "Favorite this item is a favorite",
+                    "type": "boolean"
+                },
+                "id": {
+                    "description": "ID of the item",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Name of the item",
+                    "type": "string"
+                },
+                "page_count": {
+                    "description": "PageCount the number of pages.",
+                    "type": "integer"
+                },
+                "read": {
+                    "description": "Read this item has been read before.",
+                    "type": "boolean"
+                }
+            }
+        },
         "browse.browseRequest": {
             "type": "object",
             "properties": {
@@ -485,7 +510,7 @@ const docTemplate = `{
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ent.Meta"
+                        "$ref": "#/definitions/browse.browseItem"
                     }
                 },
                 "request": {
