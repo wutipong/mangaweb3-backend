@@ -36,9 +36,25 @@ func (mu *MetaUpdate) SetName(s string) *MetaUpdate {
 	return mu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableName(s *string) *MetaUpdate {
+	if s != nil {
+		mu.SetName(*s)
+	}
+	return mu
+}
+
 // SetCreateTime sets the "create_time" field.
 func (mu *MetaUpdate) SetCreateTime(t time.Time) *MetaUpdate {
 	mu.mutation.SetCreateTime(t)
+	return mu
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableCreateTime(t *time.Time) *MetaUpdate {
+	if t != nil {
+		mu.SetCreateTime(*t)
+	}
 	return mu
 }
 
@@ -83,6 +99,14 @@ func (mu *MetaUpdate) ClearThumbnail() *MetaUpdate {
 // SetRead sets the "read" field.
 func (mu *MetaUpdate) SetRead(b bool) *MetaUpdate {
 	mu.mutation.SetRead(b)
+	return mu
+}
+
+// SetNillableRead sets the "read" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableRead(b *bool) *MetaUpdate {
+	if b != nil {
+		mu.SetRead(*b)
+	}
 	return mu
 }
 
@@ -290,9 +314,25 @@ func (muo *MetaUpdateOne) SetName(s string) *MetaUpdateOne {
 	return muo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableName(s *string) *MetaUpdateOne {
+	if s != nil {
+		muo.SetName(*s)
+	}
+	return muo
+}
+
 // SetCreateTime sets the "create_time" field.
 func (muo *MetaUpdateOne) SetCreateTime(t time.Time) *MetaUpdateOne {
 	muo.mutation.SetCreateTime(t)
+	return muo
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableCreateTime(t *time.Time) *MetaUpdateOne {
+	if t != nil {
+		muo.SetCreateTime(*t)
+	}
 	return muo
 }
 
@@ -337,6 +377,14 @@ func (muo *MetaUpdateOne) ClearThumbnail() *MetaUpdateOne {
 // SetRead sets the "read" field.
 func (muo *MetaUpdateOne) SetRead(b bool) *MetaUpdateOne {
 	muo.mutation.SetRead(b)
+	return muo
+}
+
+// SetNillableRead sets the "read" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableRead(b *bool) *MetaUpdateOne {
+	if b != nil {
+		muo.SetRead(*b)
+	}
 	return muo
 }
 
