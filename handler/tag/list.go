@@ -11,9 +11,10 @@ import (
 )
 
 type listRequest struct {
-	FavoriteOnly bool `json:"favorite_only"`
-	Page         int  `json:"page"`
-	ItemPerPage  int  `json:"item_per_page"`
+	FavoriteOnly bool   `json:"favorite_only"`
+	Search       string `json:"search"`
+	Page         int    `json:"page"`
+	ItemPerPage  int    `json:"item_per_page"`
 }
 
 type listResponse struct {
@@ -38,6 +39,7 @@ const (
 func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	req := listRequest{
 		FavoriteOnly: false,
+		Search:       "",
 		Page:         0,
 		ItemPerPage:  DefaultItemPerPage,
 	}
@@ -49,7 +51,7 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 
 	log.Info().Interface("request", req).Msg("Tag list")
 
-	allTags, err := tag.ReadPage(r.Context(), req.FavoriteOnly, req.Page, req.ItemPerPage)
+	allTags, err := tag.ReadPage(r.Context(), req.FavoriteOnly, req.Search, req.Page, req.ItemPerPage)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

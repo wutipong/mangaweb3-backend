@@ -693,6 +693,9 @@
                 },
                 "page": {
                     "type": "integer"
+                },
+                "search": {
+                    "type": "string"
                 }
             }
         },
