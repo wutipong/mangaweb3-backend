@@ -31,7 +31,7 @@ func ReadAll(ctx context.Context) (tags []*ent.Tag, err error) {
 	return client.Tag.Query().Order(tag.ByName()).All(ctx)
 }
 
-func ReadPage(ctx context.Context, favoriteOnly bool,
+func ReadPage(ctx context.Context, favoriteOnly bool, search string,
 	page int, itemPerPage int) (tags []*ent.Tag, err error) {
 	query := client.Tag.Query().
 		Offset(page * itemPerPage).
@@ -40,6 +40,10 @@ func ReadPage(ctx context.Context, favoriteOnly bool,
 
 	if favoriteOnly {
 		query = query.Where(tag.Favorite(favoriteOnly))
+	}
+
+	if search != "" {
+		query = query.Where(tag.NameContainsFold(search))
 	}
 
 	return query.All(ctx)

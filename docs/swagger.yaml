@@ -171,6 +171,8 @@ definitions:
         type: integer
       page:
         type: integer
+      search:
+        type: string
     type: object
   tag.listResponse:
     properties:

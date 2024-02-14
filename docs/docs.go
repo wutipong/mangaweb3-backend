@@ -701,6 +701,9 @@ const docTemplate = `{
                 },
                 "page": {
                     "type": "integer"
+                },
+                "search": {
+                    "type": "string"
                 }
             }
         },
