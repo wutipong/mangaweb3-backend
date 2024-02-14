@@ -9,15 +9,10 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
 
-type SearchField string
 type SortField string
 type SortOrder string
 
 const (
-	SearchFieldName     = SearchField("name")
-	SearchFieldFavorite = SearchField("favorite")
-	SearchFieldTag      = SearchField("tag")
-
 	SortFieldName       = SortField("name")
 	SortFieldCreateTime = SortField("createTime")
 
@@ -25,17 +20,12 @@ const (
 	SortOrderDescending = SortOrder("descending")
 )
 
-type SearchCriteria struct {
-	Field SearchField
-	Value interface{}
-}
-
 type QueryParams struct {
 	SearchName   string
-	FavoriteOnly bool
 	SearchTag    string
 	SortBy       SortField
 	SortOrder    SortOrder
+	FavoriteOnly bool
 	Page         int
 	ItemPerPage  int
 }
