@@ -25,32 +25,38 @@ func ReadAll(ctx context.Context, client *ent.Client) (tags []*ent.Tag, err erro
 	return client.Tag.Query().Order(tag.ByName()).All(ctx)
 }
 
-func ReadPage(ctx context.Context, client *ent.Client, favoriteOnly bool, search string,
-	page int, itemPerPage int) (tags []*ent.Tag, err error) {
-	query := client.Tag.Query().
-		Offset(page * itemPerPage).
-		Limit(itemPerPage).
-		Order(tag.ByName())
+type QueryParams struct {
+	FavoriteOnly bool
+	Search       string
+	Page         int
+	ItemPerPage  int
+}
 
-	if favoriteOnly {
-		query = query.Where(tag.Favorite(favoriteOnly))
+func CreateQuery(client *ent.Client, q QueryParams) *ent.TagQuery {
+	query := client.Tag.Query().Order(tag.ByName())
+	if q.ItemPerPage > 0 {
+		query = query.Limit(q.ItemPerPage).
+			Offset(q.Page * q.ItemPerPage)
 	}
 
-	if search != "" {
-		query = query.Where(tag.NameContainsFold(search))
+	if q.FavoriteOnly {
+		query = query.Where(tag.Favorite(true))
 	}
 
+	if q.Search != "" {
+		query = query.Where(tag.NameContainsFold(q.Search))
+	}
+
+	return query
+}
+
+func ReadPage(ctx context.Context, client *ent.Client, q QueryParams) (tags []*ent.Tag, err error) {
+	query := CreateQuery(client, q)
 	return query.All(ctx)
 }
 
-func Count(ctx context.Context, client *ent.Client, favoriteOnly bool, search string) (count int, err error) {
-	query := client.Tag.Query()
-	if favoriteOnly {
-		query = query.Where(tag.Favorite(favoriteOnly))
-	}
-	if search != "" {
-		query = query.Where(tag.NameContainsFold(search))
-	}
+func Count(ctx context.Context, client *ent.Client, q QueryParams) (count int, err error) {
+	query := CreateQuery(client, q)
 
 	return query.Count(ctx)
 }

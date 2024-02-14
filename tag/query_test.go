@@ -33,7 +33,14 @@ func (s *QueryTestSuite) TestReadPage() {
 	client.Tag.Create().SetName("Tag 2").SetFavorite(false).Save(context.Background())
 	client.Tag.Create().SetName("Tag 3").SetFavorite(false).Save(context.Background())
 
-	tags, err := ReadPage(context.Background(), client, false, "", 0, 30)
+	tags, err := ReadPage(context.Background(), client,
+		QueryParams{
+			FavoriteOnly: false,
+			Search:       "",
+			Page:         0,
+			ItemPerPage:  30,
+		},
+	)
 
 	s.Assert().Nil(err)
 	s.Assert().Equal(3, len(tags))
@@ -52,12 +59,24 @@ func (s *QueryTestSuite) TestReadPagePageCount() {
 	client.Tag.Create().SetName("Tag 2").SetFavorite(false).Save(context.Background())
 	client.Tag.Create().SetName("Tag 3").SetFavorite(false).Save(context.Background())
 
-	tags, err := ReadPage(context.Background(), client, false, "", 0, 2)
+	tags, err := ReadPage(context.Background(), client,
+		QueryParams{
+			FavoriteOnly: false,
+			Search:       "",
+			Page:         0,
+			ItemPerPage:  2,
+		})
 
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, len(tags))
 
-	tags, err = ReadPage(context.Background(), client, false, "", 1, 2)
+	tags, err = ReadPage(context.Background(), client,
+		QueryParams{
+			FavoriteOnly: false,
+			Search:       "",
+			Page:         1,
+			ItemPerPage:  2,
+		})
 	s.Assert().Nil(err)
 	s.Assert().Equal(1, len(tags))
 }
@@ -75,7 +94,13 @@ func (s *QueryTestSuite) TestReadPagePageWithSearch() {
 	client.Tag.Create().SetName("Name 2").SetFavorite(false).Save(context.Background())
 	client.Tag.Create().SetName("Tag 3").SetFavorite(false).Save(context.Background())
 
-	tags, err := ReadPage(context.Background(), client, false, "name", 0, 30)
+	tags, err := ReadPage(context.Background(), client,
+		QueryParams{
+			FavoriteOnly: false,
+			Search:       "name",
+			Page:         0,
+			ItemPerPage:  30,
+		})
 
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, len(tags))
@@ -96,7 +121,12 @@ func (s *QueryTestSuite) TestReadPagePageWithSearchFavoriteOnly() {
 	client.Tag.Create().SetName("Name 2").SetFavorite(false).Save(context.Background())
 	client.Tag.Create().SetName("Tag 3").SetFavorite(false).Save(context.Background())
 
-	tags, err := ReadPage(context.Background(), client, true, "name", 0, 30)
+	tags, err := ReadPage(context.Background(), client, QueryParams{
+		FavoriteOnly: true,
+		Search:       "name",
+		Page:         0,
+		ItemPerPage:  30,
+	})
 
 	s.Assert().Nil(err)
 	s.Assert().Equal(1, len(tags))
