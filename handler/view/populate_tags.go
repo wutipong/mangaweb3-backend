@@ -42,7 +42,7 @@ func PopulateTagsHandler(w http.ResponseWriter, r *http.Request, params httprout
 
 	item := req.Name
 
-	m, err := meta.Read(r.Context(), item)
+	m, err := meta.Read(r.Context(), handler.EntClient(), item)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -52,7 +52,7 @@ func PopulateTagsHandler(w http.ResponseWriter, r *http.Request, params httprout
 		Interface("request", req).
 		Msg("View Item")
 
-	m, err = meta.PopulateTags(r.Context(), m)
+	m, err = meta.PopulateTags(r.Context(), handler.EntClient(), m)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

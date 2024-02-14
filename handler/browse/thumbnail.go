@@ -24,7 +24,7 @@ func GetThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprout
 		Str("name", item).
 		Msg("Thumbnail")
 
-	m, err := meta.Read(r.Context(), item)
+	m, err := meta.Read(r.Context(), handler.EntClient(), item)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

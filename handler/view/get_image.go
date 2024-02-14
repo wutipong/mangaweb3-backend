@@ -56,7 +56,7 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 		Interface("request", query).
 		Msg("Get image")
 
-	m, err := meta.Read(r.Context(), item)
+	m, err := meta.Read(r.Context(), handler.EntClient(), item)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

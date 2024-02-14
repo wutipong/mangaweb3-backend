@@ -42,7 +42,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	item := req.Name
 
-	m, err := meta.Read(r.Context(), item)
+	m, err := meta.Read(r.Context(), handler.EntClient(), item)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -50,7 +50,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	if !m.Read {
 		m.Read = true
-		meta.Write(r.Context(), m)
+		meta.Write(r.Context(), handler.EntClient(), m)
 	}
 
 	log.Info().

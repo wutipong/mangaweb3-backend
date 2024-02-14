@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -15,11 +17,11 @@ type Meta struct {
 func (Meta) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").NotEmpty().Unique(),
-		field.Time("create_time"),
+		field.Time("create_time").Default(time.Now()),
 		field.Bool("favorite").Default(false),
-		field.Ints("file_indices"),
+		field.Ints("file_indices").Default([]int{}),
 		field.Bytes("thumbnail").Optional().Sensitive(),
-		field.Bool("read"),
+		field.Bool("read").Default(false),
 		field.Bool("active").Default(true),
 	}
 }

@@ -3,6 +3,8 @@
 package meta
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -68,8 +70,14 @@ func ValidColumn(column string) bool {
 var (
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime time.Time
 	// DefaultFavorite holds the default value on creation for the "favorite" field.
 	DefaultFavorite bool
+	// DefaultFileIndices holds the default value on creation for the "file_indices" field.
+	DefaultFileIndices []int
+	// DefaultRead holds the default value on creation for the "read" field.
+	DefaultRead bool
 	// DefaultActive holds the default value on creation for the "active" field.
 	DefaultActive bool
 )

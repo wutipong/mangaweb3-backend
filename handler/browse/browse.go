@@ -68,14 +68,17 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		handler.WriteResponse(w, err)
 	}
 
-	allMeta, err := meta.SearchItems(r.Context(),
-		req.Search,
-		req.FavoriteOnly,
-		req.Tag,
-		req.Sort,
-		req.Order,
-		req.Page,
-		req.ItemPerPage)
+	allMeta, err := meta.ReadPage(r.Context(),
+		handler.EntClient(),
+		meta.QueryParams{
+			SearchName:   req.Search,
+			FavoriteOnly: req.FavoriteOnly,
+			SearchTag:    req.Tag,
+			SortBy:       req.Sort,
+			SortOrder:    req.Order,
+			Page:         req.Page,
+			ItemPerPage:  req.ItemPerPage,
+		})
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -92,12 +95,17 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		}
 	}
 
-	count, err := meta.CountItems(r.Context(),
-		req.Search,
-		req.FavoriteOnly,
-		req.Tag,
-		req.Sort,
-		req.Order)
+	count, err := meta.Count(r.Context(),
+		handler.EntClient(),
+		meta.QueryParams{
+			SearchName:   req.Search,
+			FavoriteOnly: req.FavoriteOnly,
+			SearchTag:    req.Tag,
+			SortBy:       req.Sort,
+			SortOrder:    req.Order,
+			Page:         0,
+			ItemPerPage:  0,
+		})
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -123,7 +131,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	}
 
 	if req.Tag != "" {
-		tagObj, err := tag.Read(r.Context(), req.Tag)
+		tagObj, err := tag.Read(r.Context(), handler.EntClient(), req.Tag)
 		if err != nil {
 			handler.WriteResponse(w, err)
 			return

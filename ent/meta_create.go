@@ -35,6 +35,14 @@ func (mc *MetaCreate) SetCreateTime(t time.Time) *MetaCreate {
 	return mc
 }
 
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableCreateTime(t *time.Time) *MetaCreate {
+	if t != nil {
+		mc.SetCreateTime(*t)
+	}
+	return mc
+}
+
 // SetFavorite sets the "favorite" field.
 func (mc *MetaCreate) SetFavorite(b bool) *MetaCreate {
 	mc.mutation.SetFavorite(b)
@@ -64,6 +72,14 @@ func (mc *MetaCreate) SetThumbnail(b []byte) *MetaCreate {
 // SetRead sets the "read" field.
 func (mc *MetaCreate) SetRead(b bool) *MetaCreate {
 	mc.mutation.SetRead(b)
+	return mc
+}
+
+// SetNillableRead sets the "read" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableRead(b *bool) *MetaCreate {
+	if b != nil {
+		mc.SetRead(*b)
+	}
 	return mc
 }
 
@@ -131,9 +147,21 @@ func (mc *MetaCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (mc *MetaCreate) defaults() {
+	if _, ok := mc.mutation.CreateTime(); !ok {
+		v := meta.DefaultCreateTime
+		mc.mutation.SetCreateTime(v)
+	}
 	if _, ok := mc.mutation.Favorite(); !ok {
 		v := meta.DefaultFavorite
 		mc.mutation.SetFavorite(v)
+	}
+	if _, ok := mc.mutation.FileIndices(); !ok {
+		v := meta.DefaultFileIndices
+		mc.mutation.SetFileIndices(v)
+	}
+	if _, ok := mc.mutation.Read(); !ok {
+		v := meta.DefaultRead
+		mc.mutation.SetRead(v)
 	}
 	if _, ok := mc.mutation.Active(); !ok {
 		v := meta.DefaultActive

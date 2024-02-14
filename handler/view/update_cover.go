@@ -42,7 +42,7 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		Interface("request", req).
 		Msg("Update cover.")
 
-	m, err := meta.Read(r.Context(), req.Name)
+	m, err := meta.Read(r.Context(), handler.EntClient(), req.Name)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -54,7 +54,7 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		return
 	}
 
-	err = meta.Write(r.Context(), m)
+	err = meta.Write(r.Context(), handler.EntClient(), m)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

@@ -36,7 +36,7 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 
 	log.Info().Interface("request", req).Msg("Set favorite tag.")
 
-	m, err := tag.Read(r.Context(), req.Tag)
+	m, err := tag.Read(r.Context(), handler.EntClient(), req.Tag)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -44,7 +44,7 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 
 	if req.Favorite != m.Favorite {
 		m.Favorite = req.Favorite
-		tag.Write(r.Context(), m)
+		tag.Write(r.Context(), handler.EntClient(), m)
 	}
 
 	response := setFavoriteResponse{

@@ -24,7 +24,6 @@ import (
 	"github.com/wutipong/mangaweb3-backend/handler/view"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/scheduler"
-	"github.com/wutipong/mangaweb3-backend/tag"
 )
 
 var versionString string = "development"
@@ -102,14 +101,13 @@ func main() {
 		return
 	}
 
-	meta.Init(client)
-	tag.Init(client)
-
-	scheduler.Init(scheduler.Options{})
+	scheduler.Init(scheduler.Options{
+		EntClient: client,
+	})
 	scheduler.Start()
 
 	router := httprouter.New()
-	RegisterHandler(router)
+	RegisterHandler(router, client)
 
 	log.Info().Msg("Server starts.")
 
@@ -123,9 +121,10 @@ func main() {
 	scheduler.Stop()
 }
 
-func RegisterHandler(router *httprouter.Router) {
+func RegisterHandler(router *httprouter.Router, client *ent.Client) {
 	handler.Init(handler.Options{
 		VersionString: versionString,
+		EntClient:     client,
 	})
 
 	browse.Register(router)

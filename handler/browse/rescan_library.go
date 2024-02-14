@@ -23,7 +23,7 @@ const (
 func RescanLibraryHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Info().Msg("Rescan library")
 
-	scheduler.ScheduleScanLibrary()
+	scheduler.ScheduleScanLibrary(handler.EntClient())
 
 	response := rescanLibraryResponse{
 		Result: true,

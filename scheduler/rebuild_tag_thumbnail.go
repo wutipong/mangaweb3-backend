@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
 
-func RebuildTagThumbnail() error {
-	allTags, err := tag.ReadAll(context.Background())
+func RebuildTagThumbnail(client *ent.Client) error {
+	allTags, err := tag.ReadAll(context.Background(), client)
 	if err != nil {
 		return err
 	}
@@ -29,9 +30,9 @@ func RebuildTagThumbnail() error {
 	return nil
 }
 
-func ScheduleRebuildTagThumbnail() {
+func ScheduleRebuildTagThumbnail(client *ent.Client) {
 	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
 		log.Info().Msg("Rebuild tag thumbnails.")
-		RebuildTagThumbnail()
+		RebuildTagThumbnail(client)
 	})
 }

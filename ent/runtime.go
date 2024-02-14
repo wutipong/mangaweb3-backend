@@ -3,6 +3,8 @@
 package ent
 
 import (
+	"time"
+
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/schema"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
@@ -18,10 +20,22 @@ func init() {
 	metaDescName := metaFields[0].Descriptor()
 	// meta.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	meta.NameValidator = metaDescName.Validators[0].(func(string) error)
+	// metaDescCreateTime is the schema descriptor for create_time field.
+	metaDescCreateTime := metaFields[1].Descriptor()
+	// meta.DefaultCreateTime holds the default value on creation for the create_time field.
+	meta.DefaultCreateTime = metaDescCreateTime.Default.(time.Time)
 	// metaDescFavorite is the schema descriptor for favorite field.
 	metaDescFavorite := metaFields[2].Descriptor()
 	// meta.DefaultFavorite holds the default value on creation for the favorite field.
 	meta.DefaultFavorite = metaDescFavorite.Default.(bool)
+	// metaDescFileIndices is the schema descriptor for file_indices field.
+	metaDescFileIndices := metaFields[3].Descriptor()
+	// meta.DefaultFileIndices holds the default value on creation for the file_indices field.
+	meta.DefaultFileIndices = metaDescFileIndices.Default.([]int)
+	// metaDescRead is the schema descriptor for read field.
+	metaDescRead := metaFields[5].Descriptor()
+	// meta.DefaultRead holds the default value on creation for the read field.
+	meta.DefaultRead = metaDescRead.Default.(bool)
 	// metaDescActive is the schema descriptor for active field.
 	metaDescActive := metaFields[6].Descriptor()
 	// meta.DefaultActive holds the default value on creation for the active field.
