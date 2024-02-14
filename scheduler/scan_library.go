@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
-func ScanLibrary() error {
-	allMeta, err := meta.ReadAll(context.Background())
+func ScanLibrary(client *ent.Client) error {
+	allMeta, err := meta.ReadAll(context.Background(), client)
 	if err != nil {
 		return err
 	}
@@ -37,16 +38,16 @@ func ScanLibrary() error {
 			Str("file", file).
 			Msg("Creating metadata.")
 
-		if item, err := meta.Read(context.Background(), file); err == nil {
+		if item, err := meta.Read(context.Background(), client, file); err == nil {
 			item.Active = true
-			if err := meta.Write(context.Background(), item); err != nil {
+			if err := meta.Write(context.Background(), client, item); err != nil {
 				log.Error().
 					Str("name", item.Name).
 					AnErr("error", err).
 					Msg("Failed to re-activate meta")
 			}
 		} else {
-			item, err := meta.NewItem(context.Background(), file)
+			item, err := meta.NewItem(context.Background(), client, file)
 			if err != nil {
 				log.
 					Error().
@@ -56,7 +57,7 @@ func ScanLibrary() error {
 				continue
 			}
 
-			_, err = meta.PopulateTags(context.Background(), item)
+			_, err = meta.PopulateTags(context.Background(), client, item)
 			if err != nil {
 				log.Error().
 					AnErr("error", err).
@@ -80,7 +81,7 @@ func ScanLibrary() error {
 		log.Info().Str("file", m.Name).Msg("Inactivate metadata.")
 		m.Active = false
 
-		if err := meta.Write(context.Background(), m); err != nil {
+		if err := meta.Write(context.Background(), client, m); err != nil {
 			log.Error().
 				Str("name", m.Name).
 				AnErr("error", err).
@@ -91,9 +92,9 @@ func ScanLibrary() error {
 	return nil
 }
 
-func ScheduleScanLibrary() {
+func ScheduleScanLibrary(client *ent.Client) {
 	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
 		log.Info().Msg("Scanning Library.")
-		ScanLibrary()
+		ScanLibrary(client)
 	})
 }

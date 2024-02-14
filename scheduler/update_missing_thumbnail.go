@@ -4,12 +4,13 @@ import (
 	"context"
 
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
-func UpdateMissingThumbnail() error {
+func UpdateMissingThumbnail(client *ent.Client) error {
 
-	allMeta, err := meta.ReadAll(context.Background())
+	allMeta, err := meta.ReadAll(context.Background(), client)
 	if err != nil {
 		return err
 	}
@@ -31,15 +32,15 @@ func UpdateMissingThumbnail() error {
 			continue
 		}
 
-		meta.Write(context.Background(), m)
+		meta.Write(context.Background(), client, m)
 	}
 
 	return nil
 }
 
-func ScheduleUpdateMissingThumbnail() {
+func ScheduleUpdateMissingThumbnail(client *ent.Client) {
 	scheduler.Every(1).Hour().Do(func() {
 		log.Info().Msg("Updating missing thumbnail.")
-		UpdateMissingThumbnail()
+		UpdateMissingThumbnail(client)
 	})
 }

@@ -69,6 +69,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	}
 
 	allMeta, err := meta.SearchItems(r.Context(),
+		handler.EntClient(),
 		req.Search,
 		req.FavoriteOnly,
 		req.Tag,
@@ -93,6 +94,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	}
 
 	count, err := meta.CountItems(r.Context(),
+		handler.EntClient(),
 		req.Search,
 		req.FavoriteOnly,
 		req.Tag,

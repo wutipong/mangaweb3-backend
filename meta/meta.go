@@ -23,13 +23,7 @@ import (
 	_ "golang.org/x/image/webp"
 )
 
-var client *ent.Client
-
-func Init(c *ent.Client) {
-	client = c
-}
-
-func NewItem(ctx context.Context, name string) (i *ent.Meta, err error) {
+func NewItem(ctx context.Context, client *ent.Client, name string) (i *ent.Meta, err error) {
 	createTime := time.Now()
 
 	if stat, e := fs.Stat(os.DirFS(BaseDirectory), name); e == nil {
@@ -171,7 +165,7 @@ func GenerateImageIndices(m *ent.Meta) error {
 	return nil
 }
 
-func PopulateTags(ctx context.Context, m *ent.Meta) (out *ent.Meta, err error) {
+func PopulateTags(ctx context.Context, client *ent.Client, m *ent.Meta) (out *ent.Meta, err error) {
 	tagStrs := tag_util.ParseTag(m.Name)
 	currentTags, _ := m.QueryTags().All(ctx)
 

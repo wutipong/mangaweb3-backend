@@ -52,7 +52,7 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 		Interface("request", req).
 		Msg("Set Favorite Item.")
 
-	m, err := meta.Read(r.Context(), item)
+	m, err := meta.Read(r.Context(), handler.EntClient(), item)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -60,7 +60,7 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 
 	if req.Favorite != m.Favorite {
 		m.Favorite = req.Favorite
-		meta.Write(r.Context(), m)
+		meta.Write(r.Context(), handler.EntClient(), m)
 	}
 
 	response := setFavoriteResponse{

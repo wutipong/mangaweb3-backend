@@ -31,6 +31,7 @@ type SearchCriteria struct {
 }
 
 func SearchFilter(ctx context.Context,
+	client *ent.Client,
 	name string,
 	favoriteOnly bool,
 	searchTag string,
@@ -88,6 +89,7 @@ func SearchFilter(ctx context.Context,
 }
 
 func SearchItems(ctx context.Context,
+	client *ent.Client,
 	name string,
 	favoriteOnly bool,
 	searchTag string,
@@ -97,7 +99,7 @@ func SearchItems(ctx context.Context,
 	itemPerPage int,
 ) (items []*ent.Meta, err error) {
 
-	query, err := SearchFilter(ctx, name, favoriteOnly, searchTag, sortBy, sortOrder, page, itemPerPage)
+	query, err := SearchFilter(ctx, client, name, favoriteOnly, searchTag, sortBy, sortOrder, page, itemPerPage)
 	if err != nil {
 		return
 	}
@@ -106,6 +108,7 @@ func SearchItems(ctx context.Context,
 }
 
 func CountItems(ctx context.Context,
+	client *ent.Client,
 	name string,
 	favoriteOnly bool,
 	searchTag string,
@@ -113,7 +116,7 @@ func CountItems(ctx context.Context,
 	sortOrder SortOrder,
 ) (count int, err error) {
 
-	query, err := SearchFilter(ctx, name, favoriteOnly, searchTag, sortBy, sortOrder, 0, 0)
+	query, err := SearchFilter(ctx, client, name, favoriteOnly, searchTag, sortBy, sortOrder, 0, 0)
 	if err != nil {
 		return
 	}

@@ -24,7 +24,7 @@ func Download(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 
 	log.Info().Str("name", item).Msg("Download")
 
-	m, err := meta.Read(r.Context(), item)
+	m, err := meta.Read(r.Context(), handler.EntClient(), item)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

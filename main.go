@@ -101,9 +101,9 @@ func main() {
 		return
 	}
 
-	meta.Init(client)
-
-	scheduler.Init(scheduler.Options{})
+	scheduler.Init(scheduler.Options{
+		EntClient: client,
+	})
 	scheduler.Start()
 
 	router := httprouter.New()

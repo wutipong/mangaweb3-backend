@@ -40,13 +40,13 @@ func FixMeta(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		Interface("request", req).
 		Msg("Fix metadata")
 
-	m, err := meta.Read(r.Context(), req.Name)
+	m, err := meta.Read(r.Context(), handler.EntClient(), req.Name)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
 
-	if m, err = meta.PopulateTags(r.Context(), m); err != nil {
+	if m, err = meta.PopulateTags(r.Context(), handler.EntClient(), m); err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
@@ -61,7 +61,7 @@ func FixMeta(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	if err = meta.Write(r.Context(), m); err != nil {
+	if err = meta.Write(r.Context(), handler.EntClient(), m); err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
