@@ -35,7 +35,12 @@ func (s *QueryTestSuite) TestReadPage() {
 	client.Meta.Create().SetName("[some artist]manga 4 here.zip").Save(context.Background())
 	client.Meta.Create().SetName("[some artist]manga 5 here.zip").SetActive(false).Save(context.Background())
 
-	tags, err := ReadPage(context.Background(), client, "", false, "", SortFieldName, SortOrderAscending, 0, 30)
+	tags, err := ReadPage(context.Background(), client, QueryParams{
+		SortBy:      SortFieldName,
+		SortOrder:   SortOrderAscending,
+		Page:        0,
+		ItemPerPage: 30,
+	})
 	s.Assert().Nil(err)
 
 	s.Assert().Equal(4, len(tags))
@@ -60,7 +65,13 @@ func (s *QueryTestSuite) TestReadPageFavoriteOnly() {
 	client.Meta.Create().SetName("[some artist]manga 3 here.zip").Save(context.Background())
 	client.Meta.Create().SetName("[some artist]manga 4 here.zip").Save(context.Background())
 
-	tags, err := ReadPage(context.Background(), client, "", true, "", SortFieldName, SortOrderAscending, 0, 30)
+	tags, err := ReadPage(context.Background(), client, QueryParams{
+		FavoriteOnly: true,
+		SortBy:       SortFieldName,
+		SortOrder:    SortOrderAscending,
+		Page:         0,
+		ItemPerPage:  30,
+	})
 	s.Assert().Nil(err)
 
 	s.Assert().Equal(2, len(tags))

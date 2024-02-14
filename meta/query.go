@@ -30,18 +30,19 @@ type SearchCriteria struct {
 	Value interface{}
 }
 
-func CreateQuery(ctx context.Context,
-	client *ent.Client,
-	name string,
-	favoriteOnly bool,
-	searchTag string,
-	sortBy SortField,
-	sortOrder SortOrder,
-	page int,
-	itemPerPage int) (query *ent.MetaQuery, err error) {
+type QueryParams struct {
+	SearchName   string
+	FavoriteOnly bool
+	SearchTag    string
+	SortBy       SortField
+	SortOrder    SortOrder
+	Page         int
+	ItemPerPage  int
+}
 
-	if searchTag != "" {
-		t, e := client.Tag.Query().Where(tag.Name(searchTag)).Only(ctx)
+func CreateQuery(ctx context.Context, client *ent.Client, q QueryParams) (query *ent.MetaQuery, err error) {
+	if q.SearchTag != "" {
+		t, e := client.Tag.Query().Where(tag.Name(q.SearchTag)).Only(ctx)
 		if e != nil {
 			err = e
 			return
@@ -54,48 +55,38 @@ func CreateQuery(ctx context.Context,
 
 	query = query.Where(meta.Active(true))
 
-	if name != "" {
-		query = query.Where(meta.NameContainsFold(name))
+	if q.SearchName != "" {
+		query = query.Where(meta.NameContainsFold(q.SearchName))
 	}
 
-	if favoriteOnly {
+	if q.FavoriteOnly {
 		query = query.Where(meta.Favorite(true))
 	}
 
 	field := ""
-	switch sortBy {
+	switch q.SortBy {
 	case SortFieldName:
 		field = meta.FieldName
 	case SortFieldCreateTime:
 		field = meta.FieldCreateTime
 	}
 
-	switch sortOrder {
+	switch q.SortOrder {
 	case SortOrderAscending:
 		query = query.Order(ent.Asc(string(field)))
 	case SortOrderDescending:
 		query = query.Order(ent.Desc(string(field)))
 	}
 
-	if itemPerPage > 0 {
-		query = query.Limit(itemPerPage).Offset(itemPerPage * page)
+	if q.ItemPerPage > 0 {
+		query = query.Limit(q.ItemPerPage).Offset(q.ItemPerPage * q.Page)
 	}
 
 	return
 }
 
-func ReadPage(ctx context.Context,
-	client *ent.Client,
-	name string,
-	favoriteOnly bool,
-	searchTag string,
-	sortBy SortField,
-	sortOrder SortOrder,
-	page int,
-	itemPerPage int,
-) (items []*ent.Meta, err error) {
-
-	query, err := CreateQuery(ctx, client, name, favoriteOnly, searchTag, sortBy, sortOrder, page, itemPerPage)
+func ReadPage(ctx context.Context, client *ent.Client, q QueryParams) (items []*ent.Meta, err error) {
+	query, err := CreateQuery(ctx, client, q)
 	if err != nil {
 		return
 	}
@@ -103,16 +94,8 @@ func ReadPage(ctx context.Context,
 	return query.All(ctx)
 }
 
-func Count(ctx context.Context,
-	client *ent.Client,
-	name string,
-	favoriteOnly bool,
-	searchTag string,
-	sortBy SortField,
-	sortOrder SortOrder,
-) (count int, err error) {
-
-	query, err := CreateQuery(ctx, client, name, favoriteOnly, searchTag, sortBy, sortOrder, 0, 0)
+func Count(ctx context.Context, client *ent.Client, q QueryParams) (count int, err error) {
+	query, err := CreateQuery(ctx, client, q)
 	if err != nil {
 		return
 	}

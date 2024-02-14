@@ -70,13 +70,15 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	allMeta, err := meta.ReadPage(r.Context(),
 		handler.EntClient(),
-		req.Search,
-		req.FavoriteOnly,
-		req.Tag,
-		req.Sort,
-		req.Order,
-		req.Page,
-		req.ItemPerPage)
+		meta.QueryParams{
+			SearchName:   req.Search,
+			FavoriteOnly: req.FavoriteOnly,
+			SearchTag:    req.Tag,
+			SortBy:       req.Sort,
+			SortOrder:    req.Order,
+			Page:         req.Page,
+			ItemPerPage:  req.ItemPerPage,
+		})
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -95,11 +97,15 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	count, err := meta.Count(r.Context(),
 		handler.EntClient(),
-		req.Search,
-		req.FavoriteOnly,
-		req.Tag,
-		req.Sort,
-		req.Order)
+		meta.QueryParams{
+			SearchName:   req.Search,
+			FavoriteOnly: req.FavoriteOnly,
+			SearchTag:    req.Tag,
+			SortBy:       req.Sort,
+			SortOrder:    req.Order,
+			Page:         0,
+			ItemPerPage:  0,
+		})
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
