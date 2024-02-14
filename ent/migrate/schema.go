@@ -16,7 +16,7 @@ var (
 		{Name: "favorite", Type: field.TypeBool, Default: false},
 		{Name: "file_indices", Type: field.TypeJSON},
 		{Name: "thumbnail", Type: field.TypeBytes, Nullable: true},
-		{Name: "read", Type: field.TypeBool},
+		{Name: "read", Type: field.TypeBool, Default: false},
 		{Name: "active", Type: field.TypeBool, Default: true},
 	}
 	// MetaTable holds the schema information for the "meta" table.

@@ -3,9 +3,9 @@ package meta
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
-	"github.com/wutipong/mangaweb3-backend/ent/predicate"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
 
@@ -30,7 +30,7 @@ type SearchCriteria struct {
 	Value interface{}
 }
 
-func SearchFilter(ctx context.Context,
+func CreateQuery(ctx context.Context,
 	client *ent.Client,
 	name string,
 	favoriteOnly bool,
@@ -52,19 +52,15 @@ func SearchFilter(ctx context.Context,
 		query = client.Meta.Query()
 	}
 
-	predicates := []predicate.Meta{
-		meta.Active(true),
-	}
+	query = query.Where(meta.Active(true))
 
 	if name != "" {
-		predicates = append(predicates, meta.NameContains(name))
+		query = query.Where(meta.NameContainsFold(name))
 	}
 
 	if favoriteOnly {
-		predicates = append(predicates, meta.Favorite(true))
+		query = query.Where(meta.Favorite(true))
 	}
-
-	query = query.Where(predicates...)
 
 	field := ""
 	switch sortBy {
@@ -88,7 +84,7 @@ func SearchFilter(ctx context.Context,
 	return
 }
 
-func SearchItems(ctx context.Context,
+func ReadPage(ctx context.Context,
 	client *ent.Client,
 	name string,
 	favoriteOnly bool,
@@ -99,7 +95,7 @@ func SearchItems(ctx context.Context,
 	itemPerPage int,
 ) (items []*ent.Meta, err error) {
 
-	query, err := SearchFilter(ctx, client, name, favoriteOnly, searchTag, sortBy, sortOrder, page, itemPerPage)
+	query, err := CreateQuery(ctx, client, name, favoriteOnly, searchTag, sortBy, sortOrder, page, itemPerPage)
 	if err != nil {
 		return
 	}
@@ -107,7 +103,7 @@ func SearchItems(ctx context.Context,
 	return query.All(ctx)
 }
 
-func CountItems(ctx context.Context,
+func Count(ctx context.Context,
 	client *ent.Client,
 	name string,
 	favoriteOnly bool,
@@ -116,10 +112,40 @@ func CountItems(ctx context.Context,
 	sortOrder SortOrder,
 ) (count int, err error) {
 
-	query, err := SearchFilter(ctx, client, name, favoriteOnly, searchTag, sortBy, sortOrder, 0, 0)
+	query, err := CreateQuery(ctx, client, name, favoriteOnly, searchTag, sortBy, sortOrder, 0, 0)
 	if err != nil {
 		return
 	}
 
 	return query.Count(ctx)
+}
+
+func IsItemExist(ctx context.Context, client *ent.Client, name string) bool {
+	count, err := client.Meta.Query().Where(meta.Name(name)).Count(ctx)
+	if err != nil {
+		return false
+	}
+
+	return count > 0
+}
+
+func Write(ctx context.Context, client *ent.Client, m *ent.Meta) error {
+	return client.Meta.Create().
+		SetName(m.Name).
+		SetCreateTime(m.CreateTime).
+		SetFavorite(m.Favorite).
+		SetFileIndices(m.FileIndices).
+		SetThumbnail(m.Thumbnail).
+		SetRead(m.Read).
+		SetActive(m.Active).
+		OnConflict(sql.ConflictColumns(meta.FieldName)).
+		UpdateNewValues().Exec(ctx)
+}
+
+func Read(ctx context.Context, client *ent.Client, name string) (m *ent.Meta, err error) {
+	return client.Meta.Query().Where(meta.Name(name)).Only(ctx)
+}
+
+func ReadAll(ctx context.Context, client *ent.Client) (items []*ent.Meta, err error) {
+	return client.Meta.Query().Where(meta.Active(true)).All(ctx)
 }
