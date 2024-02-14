@@ -23,7 +23,7 @@ const (
 func RecreateThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Info().Msg("Rescan library")
 
-	scheduler.ScheduleRebuildTagThumbnail()
+	scheduler.ScheduleRebuildTagThumbnail(handler.EntClient())
 
 	response := recreateThumbnailsResponse{
 		Result: true,

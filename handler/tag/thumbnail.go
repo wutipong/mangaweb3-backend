@@ -22,7 +22,7 @@ func ThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.
 
 	log.Info().Str("tag", tagStr).Msg("Tag thumbnail image")
 
-	m, err := tag.Read(r.Context(), tagStr)
+	m, err := tag.Read(r.Context(), handler.EntClient(), tagStr)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

@@ -185,7 +185,7 @@ func PopulateTags(ctx context.Context, m *ent.Meta) (out *ent.Meta, err error) {
 		}
 
 		var tag *ent.Tag
-		if temp, err := tag_util.Read(ctx, t); err != nil {
+		if temp, err := tag_util.Read(ctx, client, t); err != nil {
 			tag = &ent.Tag{
 				Name: t,
 			}

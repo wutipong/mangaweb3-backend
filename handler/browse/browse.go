@@ -123,7 +123,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	}
 
 	if req.Tag != "" {
-		tagObj, err := tag.Read(r.Context(), req.Tag)
+		tagObj, err := tag.Read(r.Context(), handler.EntClient(), req.Tag)
 		if err != nil {
 			handler.WriteResponse(w, err)
 			return

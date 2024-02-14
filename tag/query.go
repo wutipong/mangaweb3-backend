@@ -8,13 +8,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
 
-var client *ent.Client
-
-func Init(c *ent.Client) {
-	client = c
-}
-
-func IsTagExist(ctx context.Context, name string) bool {
+func IsTagExist(ctx context.Context, client *ent.Client, name string) bool {
 	count, err := client.Tag.Query().Where(tag.Name(name)).Count(ctx)
 	if err != nil {
 		return false
@@ -23,15 +17,15 @@ func IsTagExist(ctx context.Context, name string) bool {
 	return count > 0
 }
 
-func Read(ctx context.Context, name string) (t *ent.Tag, err error) {
+func Read(ctx context.Context, client *ent.Client, name string) (t *ent.Tag, err error) {
 	return client.Tag.Query().Where(tag.Name(name)).First(ctx)
 }
 
-func ReadAll(ctx context.Context) (tags []*ent.Tag, err error) {
+func ReadAll(ctx context.Context, client *ent.Client) (tags []*ent.Tag, err error) {
 	return client.Tag.Query().Order(tag.ByName()).All(ctx)
 }
 
-func ReadPage(ctx context.Context, favoriteOnly bool, search string,
+func ReadPage(ctx context.Context, client *ent.Client, favoriteOnly bool, search string,
 	page int, itemPerPage int) (tags []*ent.Tag, err error) {
 	query := client.Tag.Query().
 		Offset(page * itemPerPage).
@@ -49,16 +43,19 @@ func ReadPage(ctx context.Context, favoriteOnly bool, search string,
 	return query.All(ctx)
 }
 
-func Count(ctx context.Context, favoriteOnly bool) (count int, err error) {
+func Count(ctx context.Context, client *ent.Client, favoriteOnly bool, search string) (count int, err error) {
 	query := client.Tag.Query()
 	if favoriteOnly {
 		query = query.Where(tag.Favorite(favoriteOnly))
+	}
+	if search != "" {
+		query = query.Where(tag.NameContainsFold(search))
 	}
 
 	return query.Count(ctx)
 }
 
-func Write(ctx context.Context, t *ent.Tag) error {
+func Write(ctx context.Context, client *ent.Client, t *ent.Tag) error {
 	return client.Tag.Create().
 		SetName(t.Name).
 		SetHidden(t.Hidden).

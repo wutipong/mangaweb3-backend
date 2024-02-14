@@ -51,13 +51,13 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 
 	log.Info().Interface("request", req).Msg("Tag list")
 
-	allTags, err := tag.ReadPage(r.Context(), req.FavoriteOnly, req.Search, req.Page, req.ItemPerPage)
+	allTags, err := tag.ReadPage(r.Context(), handler.EntClient(), req.FavoriteOnly, req.Search, req.Page, req.ItemPerPage)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
 
-	total, err := tag.Count(r.Context(), req.FavoriteOnly)
+	total, err := tag.Count(r.Context(), handler.EntClient(), req.FavoriteOnly, req.Search)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

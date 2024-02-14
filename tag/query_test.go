@@ -12,15 +12,15 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-type ProviderTestSuite struct {
+type QueryTestSuite struct {
 	suite.Suite
 }
 
 func TestProviderTestSuite(t *testing.T) {
-	suite.Run(t, new(ProviderTestSuite))
+	suite.Run(t, new(QueryTestSuite))
 }
 
-func (s *ProviderTestSuite) TestReadPage() {
+func (s *QueryTestSuite) TestReadPage() {
 	db, err := sql.Open("sqlite", "file:ent?mode=memory&_fk=1&_pragma=foreign_keys(1)")
 	s.Assert().Nil(err)
 	s.Assert().NotNil(db)
@@ -29,19 +29,17 @@ func (s *ProviderTestSuite) TestReadPage() {
 	client := enttest.NewClient(s.T(), enttest.WithOptions(ent.Driver(dialect_sql.OpenDB("sqlite3", db))))
 	defer client.Close()
 
-	Init(client)
-
 	client.Tag.Create().SetName("Tag 1").SetFavorite(false).Save(context.Background())
 	client.Tag.Create().SetName("Tag 2").SetFavorite(false).Save(context.Background())
 	client.Tag.Create().SetName("Tag 3").SetFavorite(false).Save(context.Background())
 
-	tags, err := ReadPage(context.Background(), false, "", 0, 30)
+	tags, err := ReadPage(context.Background(), client, false, "", 0, 30)
 
 	s.Assert().Nil(err)
 	s.Assert().Equal(3, len(tags))
 }
 
-func (s *ProviderTestSuite) TestReadPagePageCount() {
+func (s *QueryTestSuite) TestReadPagePageCount() {
 	db, err := sql.Open("sqlite", "file:ent?mode=memory&_fk=1&_pragma=foreign_keys(1)")
 	s.Assert().Nil(err)
 	s.Assert().NotNil(db)
@@ -49,24 +47,22 @@ func (s *ProviderTestSuite) TestReadPagePageCount() {
 
 	client := enttest.NewClient(s.T(), enttest.WithOptions(ent.Driver(dialect_sql.OpenDB("sqlite3", db))))
 	defer client.Close()
-
-	Init(client)
 
 	client.Tag.Create().SetName("Tag 1").SetFavorite(false).Save(context.Background())
 	client.Tag.Create().SetName("Tag 2").SetFavorite(false).Save(context.Background())
 	client.Tag.Create().SetName("Tag 3").SetFavorite(false).Save(context.Background())
 
-	tags, err := ReadPage(context.Background(), false, "", 0, 2)
+	tags, err := ReadPage(context.Background(), client, false, "", 0, 2)
 
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, len(tags))
 
-	tags, err = ReadPage(context.Background(), false, "", 1, 2)
+	tags, err = ReadPage(context.Background(), client, false, "", 1, 2)
 	s.Assert().Nil(err)
 	s.Assert().Equal(1, len(tags))
 }
 
-func (s *ProviderTestSuite) TestReadPagePageWithSearch() {
+func (s *QueryTestSuite) TestReadPagePageWithSearch() {
 	db, err := sql.Open("sqlite", "file:ent?mode=memory&_fk=1&_pragma=foreign_keys(1)")
 	s.Assert().Nil(err)
 	s.Assert().NotNil(db)
@@ -75,13 +71,11 @@ func (s *ProviderTestSuite) TestReadPagePageWithSearch() {
 	client := enttest.NewClient(s.T(), enttest.WithOptions(ent.Driver(dialect_sql.OpenDB("sqlite3", db))))
 	defer client.Close()
 
-	Init(client)
-
 	client.Tag.Create().SetName("Name 1").SetFavorite(false).Save(context.Background())
 	client.Tag.Create().SetName("Name 2").SetFavorite(false).Save(context.Background())
 	client.Tag.Create().SetName("Tag 3").SetFavorite(false).Save(context.Background())
 
-	tags, err := ReadPage(context.Background(), false, "name", 0, 30)
+	tags, err := ReadPage(context.Background(), client, false, "name", 0, 30)
 
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, len(tags))
@@ -89,7 +83,7 @@ func (s *ProviderTestSuite) TestReadPagePageWithSearch() {
 	s.Assert().Equal("Name 2", tags[1].Name)
 }
 
-func (s *ProviderTestSuite) TestReadPagePageWithSearchFavoriteOnly() {
+func (s *QueryTestSuite) TestReadPagePageWithSearchFavoriteOnly() {
 	db, err := sql.Open("sqlite", "file:ent?mode=memory&_fk=1&_pragma=foreign_keys(1)")
 	s.Assert().Nil(err)
 	s.Assert().NotNil(db)
@@ -98,13 +92,11 @@ func (s *ProviderTestSuite) TestReadPagePageWithSearchFavoriteOnly() {
 	client := enttest.NewClient(s.T(), enttest.WithOptions(ent.Driver(dialect_sql.OpenDB("sqlite3", db))))
 	defer client.Close()
 
-	Init(client)
-
 	client.Tag.Create().SetName("Name 1").SetFavorite(true).Save(context.Background())
 	client.Tag.Create().SetName("Name 2").SetFavorite(false).Save(context.Background())
 	client.Tag.Create().SetName("Tag 3").SetFavorite(false).Save(context.Background())
 
-	tags, err := ReadPage(context.Background(), true, "name", 0, 30)
+	tags, err := ReadPage(context.Background(), client, true, "name", 0, 30)
 
 	s.Assert().Nil(err)
 	s.Assert().Equal(1, len(tags))
