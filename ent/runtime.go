@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 
+	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/schema"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
@@ -14,6 +15,12 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	historyFields := schema.History{}.Fields()
+	_ = historyFields
+	// historyDescCreateTime is the schema descriptor for create_time field.
+	historyDescCreateTime := historyFields[0].Descriptor()
+	// history.DefaultCreateTime holds the default value on creation for the create_time field.
+	history.DefaultCreateTime = historyDescCreateTime.Default.(func() time.Time)
 	metaFields := schema.Meta{}.Fields()
 	_ = metaFields
 	// metaDescName is the schema descriptor for name field.
@@ -23,7 +30,7 @@ func init() {
 	// metaDescCreateTime is the schema descriptor for create_time field.
 	metaDescCreateTime := metaFields[1].Descriptor()
 	// meta.DefaultCreateTime holds the default value on creation for the create_time field.
-	meta.DefaultCreateTime = metaDescCreateTime.Default.(time.Time)
+	meta.DefaultCreateTime = metaDescCreateTime.Default.(func() time.Time)
 	// metaDescFavorite is the schema descriptor for favorite field.
 	metaDescFavorite := metaFields[2].Descriptor()
 	// meta.DefaultFavorite holds the default value on creation for the favorite field.

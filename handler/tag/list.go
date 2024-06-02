@@ -14,7 +14,7 @@ type listRequest struct {
 	FavoriteOnly bool   `json:"favorite_only"`
 	Search       string `json:"search"`
 	Page         int    `json:"page"`
-	ItemPerPage  int    `json:"item_per_page"`
+	ItemPerPage  int    `json:"item_per_page"  default:"30"`
 }
 
 type listResponse struct {

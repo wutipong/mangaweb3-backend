@@ -15,6 +15,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
@@ -24,6 +25,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// History is the client for interacting with the History builders.
+	History *HistoryClient
 	// Meta is the client for interacting with the Meta builders.
 	Meta *MetaClient
 	// Tag is the client for interacting with the Tag builders.
@@ -39,6 +42,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.History = NewHistoryClient(c.config)
 	c.Meta = NewMetaClient(c.config)
 	c.Tag = NewTagClient(c.config)
 }
@@ -131,10 +135,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Meta:   NewMetaClient(cfg),
-		Tag:    NewTagClient(cfg),
+		ctx:     ctx,
+		config:  cfg,
+		History: NewHistoryClient(cfg),
+		Meta:    NewMetaClient(cfg),
+		Tag:     NewTagClient(cfg),
 	}, nil
 }
 
@@ -152,17 +157,18 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Meta:   NewMetaClient(cfg),
-		Tag:    NewTagClient(cfg),
+		ctx:     ctx,
+		config:  cfg,
+		History: NewHistoryClient(cfg),
+		Meta:    NewMetaClient(cfg),
+		Tag:     NewTagClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Meta.
+//		History.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -184,6 +190,7 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.History.Use(hooks...)
 	c.Meta.Use(hooks...)
 	c.Tag.Use(hooks...)
 }
@@ -191,6 +198,7 @@ func (c *Client) Use(hooks ...Hook) {
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.History.Intercept(interceptors...)
 	c.Meta.Intercept(interceptors...)
 	c.Tag.Intercept(interceptors...)
 }
@@ -198,12 +206,163 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *HistoryMutation:
+		return c.History.mutate(ctx, m)
 	case *MetaMutation:
 		return c.Meta.mutate(ctx, m)
 	case *TagMutation:
 		return c.Tag.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// HistoryClient is a client for the History schema.
+type HistoryClient struct {
+	config
+}
+
+// NewHistoryClient returns a client for the History from the given config.
+func NewHistoryClient(c config) *HistoryClient {
+	return &HistoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `history.Hooks(f(g(h())))`.
+func (c *HistoryClient) Use(hooks ...Hook) {
+	c.hooks.History = append(c.hooks.History, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `history.Intercept(f(g(h())))`.
+func (c *HistoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.History = append(c.inters.History, interceptors...)
+}
+
+// Create returns a builder for creating a History entity.
+func (c *HistoryClient) Create() *HistoryCreate {
+	mutation := newHistoryMutation(c.config, OpCreate)
+	return &HistoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of History entities.
+func (c *HistoryClient) CreateBulk(builders ...*HistoryCreate) *HistoryCreateBulk {
+	return &HistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *HistoryClient) MapCreateBulk(slice any, setFunc func(*HistoryCreate, int)) *HistoryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &HistoryCreateBulk{err: fmt.Errorf("calling to HistoryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*HistoryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &HistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for History.
+func (c *HistoryClient) Update() *HistoryUpdate {
+	mutation := newHistoryMutation(c.config, OpUpdate)
+	return &HistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *HistoryClient) UpdateOne(h *History) *HistoryUpdateOne {
+	mutation := newHistoryMutation(c.config, OpUpdateOne, withHistory(h))
+	return &HistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *HistoryClient) UpdateOneID(id int) *HistoryUpdateOne {
+	mutation := newHistoryMutation(c.config, OpUpdateOne, withHistoryID(id))
+	return &HistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for History.
+func (c *HistoryClient) Delete() *HistoryDelete {
+	mutation := newHistoryMutation(c.config, OpDelete)
+	return &HistoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *HistoryClient) DeleteOne(h *History) *HistoryDeleteOne {
+	return c.DeleteOneID(h.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *HistoryClient) DeleteOneID(id int) *HistoryDeleteOne {
+	builder := c.Delete().Where(history.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &HistoryDeleteOne{builder}
+}
+
+// Query returns a query builder for History.
+func (c *HistoryClient) Query() *HistoryQuery {
+	return &HistoryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeHistory},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a History entity by its id.
+func (c *HistoryClient) Get(ctx context.Context, id int) (*History, error) {
+	return c.Query().Where(history.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *HistoryClient) GetX(ctx context.Context, id int) *History {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryItem queries the item edge of a History.
+func (c *HistoryClient) QueryItem(h *History) *MetaQuery {
+	query := (&MetaClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := h.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(history.Table, history.FieldID, id),
+			sqlgraph.To(meta.Table, meta.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, history.ItemTable, history.ItemColumn),
+		)
+		fromV = sqlgraph.Neighbors(h.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *HistoryClient) Hooks() []Hook {
+	return c.hooks.History
+}
+
+// Interceptors returns the client interceptors.
+func (c *HistoryClient) Interceptors() []Interceptor {
+	return c.inters.History
+}
+
+func (c *HistoryClient) mutate(ctx context.Context, m *HistoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&HistoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&HistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&HistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&HistoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown History mutation op: %q", m.Op())
 	}
 }
 
@@ -324,6 +483,22 @@ func (c *MetaClient) QueryTags(m *Meta) *TagQuery {
 			sqlgraph.From(meta.Table, meta.FieldID, id),
 			sqlgraph.To(tag.Table, tag.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, meta.TagsTable, meta.TagsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryHistories queries the histories edge of a Meta.
+func (c *MetaClient) QueryHistories(m *Meta) *HistoryQuery {
+	query := (&HistoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(meta.Table, meta.FieldID, id),
+			sqlgraph.To(history.Table, history.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, meta.HistoriesTable, meta.HistoriesColumn),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -508,9 +683,9 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Meta, Tag []ent.Hook
+		History, Meta, Tag []ent.Hook
 	}
 	inters struct {
-		Meta, Tag []ent.Interceptor
+		History, Meta, Tag []ent.Interceptor
 	}
 )

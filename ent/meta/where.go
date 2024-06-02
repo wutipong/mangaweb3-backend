@@ -293,6 +293,29 @@ func HasTagsWith(preds ...predicate.Tag) predicate.Meta {
 	})
 }
 
+// HasHistories applies the HasEdge predicate on the "histories" edge.
+func HasHistories() predicate.Meta {
+	return predicate.Meta(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, HistoriesTable, HistoriesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasHistoriesWith applies the HasEdge predicate on the "histories" edge with a given conditions (other predicates).
+func HasHistoriesWith(preds ...predicate.History) predicate.Meta {
+	return predicate.Meta(func(s *sql.Selector) {
+		step := newHistoriesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Meta) predicate.Meta {
 	return predicate.Meta(sql.AndPredicates(predicates...))

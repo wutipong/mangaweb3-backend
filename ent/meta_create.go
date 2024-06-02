@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
@@ -112,6 +113,21 @@ func (mc *MetaCreate) AddTags(t ...*Tag) *MetaCreate {
 	return mc.AddTagIDs(ids...)
 }
 
+// AddHistoryIDs adds the "histories" edge to the History entity by IDs.
+func (mc *MetaCreate) AddHistoryIDs(ids ...int) *MetaCreate {
+	mc.mutation.AddHistoryIDs(ids...)
+	return mc
+}
+
+// AddHistories adds the "histories" edges to the History entity.
+func (mc *MetaCreate) AddHistories(h ...*History) *MetaCreate {
+	ids := make([]int, len(h))
+	for i := range h {
+		ids[i] = h[i].ID
+	}
+	return mc.AddHistoryIDs(ids...)
+}
+
 // Mutation returns the MetaMutation object of the builder.
 func (mc *MetaCreate) Mutation() *MetaMutation {
 	return mc.mutation
@@ -148,7 +164,7 @@ func (mc *MetaCreate) ExecX(ctx context.Context) {
 // defaults sets the default values of the builder before save.
 func (mc *MetaCreate) defaults() {
 	if _, ok := mc.mutation.CreateTime(); !ok {
-		v := meta.DefaultCreateTime
+		v := meta.DefaultCreateTime()
 		mc.mutation.SetCreateTime(v)
 	}
 	if _, ok := mc.mutation.Favorite(); !ok {
@@ -258,6 +274,22 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.HistoriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.HistoriesTable,
+			Columns: []string{meta.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -72,5 +72,9 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		PageCount: len(m.FileIndices),
 	}
 
+	handler.EntClient().History.Create().
+		SetItem(m).
+		Save(r.Context())
+
 	handler.WriteResponse(w, data)
 }

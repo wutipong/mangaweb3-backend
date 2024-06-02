@@ -101,6 +101,37 @@
                 }
             }
         },
+        "/history": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/browse.historyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/browse.historyResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/tag/list": {
             "post": {
                 "consumes": [
@@ -477,7 +508,8 @@
                     "type": "boolean"
                 },
                 "item_per_page": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 30
                 },
                 "order": {
                     "$ref": "#/definitions/meta.SortOrder"
@@ -516,6 +548,64 @@
                 }
             }
         },
+        "browse.historyItem": {
+            "type": "object",
+            "properties": {
+                "access_time": {
+                    "description": "AccessTime the time the item is accessed.",
+                    "type": "string"
+                },
+                "favorite": {
+                    "description": "Favorite this item is a favorite",
+                    "type": "boolean"
+                },
+                "id": {
+                    "description": "ID of the item",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Name of the item",
+                    "type": "string"
+                },
+                "page_count": {
+                    "description": "PageCount the number of pages.",
+                    "type": "integer"
+                },
+                "read": {
+                    "description": "Read this item has been read before.",
+                    "type": "boolean"
+                }
+            }
+        },
+        "browse.historyRequest": {
+            "type": "object",
+            "properties": {
+                "item_per_page": {
+                    "type": "integer",
+                    "default": 30
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
+        "browse.historyResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/browse.historyItem"
+                    }
+                },
+                "request": {
+                    "$ref": "#/definitions/browse.historyRequest"
+                },
+                "total_page": {
+                    "type": "integer"
+                }
+            }
+        },
         "browse.recreateThumbnailsResponse": {
             "type": "object",
             "properties": {
@@ -529,6 +619,40 @@
             "properties": {
                 "result": {
                     "type": "boolean"
+                }
+            }
+        },
+        "ent.History": {
+            "type": "object",
+            "properties": {
+                "create_time": {
+                    "description": "CreateTime holds the value of the \"create_time\" field.",
+                    "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the HistoryQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.HistoryEdges"
+                        }
+                    ]
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.HistoryEdges": {
+            "type": "object",
+            "properties": {
+                "item": {
+                    "description": "Item holds the value of the item edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.Meta"
+                        }
+                    ]
                 }
             }
         },
@@ -579,6 +703,13 @@
         "ent.MetaEdges": {
             "type": "object",
             "properties": {
+                "histories": {
+                    "description": "Histories holds the value of the histories edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.History"
+                    }
+                },
                 "tags": {
                     "description": "Tags holds the value of the tags edge.",
                     "type": "array",
@@ -689,7 +820,8 @@
                     "type": "boolean"
                 },
                 "item_per_page": {
-                    "type": "integer"
+                    "type": "integer",
+                    "default": 30
                 },
                 "page": {
                     "type": "integer"

@@ -42,9 +42,11 @@ type Meta struct {
 type MetaEdges struct {
 	// Tags holds the value of the tags edge.
 	Tags []*Tag `json:"tags,omitempty"`
+	// Histories holds the value of the histories edge.
+	Histories []*History `json:"histories,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // TagsOrErr returns the Tags value or an error if the edge
@@ -54,6 +56,15 @@ func (e MetaEdges) TagsOrErr() ([]*Tag, error) {
 		return e.Tags, nil
 	}
 	return nil, &NotLoadedError{edge: "tags"}
+}
+
+// HistoriesOrErr returns the Histories value or an error if the edge
+// was not loaded in eager-loading.
+func (e MetaEdges) HistoriesOrErr() ([]*History, error) {
+	if e.loadedTypes[1] {
+		return e.Histories, nil
+	}
+	return nil, &NotLoadedError{edge: "histories"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -152,6 +163,11 @@ func (m *Meta) Value(name string) (ent.Value, error) {
 // QueryTags queries the "tags" edge of the Meta entity.
 func (m *Meta) QueryTags() *TagQuery {
 	return NewMetaClient(m.config).QueryTags(m)
+}
+
+// QueryHistories queries the "histories" edge of the Meta entity.
+func (m *Meta) QueryHistories() *HistoryQuery {
+	return NewMetaClient(m.config).QueryHistories(m)
 }
 
 // Update returns a builder for updating this Meta.

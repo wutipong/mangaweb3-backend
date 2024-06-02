@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
@@ -19,11 +20,12 @@ import (
 // MetaQuery is the builder for querying Meta entities.
 type MetaQuery struct {
 	config
-	ctx        *QueryContext
-	order      []meta.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Meta
-	withTags   *TagQuery
+	ctx           *QueryContext
+	order         []meta.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.Meta
+	withTags      *TagQuery
+	withHistories *HistoryQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -75,6 +77,28 @@ func (mq *MetaQuery) QueryTags() *TagQuery {
 			sqlgraph.From(meta.Table, meta.FieldID, selector),
 			sqlgraph.To(tag.Table, tag.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, meta.TagsTable, meta.TagsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryHistories chains the current query on the "histories" edge.
+func (mq *MetaQuery) QueryHistories() *HistoryQuery {
+	query := (&HistoryClient{config: mq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(meta.Table, meta.FieldID, selector),
+			sqlgraph.To(history.Table, history.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, meta.HistoriesTable, meta.HistoriesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -269,12 +293,13 @@ func (mq *MetaQuery) Clone() *MetaQuery {
 		return nil
 	}
 	return &MetaQuery{
-		config:     mq.config,
-		ctx:        mq.ctx.Clone(),
-		order:      append([]meta.OrderOption{}, mq.order...),
-		inters:     append([]Interceptor{}, mq.inters...),
-		predicates: append([]predicate.Meta{}, mq.predicates...),
-		withTags:   mq.withTags.Clone(),
+		config:        mq.config,
+		ctx:           mq.ctx.Clone(),
+		order:         append([]meta.OrderOption{}, mq.order...),
+		inters:        append([]Interceptor{}, mq.inters...),
+		predicates:    append([]predicate.Meta{}, mq.predicates...),
+		withTags:      mq.withTags.Clone(),
+		withHistories: mq.withHistories.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
@@ -289,6 +314,17 @@ func (mq *MetaQuery) WithTags(opts ...func(*TagQuery)) *MetaQuery {
 		opt(query)
 	}
 	mq.withTags = query
+	return mq
+}
+
+// WithHistories tells the query-builder to eager-load the nodes that are connected to
+// the "histories" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MetaQuery) WithHistories(opts ...func(*HistoryQuery)) *MetaQuery {
+	query := (&HistoryClient{config: mq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	mq.withHistories = query
 	return mq
 }
 
@@ -370,8 +406,9 @@ func (mq *MetaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Meta, e
 	var (
 		nodes       = []*Meta{}
 		_spec       = mq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			mq.withTags != nil,
+			mq.withHistories != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -396,6 +433,13 @@ func (mq *MetaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Meta, e
 		if err := mq.loadTags(ctx, query, nodes,
 			func(n *Meta) { n.Edges.Tags = []*Tag{} },
 			func(n *Meta, e *Tag) { n.Edges.Tags = append(n.Edges.Tags, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := mq.withHistories; query != nil {
+		if err := mq.loadHistories(ctx, query, nodes,
+			func(n *Meta) { n.Edges.Histories = []*History{} },
+			func(n *Meta, e *History) { n.Edges.Histories = append(n.Edges.Histories, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -460,6 +504,37 @@ func (mq *MetaQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Met
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (mq *MetaQuery) loadHistories(ctx context.Context, query *HistoryQuery, nodes []*Meta, init func(*Meta), assign func(*Meta, *History)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Meta)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.History(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(meta.HistoriesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.meta_histories
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "meta_histories" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "meta_histories" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }
