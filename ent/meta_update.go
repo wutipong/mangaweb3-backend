@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
+	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
@@ -139,6 +140,21 @@ func (mu *MetaUpdate) AddTags(t ...*Tag) *MetaUpdate {
 	return mu.AddTagIDs(ids...)
 }
 
+// AddHistoryIDs adds the "histories" edge to the History entity by IDs.
+func (mu *MetaUpdate) AddHistoryIDs(ids ...int) *MetaUpdate {
+	mu.mutation.AddHistoryIDs(ids...)
+	return mu
+}
+
+// AddHistories adds the "histories" edges to the History entity.
+func (mu *MetaUpdate) AddHistories(h ...*History) *MetaUpdate {
+	ids := make([]int, len(h))
+	for i := range h {
+		ids[i] = h[i].ID
+	}
+	return mu.AddHistoryIDs(ids...)
+}
+
 // Mutation returns the MetaMutation object of the builder.
 func (mu *MetaUpdate) Mutation() *MetaMutation {
 	return mu.mutation
@@ -163,6 +179,27 @@ func (mu *MetaUpdate) RemoveTags(t ...*Tag) *MetaUpdate {
 		ids[i] = t[i].ID
 	}
 	return mu.RemoveTagIDs(ids...)
+}
+
+// ClearHistories clears all "histories" edges to the History entity.
+func (mu *MetaUpdate) ClearHistories() *MetaUpdate {
+	mu.mutation.ClearHistories()
+	return mu
+}
+
+// RemoveHistoryIDs removes the "histories" edge to History entities by IDs.
+func (mu *MetaUpdate) RemoveHistoryIDs(ids ...int) *MetaUpdate {
+	mu.mutation.RemoveHistoryIDs(ids...)
+	return mu
+}
+
+// RemoveHistories removes "histories" edges to History entities.
+func (mu *MetaUpdate) RemoveHistories(h ...*History) *MetaUpdate {
+	ids := make([]int, len(h))
+	for i := range h {
+		ids[i] = h[i].ID
+	}
+	return mu.RemoveHistoryIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -281,6 +318,51 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if mu.mutation.HistoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.HistoriesTable,
+			Columns: []string{meta.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.RemovedHistoriesIDs(); len(nodes) > 0 && !mu.mutation.HistoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.HistoriesTable,
+			Columns: []string{meta.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.HistoriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.HistoriesTable,
+			Columns: []string{meta.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -417,6 +499,21 @@ func (muo *MetaUpdateOne) AddTags(t ...*Tag) *MetaUpdateOne {
 	return muo.AddTagIDs(ids...)
 }
 
+// AddHistoryIDs adds the "histories" edge to the History entity by IDs.
+func (muo *MetaUpdateOne) AddHistoryIDs(ids ...int) *MetaUpdateOne {
+	muo.mutation.AddHistoryIDs(ids...)
+	return muo
+}
+
+// AddHistories adds the "histories" edges to the History entity.
+func (muo *MetaUpdateOne) AddHistories(h ...*History) *MetaUpdateOne {
+	ids := make([]int, len(h))
+	for i := range h {
+		ids[i] = h[i].ID
+	}
+	return muo.AddHistoryIDs(ids...)
+}
+
 // Mutation returns the MetaMutation object of the builder.
 func (muo *MetaUpdateOne) Mutation() *MetaMutation {
 	return muo.mutation
@@ -441,6 +538,27 @@ func (muo *MetaUpdateOne) RemoveTags(t ...*Tag) *MetaUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return muo.RemoveTagIDs(ids...)
+}
+
+// ClearHistories clears all "histories" edges to the History entity.
+func (muo *MetaUpdateOne) ClearHistories() *MetaUpdateOne {
+	muo.mutation.ClearHistories()
+	return muo
+}
+
+// RemoveHistoryIDs removes the "histories" edge to History entities by IDs.
+func (muo *MetaUpdateOne) RemoveHistoryIDs(ids ...int) *MetaUpdateOne {
+	muo.mutation.RemoveHistoryIDs(ids...)
+	return muo
+}
+
+// RemoveHistories removes "histories" edges to History entities.
+func (muo *MetaUpdateOne) RemoveHistories(h ...*History) *MetaUpdateOne {
+	ids := make([]int, len(h))
+	for i := range h {
+		ids[i] = h[i].ID
+	}
+	return muo.RemoveHistoryIDs(ids...)
 }
 
 // Where appends a list predicates to the MetaUpdate builder.
@@ -589,6 +707,51 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if muo.mutation.HistoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.HistoriesTable,
+			Columns: []string{meta.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.RemovedHistoriesIDs(); len(nodes) > 0 && !muo.mutation.HistoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.HistoriesTable,
+			Columns: []string{meta.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.HistoriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.HistoriesTable,
+			Columns: []string{meta.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

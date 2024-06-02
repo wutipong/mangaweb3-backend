@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 )
@@ -74,8 +75,9 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			meta.Table: meta.ValidColumn,
-			tag.Table:  tag.ValidColumn,
+			history.Table: history.ValidColumn,
+			meta.Table:    meta.ValidColumn,
+			tag.Table:     tag.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

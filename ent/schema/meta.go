@@ -17,7 +17,7 @@ type Meta struct {
 func (Meta) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").NotEmpty().Unique(),
-		field.Time("create_time").Default(time.Now()),
+		field.Time("create_time").Default(time.Now),
 		field.Bool("favorite").Default(false),
 		field.Ints("file_indices").Default([]int{}),
 		field.Bytes("thumbnail").Optional().Sensitive(),
@@ -30,5 +30,6 @@ func (Meta) Fields() []ent.Field {
 func (Meta) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("tags", Tag.Type),
+		edge.To("histories", History.Type),
 	}
 }

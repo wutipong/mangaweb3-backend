@@ -8,6 +8,26 @@ import (
 )
 
 var (
+	// HistoriesColumns holds the columns for the "histories" table.
+	HistoriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "meta_histories", Type: field.TypeInt, Nullable: true},
+	}
+	// HistoriesTable holds the schema information for the "histories" table.
+	HistoriesTable = &schema.Table{
+		Name:       "histories",
+		Columns:    HistoriesColumns,
+		PrimaryKey: []*schema.Column{HistoriesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "histories_meta_histories",
+				Columns:    []*schema.Column{HistoriesColumns[2]},
+				RefColumns: []*schema.Column{MetaColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// MetaColumns holds the columns for the "meta" table.
 	MetaColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -66,6 +86,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		HistoriesTable,
 		MetaTable,
 		TagsTable,
 		MetaTagsTable,
@@ -73,6 +94,7 @@ var (
 )
 
 func init() {
+	HistoriesTable.ForeignKeys[0].RefTable = MetaTable
 	MetaTagsTable.ForeignKeys[0].RefTable = MetaTable
 	MetaTagsTable.ForeignKeys[1].RefTable = TagsTable
 }

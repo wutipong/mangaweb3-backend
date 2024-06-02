@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// History is the predicate function for history builders.
+type History func(*sql.Selector)
+
 // Meta is the predicate function for meta builders.
 type Meta func(*sql.Selector)
 
