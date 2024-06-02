@@ -22,6 +22,7 @@ definitions:
       favorite_only:
         type: boolean
       item_per_page:
+        default: 30
         type: integer
       order:
         $ref: '#/definitions/meta.SortOrder'
@@ -47,6 +48,43 @@ definitions:
       total_page:
         type: integer
     type: object
+  browse.historyItem:
+    properties:
+      favorite:
+        description: Favorite this item is a favorite
+        type: boolean
+      id:
+        description: ID of the item
+        type: integer
+      name:
+        description: Name of the item
+        type: string
+      page_count:
+        description: PageCount the number of pages.
+        type: integer
+      read:
+        description: Read this item has been read before.
+        type: boolean
+    type: object
+  browse.historyRequest:
+    properties:
+      item_per_page:
+        default: 30
+        type: integer
+      page:
+        type: integer
+    type: object
+  browse.historyResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/browse.historyItem'
+        type: array
+      request:
+        $ref: '#/definitions/browse.historyRequest'
+      total_page:
+        type: integer
+    type: object
   browse.recreateThumbnailsResponse:
     properties:
       result:
@@ -56,6 +94,28 @@ definitions:
     properties:
       result:
         type: boolean
+    type: object
+  ent.History:
+    properties:
+      create_time:
+        description: CreateTime holds the value of the "create_time" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.HistoryEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the HistoryQuery when eager-loading is set.
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.HistoryEdges:
+    properties:
+      item:
+        allOf:
+        - $ref: '#/definitions/ent.Meta'
+        description: Item holds the value of the item edge.
     type: object
   ent.Meta:
     properties:
@@ -91,6 +151,11 @@ definitions:
     type: object
   ent.MetaEdges:
     properties:
+      histories:
+        description: Histories holds the value of the histories edge.
+        items:
+          $ref: '#/definitions/ent.History'
+        type: array
       tags:
         description: Tags holds the value of the tags edge.
         items:
@@ -168,6 +233,7 @@ definitions:
       favorite_only:
         type: boolean
       item_per_page:
+        default: 30
         type: integer
       page:
         type: integer
@@ -350,6 +416,25 @@ paths:
           description: OK
           schema:
             type: body
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+  /history:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/browse.historyRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/browse.historyResponse'
         "500":
           description: Internal Server Error
           schema:

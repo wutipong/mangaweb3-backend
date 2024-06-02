@@ -18,7 +18,7 @@ type browseRequest struct {
 	Tag          string         `json:"tag"`
 	FavoriteOnly bool           `json:"favorite_only"`
 	Page         int            `json:"page"`
-	ItemPerPage  int            `json:"item_per_page"`
+	ItemPerPage  int            `json:"item_per_page" default:"30"`
 	Search       string         `json:"search"`
 	Sort         meta.SortField `json:"sort"`
 	Order        meta.SortOrder `json:"order"`
