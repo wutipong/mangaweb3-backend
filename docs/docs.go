@@ -559,6 +559,10 @@ const docTemplate = `{
         "browse.historyItem": {
             "type": "object",
             "properties": {
+                "access_time": {
+                    "description": "AccessTime the time the item is accessed.",
+                    "type": "string"
+                },
                 "favorite": {
                     "description": "Favorite this item is a favorite",
                     "type": "boolean"

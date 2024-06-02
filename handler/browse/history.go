@@ -2,6 +2,7 @@ package browse
 
 import (
 	"net/http"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/julienschmidt/httprouter"
@@ -36,6 +37,8 @@ type historyItem struct {
 	Read bool `json:"read,omitempty"`
 	// PageCount the number of pages.
 	PageCount int `json:"page_count,omitempty"`
+	// AccessTime the time the item is accessed.
+	AccessTime time.Time `json:"access_time,omitempty"`
 }
 
 func createDefaultHistoryRequest() historyRequest {
@@ -76,11 +79,12 @@ func historyHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		}
 
 		items[i] = historyItem{
-			ID:        m.ID,
-			Name:      m.Name,
-			Favorite:  m.Favorite,
-			Read:      m.Read,
-			PageCount: len(m.FileIndices),
+			ID:         m.ID,
+			Name:       m.Name,
+			Favorite:   m.Favorite,
+			Read:       m.Read,
+			PageCount:  len(m.FileIndices),
+			AccessTime: h.CreateTime,
 		}
 	}
 
