@@ -506,6 +506,10 @@ const docTemplate = `{
                 "read": {
                     "description": "Read this item has been read before.",
                     "type": "boolean"
+                },
+                "tag_favorite": {
+                    "description": "TagFavorite this item contains favorite tags",
+                    "type": "boolean"
                 }
             }
         },
@@ -581,6 +585,10 @@ const docTemplate = `{
                 },
                 "read": {
                     "description": "Read this item has been read before.",
+                    "type": "boolean"
+                },
+                "tag_favorite": {
+                    "description": "TagFavorite this item contains favorite tags",
                     "type": "boolean"
                 }
             }

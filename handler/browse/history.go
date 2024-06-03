@@ -39,6 +39,8 @@ type historyItem struct {
 	PageCount int `json:"page_count,omitempty"`
 	// AccessTime the time the item is accessed.
 	AccessTime time.Time `json:"access_time,omitempty"`
+	// TagFavorite this item contains favorite tags
+	TagFavorite bool `json:"tag_favorite,omitempty"`
 }
 
 func createDefaultHistoryRequest() historyRequest {
@@ -76,6 +78,7 @@ func historyHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 
 		if err != nil {
 			handler.WriteResponse(w, err)
+			return
 		}
 
 		items[i] = historyItem{
@@ -85,6 +88,19 @@ func historyHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 			Read:       m.Read,
 			PageCount:  len(m.FileIndices),
 			AccessTime: h.CreateTime,
+		}
+
+		tags, err := m.QueryTags().All(r.Context())
+		if err != nil {
+			handler.WriteResponse(w, err)
+			return
+		}
+
+		for _, t := range tags {
+			if t.Favorite {
+				items[i].TagFavorite = true
+				break
+			}
 		}
 	}
 
