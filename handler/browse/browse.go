@@ -42,6 +42,8 @@ type browseItem struct {
 	Read bool `json:"read,omitempty"`
 	// PageCount the number of pages.
 	PageCount int `json:"page_count,omitempty"`
+	// TagFavorite this item contains favorite tags
+	TagFavorite bool `json:"tag_favorite,omitempty"`
 }
 
 func createDefaultBrowseRequest() browseRequest {
@@ -92,6 +94,19 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 			Favorite:  m.Favorite,
 			Read:      m.Read,
 			PageCount: len(m.FileIndices),
+		}
+
+		tags, err := m.QueryTags().All(r.Context())
+		if err != nil {
+			handler.WriteResponse(w, err)
+			return
+		}
+
+		for _, t := range tags {
+			if t.Favorite {
+				items[i].TagFavorite = true
+				break
+			}
 		}
 	}
 

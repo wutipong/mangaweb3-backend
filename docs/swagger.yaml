@@ -16,6 +16,9 @@ definitions:
       read:
         description: Read this item has been read before.
         type: boolean
+      tag_favorite:
+        description: TagFavorite this item contains favorite tags
+        type: boolean
     type: object
   browse.browseRequest:
     properties:
@@ -67,6 +70,9 @@ definitions:
         type: integer
       read:
         description: Read this item has been read before.
+        type: boolean
+      tag_favorite:
+        description: TagFavorite this item contains favorite tags
         type: boolean
     type: object
   browse.historyRequest:
