@@ -3,7 +3,6 @@ package view
 import (
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
@@ -32,7 +31,7 @@ const (
 // @Success      200  {object}  view.viewResponse
 // @Failure      500  {object}  errors.Error
 // @Router /view [post]
-func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func ViewHandler(w http.ResponseWriter, r *http.Request) {
 	req := viewRequest{}
 
 	if err := handler.ParseInput(r.Body, &req); err != nil {

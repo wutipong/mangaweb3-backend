@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"net/http"
 	"os"
 	"strings"
 
@@ -11,7 +10,6 @@ import (
 	entsql "entgo.io/ent/dialect/sql"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -24,6 +22,8 @@ import (
 	"github.com/wutipong/mangaweb3-backend/handler/view"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/scheduler"
+	"goji.io"
+	"goji.io/pat"
 )
 
 var versionString string = "development"
@@ -106,34 +106,27 @@ func main() {
 	})
 	scheduler.Start()
 
-	router := httprouter.New()
-	RegisterHandler(router, client)
-
 	log.Info().Msg("Server starts.")
 
-	handler := cors.AllowAll().Handler(router)
-	if err := http.ListenAndServe(address, handler); err != nil {
-		log.Error().AnErr("error", err).Msg("Starting server fails")
-		return
-	}
+	mux := goji.NewMux()
+	RegisterHandler(mux, client)
+
+	c := cors.AllowAll()
+	mux.Use(c.Handler)
 
 	log.Info().Msg("shutting down the server")
 	scheduler.Stop()
 }
 
-func RegisterHandler(router *httprouter.Router, client *ent.Client) {
+func RegisterHandler(mux *goji.Mux, client *ent.Client) {
 	handler.Init(handler.Options{
 		VersionString: versionString,
 		EntClient:     client,
 	})
 
-	browse.Register(router)
-	handlertag.Register(router)
-	view.Register(router)
+	browse.Register(mux)
+	handlertag.Register(mux)
+	view.Register(mux)
 
-	router.GET("/doc/:any", swaggerHandler)
-}
-
-func swaggerHandler(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	httpSwagger.WrapHandler(res, req)
+	mux.Handle(pat.Get("/doc/:any"), httpSwagger.WrapHandler)
 }

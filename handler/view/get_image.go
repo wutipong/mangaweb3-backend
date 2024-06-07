@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/disintegration/imaging"
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
@@ -32,8 +31,8 @@ const (
 // @Success      200  {body}  file
 // @Failure      500  {object}  errors.Error
 // @Router /view/get_image [get]
-// GetImage returns an image with specific width/height while retains aspect ratio.
-func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+// GetImageHandler returns an image with specific width/height while retains aspect ratio.
+func GetImageHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	item := query.Get("name")
 

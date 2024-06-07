@@ -3,7 +3,6 @@ package browse
 import (
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
@@ -63,7 +62,7 @@ func createDefaultBrowseRequest() browseRequest {
 // @Success      200  {object}  browse.browseResponse
 // @Failure      500  {object}  errors.Error
 // @Router /browse [post]
-func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func BrowseHandler(w http.ResponseWriter, r *http.Request) {
 	req := createDefaultBrowseRequest()
 
 	if err := handler.ParseInput(r.Body, &req); err != nil {

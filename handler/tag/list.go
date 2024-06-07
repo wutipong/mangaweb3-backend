@@ -3,7 +3,6 @@ package tag
 import (
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
@@ -36,7 +35,7 @@ const (
 // @Success      200  {object}  tag.listResponse
 // @Failure      500  {object}  errors.Error
 // @Router /tag/list [post]
-func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func ListHandler(w http.ResponseWriter, r *http.Request) {
 	req := listRequest{
 		FavoriteOnly: false,
 		Search:       "",

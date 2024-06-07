@@ -4,7 +4,6 @@ import (
 	_ "image/png"
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
@@ -29,8 +28,8 @@ const (
 // @Failure      500  {object}  errors.Error
 // @Router /view/fix_meta [post]
 // Fix the input item metadata.
-func FixMeta(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	req := updateCoverRequest{}
+func FixMetaHandler(w http.ResponseWriter, r *http.Request) {
+	req := fixMetaRequest{}
 	if err := handler.ParseInput(r.Body, &req); err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -66,7 +65,7 @@ func FixMeta(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	handler.WriteResponse(w, updateCoverResponse{
+	handler.WriteResponse(w, fixMetaResponse{
 		Request: req,
 		Success: true,
 	})

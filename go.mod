@@ -12,9 +12,9 @@ require (
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/julienschmidt/httprouter v1.3.0
-	github.com/rs/cors v1.11.0
 	github.com/rs/zerolog v1.33.0
 	github.com/swaggo/swag v1.16.3
+	goji.io v2.0.2+incompatible
 	golang.org/x/image v0.16.0
 	modernc.org/sqlite v1.30.0
 )
@@ -46,6 +46,7 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/rs/cors v1.11.0 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/zclconf/go-cty v1.14.4 // indirect
 	go.uber.org/atomic v1.11.0 // indirect

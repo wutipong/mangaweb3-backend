@@ -1,10 +1,13 @@
 package tag
 
-import "github.com/julienschmidt/httprouter"
+import (
+	"goji.io"
+	"goji.io/pat"
+)
 
-func Register(router *httprouter.Router) {
-	router.GET(PathThumbnail, ThumbnailHandler)
-	router.GET(PathRecreateThumbnails, RecreateThumbnailHandler)
-	router.POST(PathList, ListHandler)
-	router.POST(PathSetFavorite, SetFavoriteHandler)
+func Register(mux *goji.Mux) {
+	mux.HandleFunc(pat.Get(PathThumbnail), ThumbnailHandler)
+	mux.HandleFunc(pat.Get(PathRecreateThumbnails), RecreateThumbnailHandler)
+	mux.HandleFunc(pat.Post(PathList), ListHandler)
+	mux.HandleFunc(pat.Post(PathSetFavorite), SetFavoriteHandler)
 }

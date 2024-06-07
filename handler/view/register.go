@@ -1,13 +1,16 @@
 package view
 
-import "github.com/julienschmidt/httprouter"
+import (
+	"goji.io"
+	"goji.io/pat"
+)
 
-func Register(router *httprouter.Router) {
-	router.GET(PathDownload, Download)
-	router.GET(PathGetImage, GetImage)
-	router.POST(PathFavorite, SetFavoriteHandler)
-	router.POST(PathUpdateCover, UpdateCover)
-	router.POST(PathView, Handler)
-	router.POST(PathPopulateTags, PopulateTagsHandler)
-	router.POST(PathFixMeta, FixMeta)
+func Register(mux *goji.Mux) {
+	mux.HandleFunc(pat.Get(PathDownload), DownloadHandler)
+	mux.HandleFunc(pat.Get(PathGetImage), GetImageHandler)
+	mux.HandleFunc(pat.Post(PathFavorite), SetFavoriteHandler)
+	mux.HandleFunc(pat.Post(PathUpdateCover), UpdateCoverHandler)
+	mux.HandleFunc(pat.Post(PathView), ViewHandler)
+	mux.HandleFunc(pat.Post(PathPopulateTags), PopulateTagsHandler)
+	mux.HandleFunc(pat.Post(PathFixMeta), FixMetaHandler)
 }

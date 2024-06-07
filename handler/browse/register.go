@@ -1,11 +1,14 @@
 package browse
 
-import "github.com/julienschmidt/httprouter"
+import (
+	"goji.io"
+	"goji.io/pat"
+)
 
-func Register(router *httprouter.Router) {
-	router.GET(PathRecreateThumbnails, RecreateThumbnailHandler)
-	router.GET(PathRescanLibrary, RescanLibraryHandler)
-	router.GET(PathThumbnail, GetThumbnailHandler)
-	router.POST(PathBrowse, Handler)
-	router.POST(PathHistory, historyHandler)
+func Register(mux *goji.Mux) {
+	mux.HandleFunc(pat.Get(PathRecreateThumbnails), RecreateThumbnailHandler)
+	mux.HandleFunc(pat.Get(PathRescanLibrary), RescanLibraryHandler)
+	mux.HandleFunc(pat.Get(PathThumbnail), GetThumbnailHandler)
+	mux.HandleFunc(pat.Post(PathBrowse), BrowseHandler)
+	mux.HandleFunc(pat.Post(PathHistory), HistoryHandler)
 }

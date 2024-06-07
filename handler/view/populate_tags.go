@@ -3,7 +3,6 @@ package view
 import (
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
@@ -32,7 +31,7 @@ const (
 // @Success      200  {object}  view.populateTagsResponse
 // @Failure      500  {object}  errors.Error
 // @Router /view/populate_tags [post]
-func PopulateTagsHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func PopulateTagsHandler(w http.ResponseWriter, r *http.Request) {
 	req := populateTagsRequest{}
 
 	if err := handler.ParseInput(r.Body, &req); err != nil {

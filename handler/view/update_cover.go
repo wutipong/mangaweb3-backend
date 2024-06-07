@@ -4,7 +4,6 @@ import (
 	_ "image/png"
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
@@ -30,8 +29,8 @@ const (
 // @Success      200  {object}  view.updateCoverResponse
 // @Failure      500  {object}  errors.Error
 // @Router /view/update_cover [post]
-// UpdateCover a handler to update the cover to specific image
-func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+// UpdateCoverHandler a handler to update the cover to specific image
+func UpdateCoverHandler(w http.ResponseWriter, r *http.Request) {
 	req := updateCoverRequest{}
 	if err := handler.ParseInput(r.Body, &req); err != nil {
 		handler.WriteResponse(w, err)

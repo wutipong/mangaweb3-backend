@@ -3,7 +3,6 @@ package tag
 import (
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/tag"
@@ -28,7 +27,7 @@ const (
 // @Success      200  {object}  tag.setFavoriteResponse
 // @Failure      500  {object}  errors.Error
 // @Router /tag/set_favorite [post]
-func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func SetFavoriteHandler(w http.ResponseWriter, r *http.Request) {
 	req := setFavoriteRequest{}
 	if err := handler.ParseInput(r.Body, &req); err != nil {
 		handler.WriteResponse(w, err)

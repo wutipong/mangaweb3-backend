@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
@@ -30,7 +29,7 @@ const (
 // @Success      200  {object}  view.setFavoriteResponse
 // @Failure      500  {object}  errors.Error
 // @Router /view/set_favorite [post]
-func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func SetFavoriteHandler(w http.ResponseWriter, r *http.Request) {
 	req := setFavoriteRequest{}
 	var reqBody []byte
 

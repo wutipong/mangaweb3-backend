@@ -3,7 +3,6 @@ package browse
 import (
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/scheduler"
@@ -20,7 +19,7 @@ const (
 // @Success      200  {object}  browse.rescanLibraryResponse
 // @Failure      500  {object}  errors.Error
 // @Router /browse/rescan_library [get]
-func RescanLibraryHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func RescanLibraryHandler(w http.ResponseWriter, r *http.Request) {
 	log.Info().Msg("Rescan library")
 
 	scheduler.ScheduleScanLibrary(handler.EntClient())

@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/handler"
@@ -55,7 +54,7 @@ func createDefaultHistoryRequest() historyRequest {
 // @Success      200  {object}  browse.historyResponse
 // @Failure      500  {object}  errors.Error
 // @Router /history [post]
-func historyHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func HistoryHandler(w http.ResponseWriter, r *http.Request) {
 	req := createDefaultHistoryRequest()
 
 	if err := handler.ParseInput(r.Body, &req); err != nil {

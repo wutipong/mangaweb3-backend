@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
@@ -19,7 +18,7 @@ const (
 // @Success      200  {body}  file
 // @Failure      500  {object}  errors.Error
 // @Router /view/download [get]
-func Download(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	item := r.URL.Query().Get("name")
 
 	log.Info().Str("name", item).Msg("Download")
