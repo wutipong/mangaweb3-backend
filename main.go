@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"net/http"
 	"os"
 	"strings"
 
@@ -113,6 +114,11 @@ func main() {
 
 	c := cors.AllowAll()
 	mux.Use(c.Handler)
+
+	if err := http.ListenAndServe(address, mux); err != nil {
+		log.Error().AnErr("error", err).Msg("Starting server fails")
+		return
+	}
 
 	log.Info().Msg("shutting down the server")
 	scheduler.Stop()
