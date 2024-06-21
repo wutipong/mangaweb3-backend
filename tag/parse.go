@@ -23,6 +23,10 @@ func ParseTag(name string) []string {
 
 	for i := 0; i < len(matches); i++ {
 		tag := matches[i][1]
+		if tag == "" {
+			continue
+		}
+
 		if _, found := tagSet[tag]; !found {
 			tagSet[tag] = true
 			output = append(output, tag)
