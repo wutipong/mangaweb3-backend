@@ -21,3 +21,11 @@ func TestParseTagMultiple(t *testing.T) {
 func TestParseTagDuplicate(t *testing.T) {
 	assert.ElementsMatch(t, ParseTag("[Test]something[Download]/[Test]Some weird name [Download]"), []string{"Test", "Download"})
 }
+
+func TestParseEmptyTag(t *testing.T) {
+	assert.ElementsMatch(t, ParseTag("[]Some weird name"), []string{})
+}
+
+func TestParseEmptyAndOtherTag(t *testing.T) {
+	assert.ElementsMatch(t, ParseTag("[]Some weird name[Test]"), []string{"Test"})
+}
