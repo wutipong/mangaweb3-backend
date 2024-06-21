@@ -1,8 +1,10 @@
 package view
 
 import (
+	"fmt"
 	"io"
 	"net/http"
+	"path/filepath"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
@@ -43,8 +45,10 @@ func Download(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write(bytes)
 	w.Header().Set("Content-Type", "application/zip")
 	w.Header().Set("Content-Length", strconv.Itoa(len(bytes)))
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filepath.Base(m.Name)))
+	w.WriteHeader(http.StatusOK)
+
+	w.Write(bytes)
 }
