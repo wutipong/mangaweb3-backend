@@ -811,11 +811,13 @@ const docTemplate = `{
             "type": "string",
             "enum": [
                 "name",
-                "createTime"
+                "createTime",
+                "pageCount"
             ],
             "x-enum-varnames": [
                 "SortFieldName",
-                "SortFieldCreateTime"
+                "SortFieldCreateTime",
+                "SortFieldPageCount"
             ]
         },
         "meta.SortOrder": {
