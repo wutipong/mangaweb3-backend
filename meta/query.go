@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
@@ -15,6 +16,7 @@ type SortOrder string
 const (
 	SortFieldName       = SortField("name")
 	SortFieldCreateTime = SortField("createTime")
+	SortFieldPageCount  = SortField("pageCount")
 
 	SortOrderAscending  = SortOrder("ascending")
 	SortOrderDescending = SortOrder("descending")
@@ -59,13 +61,24 @@ func CreateQuery(ctx context.Context, client *ent.Client, q QueryParams) (query 
 		field = meta.FieldName
 	case SortFieldCreateTime:
 		field = meta.FieldCreateTime
+	case SortFieldPageCount:
+		field = meta.FieldFileIndices
 	}
 
 	switch q.SortOrder {
 	case SortOrderAscending:
-		query = query.Order(ent.Asc(string(field)))
+		if q.SortBy == SortFieldPageCount {
+			query = query.Order(sqljson.OrderLen(meta.FieldFileIndices))
+		} else {
+			query = query.Order(ent.Asc(string(field)))
+		}
 	case SortOrderDescending:
-		query = query.Order(ent.Desc(string(field)))
+		if q.SortBy == SortFieldPageCount {
+			query = query.Order(sqljson.OrderLenDesc(meta.FieldFileIndices))
+		} else {
+			query = query.Order(ent.Desc(string(field)))
+		}
+
 	}
 
 	if q.ItemPerPage > 0 {

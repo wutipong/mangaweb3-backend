@@ -585,3 +585,65 @@ func (s *QueryTestSuite) TestCountSearchNameTagFavoriteOnlySortByCreateTimeAsc()
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, c)
 }
+
+func (s *QueryTestSuite) TestReadSortByPageCountAsc() {
+	db, err := sql.Open("sqlite", "file:ent?mode=memory&_fk=1&_pragma=foreign_keys(1)")
+	s.Assert().Nil(err)
+	s.Assert().NotNil(db)
+	defer db.Close()
+
+	client := enttest.NewClient(s.T(), enttest.WithOptions(ent.Driver(dialect_sql.OpenDB("sqlite3", db))))
+	defer client.Close()
+
+	client.Meta.Create().SetName("[some artist]manga 1 here.zip").SetFileIndices([]int{1}).Save(context.Background())
+	client.Meta.Create().SetName("[some artist]manga 2 here.zip").SetFileIndices([]int{1, 2}).Save(context.Background())
+	client.Meta.Create().SetName("[some artist]manga 3 here.zip").SetFileIndices([]int{1, 2, 3}).Save(context.Background())
+	client.Meta.Create().SetName("[some artist]manga 4 here.zip").SetFileIndices([]int{1, 2, 3, 4}).Save(context.Background())
+	client.Meta.Create().SetName("[some artist]manga 5 here.zip").SetFileIndices([]int{1, 2, 3, 4}).SetActive(false).Save(context.Background())
+
+	tags, err := ReadPage(context.Background(), client, QueryParams{
+		SortBy:      SortFieldName,
+		SortOrder:   SortOrderAscending,
+		Page:        0,
+		ItemPerPage: 30,
+	})
+	s.Assert().Nil(err)
+
+	s.Assert().Equal(4, len(tags))
+
+	s.Assert().Equal("[some artist]manga 1 here.zip", tags[0].Name)
+	s.Assert().Equal("[some artist]manga 2 here.zip", tags[1].Name)
+	s.Assert().Equal("[some artist]manga 3 here.zip", tags[2].Name)
+	s.Assert().Equal("[some artist]manga 4 here.zip", tags[3].Name)
+}
+
+func (s *QueryTestSuite) TestReadSortByPageCountDesc() {
+	db, err := sql.Open("sqlite", "file:ent?mode=memory&_fk=1&_pragma=foreign_keys(1)")
+	s.Assert().Nil(err)
+	s.Assert().NotNil(db)
+	defer db.Close()
+
+	client := enttest.NewClient(s.T(), enttest.WithOptions(ent.Driver(dialect_sql.OpenDB("sqlite3", db))))
+	defer client.Close()
+
+	client.Meta.Create().SetName("[some artist]manga 1 here.zip").SetFileIndices([]int{1, 2, 3, 4}).Save(context.Background())
+	client.Meta.Create().SetName("[some artist]manga 2 here.zip").SetFileIndices([]int{1, 2, 3}).Save(context.Background())
+	client.Meta.Create().SetName("[some artist]manga 3 here.zip").SetFileIndices([]int{1, 2}).Save(context.Background())
+	client.Meta.Create().SetName("[some artist]manga 4 here.zip").SetFileIndices([]int{1}).Save(context.Background())
+	client.Meta.Create().SetName("[some artist]manga 5 here.zip").SetFileIndices([]int{1, 2, 3, 4}).SetActive(false).Save(context.Background())
+
+	tags, err := ReadPage(context.Background(), client, QueryParams{
+		SortBy:      SortFieldName,
+		SortOrder:   SortOrderAscending,
+		Page:        0,
+		ItemPerPage: 30,
+	})
+	s.Assert().Nil(err)
+
+	s.Assert().Equal(4, len(tags))
+
+	s.Assert().Equal("[some artist]manga 1 here.zip", tags[0].Name)
+	s.Assert().Equal("[some artist]manga 2 here.zip", tags[1].Name)
+	s.Assert().Equal("[some artist]manga 3 here.zip", tags[2].Name)
+	s.Assert().Equal("[some artist]manga 4 here.zip", tags[3].Name)
+}

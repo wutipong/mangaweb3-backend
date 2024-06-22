@@ -68,6 +68,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	if err := handler.ParseInput(r.Body, &req); err != nil {
 		handler.WriteResponse(w, err)
+		return
 	}
 
 	allMeta, err := meta.ReadPage(r.Context(),

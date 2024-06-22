@@ -225,10 +225,12 @@ definitions:
     enum:
     - name
     - createTime
+    - pageCount
     type: string
     x-enum-varnames:
     - SortFieldName
     - SortFieldCreateTime
+    - SortFieldPageCount
   meta.SortOrder:
     enum:
     - ascending
