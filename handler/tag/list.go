@@ -5,7 +5,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
-	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
@@ -17,9 +16,15 @@ type listRequest struct {
 	ItemPerPage  int    `json:"item_per_page"  default:"30"`
 }
 
+type Tag struct {
+	Name      string `json:"name,omitempty"`
+	Favorite  bool   `json:"favorite,omitempty"`
+	ItemCount int    `json:"item_count,omitempty"`
+}
+
 type listResponse struct {
 	Request   listRequest `json:"request"`
-	Tags      []*ent.Tag  `json:"tags"`
+	Tags      []Tag       `json:"tags"`
 	TotalPage int         `json:"total_page"`
 }
 
@@ -79,8 +84,21 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 
 	data := listResponse{
 		Request:   req,
-		Tags:      allTags,
 		TotalPage: (total / req.ItemPerPage) + 1,
+	}
+
+	data.Tags = make([]Tag, len(allTags))
+	for i, t := range allTags {
+		items, err := t.QueryMeta().All(r.Context())
+		if err != nil {
+			handler.WriteResponse(w, err)
+			return
+		}
+		data.Tags[i] = Tag{
+			Name:      t.Name,
+			Favorite:  t.Favorite,
+			ItemCount: len(items),
+		}
 	}
 
 	handler.WriteResponse(w, data)
