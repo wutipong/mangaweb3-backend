@@ -68,17 +68,16 @@ func CreateQuery(ctx context.Context, client *ent.Client, q QueryParams) (query 
 	switch q.SortOrder {
 	case SortOrderAscending:
 		if q.SortBy == SortFieldPageCount {
-			query = query.Order(sqljson.OrderLen(meta.FieldFileIndices))
+			query = query.Order(sqljson.OrderLen(meta.FieldFileIndices)).Unique(false)
 		} else {
 			query = query.Order(ent.Asc(string(field)))
 		}
 	case SortOrderDescending:
 		if q.SortBy == SortFieldPageCount {
-			query = query.Order(sqljson.OrderLenDesc(meta.FieldFileIndices))
+			query = query.Order(sqljson.OrderLenDesc(meta.FieldFileIndices)).Unique(false)
 		} else {
 			query = query.Order(ent.Desc(string(field)))
 		}
-
 	}
 
 	if q.ItemPerPage > 0 {
