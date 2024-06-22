@@ -41,7 +41,7 @@ type browseItem struct {
 	// Read this item has been read before.
 	Read bool `json:"read,omitempty"`
 	// PageCount the number of pages.
-	PageCount int `json:"page_count,omitempty"`
+	PageCount int `json:"page_count"`
 	// TagFavorite this item contains favorite tags
 	TagFavorite bool `json:"tag_favorite,omitempty"`
 }
