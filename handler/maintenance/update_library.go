@@ -14,7 +14,7 @@ type UpdateLibraryResponse struct {
 }
 
 const (
-	PathUpdateLibrary = "/browse/rescan_library"
+	PathUpdateLibrary = "/maintenance/update_library"
 )
 
 // @Success      200  {object}  maintenance.UpdateLibraryResponse
