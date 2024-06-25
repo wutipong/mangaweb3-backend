@@ -38,9 +38,9 @@ func NewItem(ctx context.Context, client *ent.Client, name string) (i *ent.Meta,
 
 	if err = GenerateImageIndices(i); err != nil {
 		return
-	} else {
-		GenerateThumbnail(i, 0, CropDetails{})
 	}
+
+	GenerateThumbnail(i, 0, CropDetails{})
 
 	return client.Meta.Create().
 		SetName(i.Name).

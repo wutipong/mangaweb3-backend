@@ -1,4 +1,4 @@
-package scheduler
+package maintenance
 
 import (
 	"context"
@@ -26,11 +26,4 @@ func RebuildThumbnail(client *ent.Client) error {
 	}
 
 	return nil
-}
-
-func ScheduleRebuildThumbnail(client *ent.Client) {
-	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
-		log.Info().Msg("Force updating thumbnail")
-		RebuildThumbnail(client)
-	})
 }

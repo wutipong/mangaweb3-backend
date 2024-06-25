@@ -2,8 +2,6 @@ module github.com/wutipong/mangaweb3-backend
 
 go 1.22.3
 
-require github.com/go-co-op/gocron v1.37.0
-
 require github.com/joho/godotenv v1.5.1
 
 require (
@@ -48,7 +46,6 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/zclconf/go-cty v1.14.4 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
@@ -63,7 +60,6 @@ require (
 )
 
 require (
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	golang.org/x/crypto v0.23.0 // indirect

@@ -1,4 +1,4 @@
-package scheduler
+package maintenance
 
 import (
 	"context"
@@ -22,11 +22,4 @@ func UpdateTags(client *ent.Client) error {
 		}
 	}
 	return nil
-}
-
-func ScheduleUpdateTags(client *ent.Client) {
-	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
-		log.Info().Msg("Update tags.")
-		UpdateTags(client)
-	})
 }

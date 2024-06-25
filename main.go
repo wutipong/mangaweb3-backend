@@ -22,8 +22,8 @@ import (
 	"github.com/wutipong/mangaweb3-backend/handler/browse"
 	handlertag "github.com/wutipong/mangaweb3-backend/handler/tag"
 	"github.com/wutipong/mangaweb3-backend/handler/view"
+	"github.com/wutipong/mangaweb3-backend/maintenance"
 	"github.com/wutipong/mangaweb3-backend/meta"
-	"github.com/wutipong/mangaweb3-backend/scheduler"
 )
 
 var versionString string = "development"
@@ -101,10 +101,7 @@ func main() {
 		return
 	}
 
-	scheduler.Init(scheduler.Options{
-		EntClient: client,
-	})
-	scheduler.Start()
+	go maintenance.UpdateLibrary(client)
 
 	router := httprouter.New()
 	RegisterHandler(router, client)
@@ -118,7 +115,6 @@ func main() {
 	}
 
 	log.Info().Msg("shutting down the server")
-	scheduler.Stop()
 }
 
 func RegisterHandler(router *httprouter.Router, client *ent.Client) {

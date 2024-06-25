@@ -1,4 +1,4 @@
-package scheduler
+package maintenance
 
 import (
 	"context"
@@ -36,11 +36,4 @@ func UpdateMissingThumbnail(client *ent.Client) error {
 	}
 
 	return nil
-}
-
-func ScheduleUpdateMissingThumbnail(client *ent.Client) {
-	scheduler.Every(1).Hour().Do(func() {
-		log.Info().Msg("Updating missing thumbnail.")
-		UpdateMissingThumbnail(client)
-	})
 }
