@@ -140,6 +140,24 @@ const docTemplate = `{
                 }
             }
         },
+        "/maintenance/update_library": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/maintenance.UpdateLibraryResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/tag/list": {
             "post": {
                 "consumes": [
@@ -790,6 +808,14 @@ const docTemplate = `{
                 }
             }
         },
+        "maintenance.UpdateLibraryResponse": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "type": "boolean"
+                }
+            }
+        },
         "meta.CropDetails": {
             "type": "object",
             "properties": {
@@ -831,6 +857,20 @@ const docTemplate = `{
                 "SortOrderDescending"
             ]
         },
+        "tag.Tag": {
+            "type": "object",
+            "properties": {
+                "favorite": {
+                    "type": "boolean"
+                },
+                "item_count": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "tag.listRequest": {
             "type": "object",
             "properties": {
@@ -858,7 +898,7 @@ const docTemplate = `{
                 "tags": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ent.Tag"
+                        "$ref": "#/definitions/tag.Tag"
                     }
                 },
                 "total_page": {
