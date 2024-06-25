@@ -20,10 +20,11 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/handler/browse"
-	handlertag "github.com/wutipong/mangaweb3-backend/handler/tag"
+	maintenanceHandler "github.com/wutipong/mangaweb3-backend/handler/maintenance"
+	"github.com/wutipong/mangaweb3-backend/handler/tag"
 	"github.com/wutipong/mangaweb3-backend/handler/view"
+	"github.com/wutipong/mangaweb3-backend/maintenance"
 	"github.com/wutipong/mangaweb3-backend/meta"
-	"github.com/wutipong/mangaweb3-backend/scheduler"
 )
 
 var versionString string = "development"
@@ -101,12 +102,13 @@ func main() {
 		return
 	}
 
-	scheduler.Init(scheduler.Options{
-		EntClient: client,
-	})
-	scheduler.Start()
+	go maintenance.UpdateLibrary(client)
 
 	router := httprouter.New()
+	handler.Init(handler.Options{
+		VersionString: versionString,
+		EntClient:     client,
+	})
 	RegisterHandler(router, client)
 
 	log.Info().Msg("Server starts.")
@@ -118,18 +120,13 @@ func main() {
 	}
 
 	log.Info().Msg("shutting down the server")
-	scheduler.Stop()
 }
 
 func RegisterHandler(router *httprouter.Router, client *ent.Client) {
-	handler.Init(handler.Options{
-		VersionString: versionString,
-		EntClient:     client,
-	})
-
 	browse.Register(router)
-	handlertag.Register(router)
+	tag.Register(router)
 	view.Register(router)
+	maintenanceHandler.Register(router)
 
 	router.GET("/doc/:any", swaggerHandler)
 }

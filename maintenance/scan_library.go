@@ -1,4 +1,4 @@
-package scheduler
+package maintenance
 
 import (
 	"context"
@@ -90,11 +90,4 @@ func ScanLibrary(client *ent.Client) error {
 	}
 
 	return nil
-}
-
-func ScheduleScanLibrary(client *ent.Client) {
-	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
-		log.Info().Msg("Scanning Library.")
-		ScanLibrary(client)
-	})
 }

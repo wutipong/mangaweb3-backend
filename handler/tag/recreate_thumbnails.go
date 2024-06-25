@@ -6,7 +6,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/handler"
-	"github.com/wutipong/mangaweb3-backend/scheduler"
+	"github.com/wutipong/mangaweb3-backend/maintenance"
 )
 
 type recreateThumbnailsResponse struct {
@@ -23,7 +23,7 @@ const (
 func RecreateThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Info().Msg("Rescan library")
 
-	scheduler.ScheduleRebuildTagThumbnail(handler.EntClient())
+	go maintenance.RebuildTagThumbnail(handler.EntClient())
 
 	response := recreateThumbnailsResponse{
 		Result: true,

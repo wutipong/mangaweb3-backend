@@ -210,6 +210,11 @@ definitions:
         example: unknown error.
         type: string
     type: object
+  maintenance.UpdateLibraryResponse:
+    properties:
+      result:
+        type: boolean
+    type: object
   meta.CropDetails:
     properties:
       height:
@@ -239,6 +244,15 @@ definitions:
     x-enum-varnames:
     - SortOrderAscending
     - SortOrderDescending
+  tag.Tag:
+    properties:
+      favorite:
+        type: boolean
+      item_count:
+        type: integer
+      name:
+        type: string
+    type: object
   tag.listRequest:
     properties:
       favorite_only:
@@ -257,7 +271,7 @@ definitions:
         $ref: '#/definitions/tag.listRequest'
       tags:
         items:
-          $ref: '#/definitions/ent.Tag'
+          $ref: '#/definitions/tag.Tag'
         type: array
       total_page:
         type: integer
@@ -446,6 +460,17 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/browse.historyResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+  /maintenance/update_library:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/maintenance.UpdateLibraryResponse'
         "500":
           description: Internal Server Error
           schema:

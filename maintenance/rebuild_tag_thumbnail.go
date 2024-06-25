@@ -1,4 +1,4 @@
-package scheduler
+package maintenance
 
 import (
 	"context"
@@ -28,11 +28,4 @@ func RebuildTagThumbnail(client *ent.Client) error {
 	}
 
 	return nil
-}
-
-func ScheduleRebuildTagThumbnail(client *ent.Client) {
-	scheduler.Every(1).Millisecond().LimitRunsTo(1).Do(func() {
-		log.Info().Msg("Rebuild tag thumbnails.")
-		RebuildTagThumbnail(client)
-	})
 }
