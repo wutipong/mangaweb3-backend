@@ -16,7 +16,7 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/facette/natsort"
-	"github.com/wutipong/mangaweb3-backend/config"
+	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	tag_util "github.com/wutipong/mangaweb3-backend/tag"
 
@@ -27,7 +27,7 @@ import (
 func NewItem(ctx context.Context, client *ent.Client, name string) (i *ent.Meta, err error) {
 	createTime := time.Now()
 
-	c := config.Get()
+	c := configuration.Get()
 	if stat, e := fs.Stat(os.DirFS(c.DataPath), name); e == nil {
 		createTime = stat.ModTime()
 	}
@@ -58,7 +58,7 @@ func Open(m *ent.Meta) (reader io.ReadCloser, err error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	c := config.Get()
+	c := configuration.Get()
 
 	fullpath := filepath.Join(c.DataPath, m.Name)
 
@@ -78,7 +78,7 @@ func GenerateThumbnail(m *ent.Meta, fileIndex int, details CropDetails) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	c := config.Get()
+	c := configuration.Get()
 
 	fullpath := filepath.Join(c.DataPath, m.Name)
 
@@ -136,7 +136,7 @@ func GenerateImageIndices(m *ent.Meta) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	c := config.Get()
+	c := configuration.Get()
 
 	fullpath := c.DataPath + string(os.PathSeparator) + m.Name
 

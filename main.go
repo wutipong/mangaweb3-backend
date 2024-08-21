@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
-	"github.com/wutipong/mangaweb3-backend/config"
+	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/database"
 	_ "github.com/wutipong/mangaweb3-backend/docs"
 	"github.com/wutipong/mangaweb3-backend/handler/browse"
@@ -68,7 +68,7 @@ func main() {
 		Str("address", address).
 		Msg("Server started.")
 
-	config.Init(config.Config{
+	configuration.Init(configuration.Config{
 		DebugMode:     debugMode,
 		VersionString: versionString,
 		DataPath:      dataPath,

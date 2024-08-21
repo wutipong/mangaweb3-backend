@@ -5,7 +5,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
-	"github.com/wutipong/mangaweb3-backend/config"
+	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
@@ -69,7 +69,7 @@ func PopulateTagsHandler(w http.ResponseWriter, r *http.Request, params httprout
 		return
 	}
 
-	c := config.Get()
+	c := configuration.Get()
 
 	data := populateTagsResponse{
 		Request:  req,

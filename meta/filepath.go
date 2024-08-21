@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/wutipong/mangaweb3-backend/config"
+	"github.com/wutipong/mangaweb3-backend/configuration"
 )
 
 var filter func(path string) bool
@@ -32,7 +32,7 @@ func init() {
 // ListDir returns a list of content of a directory.
 func ListDir(path string) (files []string, err error) {
 
-	c := config.Get()
+	c := configuration.Get()
 	actualPath := filepath.Join(c.DataPath, path)
 	dir, err := os.Open(actualPath)
 	if err != nil {

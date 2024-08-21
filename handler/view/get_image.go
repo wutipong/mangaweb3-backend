@@ -14,7 +14,7 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
-	"github.com/wutipong/mangaweb3-backend/config"
+	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
@@ -119,7 +119,7 @@ func OpenZipEntry(m *ent.Meta, index int) (content []byte, filename string, err 
 		err = fmt.Errorf("image file not found")
 	}
 
-	c := config.Get()
+	c := configuration.Get()
 
 	fullpath := filepath.Join(c.DataPath, m.Name)
 	r, err := zip.OpenReader(fullpath)

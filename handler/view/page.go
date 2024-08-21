@@ -4,7 +4,7 @@ import (
 	"archive/zip"
 	"path/filepath"
 
-	"github.com/wutipong/mangaweb3-backend/config"
+	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/ent"
 )
 
@@ -18,7 +18,7 @@ func ListPages(m *ent.Meta) (pages []Page, err error) {
 		return
 	}
 
-	c := config.Get()
+	c := configuration.Get()
 
 	fullpath := filepath.Join(c.DataPath, m.Name)
 	r, err := zip.OpenReader(fullpath)
