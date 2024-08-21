@@ -5,6 +5,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/maintenance"
 )
@@ -23,7 +24,9 @@ const (
 func RecreateThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Info().Msg("Rescan library")
 
-	go maintenance.RebuildTagThumbnail(handler.EntClient())
+	client := database.CreateEntClient()
+	defer client.Close()
+	go maintenance.RebuildTagThumbnail(client)
 
 	response := recreateThumbnailsResponse{
 		Result: true,

@@ -5,6 +5,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/tag"
@@ -71,8 +72,11 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
+	client := database.CreateEntClient()
+	defer client.Close()
+
 	allMeta, err := meta.ReadPage(r.Context(),
-		handler.EntClient(),
+		client,
 		meta.QueryParams{
 			SearchName:   req.Search,
 			FavoriteOnly: req.FavoriteOnly,
@@ -112,7 +116,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	}
 
 	count, err := meta.Count(r.Context(),
-		handler.EntClient(),
+		client,
 		meta.QueryParams{
 			SearchName:   req.Search,
 			FavoriteOnly: req.FavoriteOnly,
@@ -147,7 +151,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	}
 
 	if req.Tag != "" {
-		tagObj, err := tag.Read(r.Context(), handler.EntClient(), req.Tag)
+		tagObj, err := tag.Read(r.Context(), client, req.Tag)
 		if err != nil {
 			handler.WriteResponse(w, err)
 			return

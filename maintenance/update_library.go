@@ -2,10 +2,13 @@ package maintenance
 
 import (
 	"github.com/rs/zerolog/log"
-	"github.com/wutipong/mangaweb3-backend/ent"
+	"github.com/wutipong/mangaweb3-backend/database"
 )
 
-func UpdateLibrary(client *ent.Client) {
+func UpdateLibrary() {
+	client := database.CreateEntClient()
+	defer client.Close()
+
 	log.Info().Msg("Update metadata set.")
 	ScanLibrary(client)
 	log.Info().Msg("Update tag list.")

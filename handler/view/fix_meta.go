@@ -6,6 +6,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
@@ -30,7 +31,7 @@ const (
 // @Router /view/fix_meta [post]
 // Fix the input item metadata.
 func FixMeta(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	req := updateCoverRequest{}
+	req := fixMetaRequest{}
 	if err := handler.ParseInput(r.Body, &req); err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -40,13 +41,16 @@ func FixMeta(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		Interface("request", req).
 		Msg("Fix metadata")
 
-	m, err := meta.Read(r.Context(), handler.EntClient(), req.Name)
+	client := database.CreateEntClient()
+	defer client.Close()
+
+	m, err := meta.Read(r.Context(), client, req.Name)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
 
-	if m, err = meta.PopulateTags(r.Context(), handler.EntClient(), m); err != nil {
+	if m, err = meta.PopulateTags(r.Context(), client, m); err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
@@ -61,12 +65,12 @@ func FixMeta(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	if err = meta.Write(r.Context(), handler.EntClient(), m); err != nil {
+	if err = meta.Write(r.Context(), client, m); err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
 
-	handler.WriteResponse(w, updateCoverResponse{
+	handler.WriteResponse(w, fixMetaResponse{
 		Request: req,
 		Success: true,
 	})

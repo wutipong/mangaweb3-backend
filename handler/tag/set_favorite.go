@@ -5,6 +5,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
@@ -36,7 +37,10 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 
 	log.Info().Interface("request", req).Msg("Set favorite tag.")
 
-	m, err := tag.Read(r.Context(), handler.EntClient(), req.Tag)
+	client := database.CreateEntClient()
+	defer client.Close()
+
+	m, err := tag.Read(r.Context(), client, req.Tag)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -44,7 +48,7 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 
 	if req.Favorite != m.Favorite {
 		m.Favorite = req.Favorite
-		tag.Write(r.Context(), handler.EntClient(), m)
+		tag.Write(r.Context(), client, m)
 	}
 
 	response := setFavoriteResponse{

@@ -14,6 +14,8 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/config"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
@@ -56,7 +58,10 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 		Interface("request", query).
 		Msg("Get image")
 
-	m, err := meta.Read(r.Context(), handler.EntClient(), item)
+	client := database.CreateEntClient()
+	defer client.Close()
+
+	m, err := meta.Read(r.Context(), client, item)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -114,7 +119,9 @@ func OpenZipEntry(m *ent.Meta, index int) (content []byte, filename string, err 
 		err = fmt.Errorf("image file not found")
 	}
 
-	fullpath := filepath.Join(meta.BaseDirectory, m.Name)
+	c := config.Get()
+
+	fullpath := filepath.Join(c.DataPath, m.Name)
 	r, err := zip.OpenReader(fullpath)
 	if err != nil {
 		return

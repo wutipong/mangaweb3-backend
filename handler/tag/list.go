@@ -5,6 +5,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
@@ -56,7 +57,10 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 
 	log.Info().Interface("request", req).Msg("Tag list")
 
-	allTags, err := tag.ReadPage(r.Context(), handler.EntClient(),
+	client := database.CreateEntClient()
+	defer client.Close()
+
+	allTags, err := tag.ReadPage(r.Context(), client,
 		tag.QueryParams{
 			FavoriteOnly: req.FavoriteOnly,
 			Search:       req.Search,
@@ -69,7 +73,7 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		return
 	}
 
-	total, err := tag.Count(r.Context(), handler.EntClient(),
+	total, err := tag.Count(r.Context(), client,
 		tag.QueryParams{
 			FavoriteOnly: req.FavoriteOnly,
 			Search:       req.Search,

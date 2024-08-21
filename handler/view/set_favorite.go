@@ -7,6 +7,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
@@ -52,7 +53,10 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 		Interface("request", req).
 		Msg("Set Favorite Item.")
 
-	m, err := meta.Read(r.Context(), handler.EntClient(), item)
+	client := database.CreateEntClient()
+	defer client.Close()
+
+	m, err := meta.Read(r.Context(), client, item)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -60,7 +64,7 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 
 	if req.Favorite != m.Favorite {
 		m.Favorite = req.Favorite
-		meta.Write(r.Context(), handler.EntClient(), m)
+		meta.Write(r.Context(), client, m)
 	}
 
 	response := setFavoriteResponse{

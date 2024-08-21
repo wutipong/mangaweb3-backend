@@ -4,8 +4,8 @@ import (
 	"archive/zip"
 	"path/filepath"
 
+	"github.com/wutipong/mangaweb3-backend/config"
 	"github.com/wutipong/mangaweb3-backend/ent"
-	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
 type Page struct {
@@ -18,7 +18,9 @@ func ListPages(m *ent.Meta) (pages []Page, err error) {
 		return
 	}
 
-	fullpath := filepath.Join(meta.BaseDirectory, m.Name)
+	c := config.Get()
+
+	fullpath := filepath.Join(c.DataPath, m.Name)
 	r, err := zip.OpenReader(fullpath)
 	if err != nil {
 		return

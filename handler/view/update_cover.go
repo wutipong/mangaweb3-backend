@@ -6,6 +6,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
@@ -42,7 +43,10 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		Interface("request", req).
 		Msg("Update cover.")
 
-	m, err := meta.Read(r.Context(), handler.EntClient(), req.Name)
+	client := database.CreateEntClient()
+	defer client.Close()
+
+	m, err := meta.Read(r.Context(), client, req.Name)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -54,7 +58,7 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		return
 	}
 
-	err = meta.Write(r.Context(), handler.EntClient(), m)
+	err = meta.Write(r.Context(), client, m)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

@@ -5,6 +5,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
@@ -24,7 +25,10 @@ func GetThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprout
 		Str("name", item).
 		Msg("Thumbnail")
 
-	m, err := meta.Read(r.Context(), handler.EntClient(), item)
+	client := database.CreateEntClient()
+	defer client.Close()
+
+	m, err := meta.Read(r.Context(), client, item)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
