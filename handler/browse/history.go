@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/handler"
 )
@@ -62,7 +63,10 @@ func historyHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		handler.WriteResponse(w, err)
 	}
 
-	histories, err := handler.EntClient().History.Query().
+	client := database.CreateEntClient()
+	defer client.Close()
+
+	histories, err := client.History.Query().
 		Order(history.ByCreateTime(sql.OrderDesc())).
 		Limit(req.ItemPerPage).
 		Offset(req.ItemPerPage * req.Page).All(r.Context())
@@ -104,7 +108,7 @@ func historyHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		}
 	}
 
-	count, err := handler.EntClient().History.Query().Count(r.Context())
+	count, err := client.History.Query().Count(r.Context())
 
 	if err != nil {
 		handler.WriteResponse(w, err)

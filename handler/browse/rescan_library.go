@@ -5,6 +5,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/maintenance"
 )
@@ -23,7 +24,10 @@ const (
 func RescanLibraryHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Info().Msg("Rescan library")
 
-	go maintenance.ScanLibrary(handler.EntClient())
+	client := database.CreateEntClient()
+	defer client.Close()
+
+	go maintenance.ScanLibrary(client)
 
 	response := rescanLibraryResponse{
 		Result: true,

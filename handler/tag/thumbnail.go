@@ -5,6 +5,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/tag"
 )
@@ -22,7 +23,10 @@ func ThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprouter.
 
 	log.Info().Str("tag", tagStr).Msg("Tag thumbnail image")
 
-	m, err := tag.Read(r.Context(), handler.EntClient(), tagStr)
+	client := database.CreateEntClient()
+	defer client.Close()
+
+	m, err := tag.Read(r.Context(), client, tagStr)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

@@ -2,29 +2,24 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"net/http"
 	"os"
 	"strings"
 
-	"entgo.io/ent/dialect"
-	entsql "entgo.io/ent/dialect/sql"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
+	"github.com/wutipong/mangaweb3-backend/configuration"
+	"github.com/wutipong/mangaweb3-backend/database"
 	_ "github.com/wutipong/mangaweb3-backend/docs"
-	"github.com/wutipong/mangaweb3-backend/ent"
-	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/handler/browse"
 	maintenanceHandler "github.com/wutipong/mangaweb3-backend/handler/maintenance"
 	"github.com/wutipong/mangaweb3-backend/handler/tag"
 	"github.com/wutipong/mangaweb3-backend/handler/view"
 	"github.com/wutipong/mangaweb3-backend/maintenance"
-	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
 var versionString string = "development"
@@ -38,27 +33,28 @@ var versionString string = "development"
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
+	useEnvFile := false
 	if err := godotenv.Overload(); err == nil {
-		log.Info().Msg("Use .env file.")
+		useEnvFile = true
 	}
 
 	address := ":8972"
-	if v, b := os.LookupEnv("MANGAWEB_ADDRESS"); b {
-		address = v
+	if value, valid := os.LookupEnv("MANGAWEB_ADDRESS"); valid {
+		address = value
 	}
 
 	dataPath := "./data"
-	if v, b := os.LookupEnv("MANGAWEB_DATA_PATH"); b {
-		dataPath = v
+	if value, valid := os.LookupEnv("MANGAWEB_DATA_PATH"); valid {
+		dataPath = value
 	}
 	connectionStr := "postgres://postgres:password@localhost:5432/manga"
-	if v, b := os.LookupEnv("MANGAWEB_DB"); b {
-		connectionStr = v
+	if value, valid := os.LookupEnv("MANGAWEB_DB"); valid {
+		connectionStr = value
 	}
 
 	debugMode := false
-	if v, b := os.LookupEnv("MANGAWEB_ENVIRONMENT"); b {
-		if strings.ToLower(strings.TrimSpace(v)) == "development" {
+	if value, valid := os.LookupEnv("MANGAWEB_ENVIRONMENT"); valid {
+		if strings.ToLower(strings.TrimSpace(value)) == "development" {
 			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).
 				Level(zerolog.DebugLevel)
 
@@ -66,50 +62,39 @@ func main() {
 			debugMode = true
 		}
 	}
-
-	meta.BaseDirectory = dataPath
+	if useEnvFile {
+		log.Info().Msg("Use .env file.")
+	}
 
 	log.Info().
+		Bool("debugMode", debugMode).
 		Str("version", versionString).
 		Str("data_path", dataPath).
 		Str("address", address).
 		Msg("Server started.")
 
-	var client *ent.Client = nil
-	if db, err := sql.Open("pgx", connectionStr); err != nil {
+	configuration.Init(configuration.Config{
+		DebugMode:     debugMode,
+		VersionString: versionString,
+		DataPath:      dataPath,
+	})
+
+	if err := database.Open(context.Background(), connectionStr); err != nil {
 		log.Error().AnErr("error", err).Msg("Connect to Postgres fails")
 		return
 	} else {
-		drv := entsql.OpenDB(dialect.Postgres, db)
-		defer db.Close()
-
-		options := []ent.Option{
-			ent.Driver(drv),
-			ent.Log(func(params ...any) {
-				log.Debug().Any("params", params).Msg("Ent Debug")
-			}),
-		}
-		if debugMode {
-			options = append(options, ent.Debug())
-		}
-
-		client = ent.NewClient(options...)
-		defer client.Close()
+		defer database.Close()
 	}
 
-	if err := client.Schema.Create(context.Background()); err != nil {
+	if err := database.CreateSchema(); err != nil {
 		log.Error().AnErr("error", err).Msg("failed creating schema resources.")
 		return
 	}
 
-	go maintenance.UpdateLibrary(client)
+	go maintenance.UpdateLibrary()
 
 	router := httprouter.New()
-	handler.Init(handler.Options{
-		VersionString: versionString,
-		EntClient:     client,
-	})
-	RegisterHandler(router, client)
+	RegisterHandler(router)
 
 	log.Info().Msg("Server starts.")
 
@@ -122,7 +107,7 @@ func main() {
 	log.Info().Msg("shutting down the server")
 }
 
-func RegisterHandler(router *httprouter.Router, client *ent.Client) {
+func RegisterHandler(router *httprouter.Router) {
 	browse.Register(router)
 	tag.Register(router)
 	view.Register(router)

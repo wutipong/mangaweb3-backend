@@ -5,6 +5,8 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/configuration"
+	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
@@ -42,7 +44,10 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	item := req.Name
 
-	m, err := meta.Read(r.Context(), handler.EntClient(), item)
+	client := database.CreateEntClient()
+	defer client.Close()
+
+	m, err := meta.Read(r.Context(), client, item)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -50,7 +55,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	if !m.Read {
 		m.Read = true
-		meta.Write(r.Context(), handler.EntClient(), m)
+		meta.Write(r.Context(), client, m)
 	}
 
 	log.Info().
@@ -63,16 +68,18 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
+	c := configuration.Get()
+
 	data := viewResponse{
 		Request:   req,
 		Name:      item,
-		Version:   handler.CreateVersionString(),
+		Version:   c.VersionString,
 		Favorite:  m.Favorite,
 		Tags:      tags,
 		PageCount: len(m.FileIndices),
 	}
 
-	handler.EntClient().History.Create().
+	client.History.Create().
 		SetItem(m).
 		Save(r.Context())
 

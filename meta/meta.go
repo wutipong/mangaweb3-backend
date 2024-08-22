@@ -16,6 +16,7 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/facette/natsort"
+	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	tag_util "github.com/wutipong/mangaweb3-backend/tag"
 
@@ -26,7 +27,8 @@ import (
 func NewItem(ctx context.Context, client *ent.Client, name string) (i *ent.Meta, err error) {
 	createTime := time.Now()
 
-	if stat, e := fs.Stat(os.DirFS(BaseDirectory), name); e == nil {
+	c := configuration.Get()
+	if stat, e := fs.Stat(os.DirFS(c.DataPath), name); e == nil {
 		createTime = stat.ModTime()
 	}
 
@@ -56,7 +58,9 @@ func Open(m *ent.Meta) (reader io.ReadCloser, err error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	fullpath := filepath.Join(BaseDirectory, m.Name)
+	c := configuration.Get()
+
+	fullpath := filepath.Join(c.DataPath, m.Name)
 
 	reader, err = os.Open(fullpath)
 	return
@@ -74,7 +78,9 @@ func GenerateThumbnail(m *ent.Meta, fileIndex int, details CropDetails) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	fullpath := filepath.Join(BaseDirectory, m.Name)
+	c := configuration.Get()
+
+	fullpath := filepath.Join(c.DataPath, m.Name)
 
 	r, err := zip.OpenReader(fullpath)
 	if err != nil {
@@ -130,7 +136,9 @@ func GenerateImageIndices(m *ent.Meta) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	fullpath := BaseDirectory + string(os.PathSeparator) + m.Name
+	c := configuration.Get()
+
+	fullpath := c.DataPath + string(os.PathSeparator) + m.Name
 
 	r, err := zip.OpenReader(fullpath)
 	if err != nil {
