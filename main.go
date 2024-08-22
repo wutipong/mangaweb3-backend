@@ -33,8 +33,9 @@ var versionString string = "development"
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
+	useEnvFile := false
 	if err := godotenv.Overload(); err == nil {
-		log.Info().Msg("Use .env file.")
+		useEnvFile = true
 	}
 
 	address := ":8972"
@@ -61,8 +62,12 @@ func main() {
 			debugMode = true
 		}
 	}
+	if useEnvFile {
+		log.Info().Msg("Use .env file.")
+	}
 
 	log.Info().
+		Bool("debugMode", debugMode).
 		Str("version", versionString).
 		Str("data_path", dataPath).
 		Str("address", address).

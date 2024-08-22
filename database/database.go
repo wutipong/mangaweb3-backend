@@ -8,11 +8,11 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/ent"
 )
 
 var pool *pgxpool.Pool
-var debugMode = false
 
 func Open(ctx context.Context, connStr string) error {
 	if p, e := pgxpool.New(ctx, connStr); e == nil {
@@ -32,12 +32,23 @@ func CreateEntClient() *ent.Client {
 	drv := sql.OpenDB(dialect.Postgres, stdlib.OpenDBFromPool(pool))
 	options := []ent.Option{
 		ent.Driver(drv),
-		ent.Log(func(params ...any) {
-			log.Debug().Any("params", params).Msg("Ent Debug")
-		}),
 	}
-	if debugMode {
-		options = append(options, ent.Debug())
+
+	config := configuration.Get()
+	if config.DebugMode {
+		options = append(options,
+			ent.Debug(),
+			ent.Log(func(params ...any) {
+				stat := pool.Stat()
+
+				log.Debug().
+					Any("params", params).
+					Int32("Acquired Conns", stat.AcquiredConns()).
+					Int32("Idle Conns", stat.IdleConns()).
+					Int32("Constructed Conns", stat.ConstructingConns()).
+					Msg("Ent Debug")
+			}),
+		)
 	}
 
 	client := ent.NewClient(options...)
