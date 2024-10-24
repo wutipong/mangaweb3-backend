@@ -9,7 +9,6 @@ import (
 )
 
 func UpdateMissingThumbnail(client *ent.Client) error {
-
 	allMeta, err := meta.ReadAll(context.Background(), client)
 	if err != nil {
 		return err
@@ -19,7 +18,7 @@ func UpdateMissingThumbnail(client *ent.Client) error {
 		if len(m.Thumbnail) != 0 {
 			continue
 		}
-		e := meta.GenerateThumbnail(m, 0, meta.CropDetails{})
+		e := meta.GenerateThumbnail(context.Background(), m, 0, meta.CropDetails{})
 
 		log.Info().
 			Str("name", m.Name).

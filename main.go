@@ -4,10 +4,13 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -62,8 +65,65 @@ func main() {
 			debugMode = true
 		}
 	}
+
 	if useEnvFile {
 		log.Info().Msg("Use .env file.")
+	}
+
+	endpoint := "localhost:9000"
+	if value, valid := os.LookupEnv("MANGAWEB_MINIO_ENDPOINT"); valid {
+		endpoint = value
+	}
+	accessKey := ""
+	if value, valid := os.LookupEnv("MANGAWEB_MINIO_ACCESS_KEY_ID"); valid {
+		accessKey = value
+	}
+
+	accessSecret := ""
+	if value, valid := os.LookupEnv("MANGAWEB_MINIO_ACCESS_KEY_SECRET"); valid {
+		accessSecret = value
+	}
+
+	secure := false
+	if value, valid := os.LookupEnv("MANGAWEB_MINIO_SECURE"); valid {
+		if b, err := strconv.ParseBool(value); err != nil {
+			log.Warn().Msg("Unable to parse MANGAWEB_MINIO_SECURE value. Default to false.")
+			secure = false
+		} else {
+			secure = b
+		}
+
+	}
+
+	bucket := "manga"
+	if value, valid := os.LookupEnv("MANGAWEB_MINIO_BUCKET"); valid {
+		bucket = value
+	}
+
+	var minioClient *minio.Client
+	if c, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKey, accessSecret, ""),
+		Secure: secure,
+	}); err != nil {
+		log.Fatal().Msg("Unable to create MinIO client.")
+		return
+	} else {
+		minioClient = c
+	}
+
+	if found, err := minioClient.BucketExists(context.Background(), bucket); !found || err != nil {
+		if !found {
+			log.Fatal().Msg("MinIO bucket not found.")
+			return
+		}
+
+		if err != nil {
+			log.Fatal().
+				Err(err).
+				Msg("MinIO error.")
+
+			return
+		}
 	}
 
 	log.Info().
@@ -71,12 +131,20 @@ func main() {
 		Str("version", versionString).
 		Str("data_path", dataPath).
 		Str("address", address).
+		Str("minio_endpoint", endpoint).
+		Str("minio_access_key", accessKey).
+		Bool("minio_secure", secure).
 		Msg("Server started.")
 
 	configuration.Init(configuration.Config{
-		DebugMode:     debugMode,
-		VersionString: versionString,
-		DataPath:      dataPath,
+		DebugMode:           debugMode,
+		VersionString:       versionString,
+		DataPath:            dataPath,
+		MinIoEndPoint:       endpoint,
+		MinIoAccessKey:      accessKey,
+		MinIoAcessKeySecret: accessSecret,
+		MinIoSecure:         secure,
+		MinIoBucket:         bucket,
 	})
 
 	if err := database.Open(context.Background(), connectionStr); err != nil {

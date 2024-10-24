@@ -55,12 +55,12 @@ func FixMeta(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	if err = meta.GenerateImageIndices(m); err != nil {
+	if err = meta.GenerateImageIndices(r.Context(), m); err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}
 
-	if err = meta.GenerateThumbnail(m, 0, meta.CropDetails{}); err != nil {
+	if err = meta.GenerateThumbnail(r.Context(), m, 0, meta.CropDetails{}); err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}

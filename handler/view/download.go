@@ -9,6 +9,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/data"
 	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
@@ -36,12 +37,7 @@ func Download(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 		return
 	}
 
-	reader, err := meta.Open(m)
-	if err != nil {
-		handler.WriteResponse(w, err)
-		return
-	}
-	defer reader.Close()
+	reader, err := data.GetObject(r.Context(), m.Name)
 
 	bytes, err := io.ReadAll(reader)
 	if err != nil {

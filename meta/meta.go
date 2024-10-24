@@ -1,22 +1,16 @@
 package meta
 
 import (
-	"archive/zip"
 	"bytes"
 	"context"
 	"fmt"
 	"image"
-	"io"
-	"io/fs"
-	"os"
-	"path/filepath"
 	"sort"
-	"sync"
 	"time"
 
 	"github.com/disintegration/imaging"
 	"github.com/facette/natsort"
-	"github.com/wutipong/mangaweb3-backend/configuration"
+	"github.com/wutipong/mangaweb3-backend/data"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	tag_util "github.com/wutipong/mangaweb3-backend/tag"
 
@@ -26,10 +20,8 @@ import (
 
 func NewItem(ctx context.Context, client *ent.Client, name string) (i *ent.Meta, err error) {
 	createTime := time.Now()
-
-	c := configuration.Get()
-	if stat, e := fs.Stat(os.DirFS(c.DataPath), name); e == nil {
-		createTime = stat.ModTime()
+	if t, e := data.GetLastModifiedTime(ctx, name); e == nil {
+		createTime = t
 	}
 
 	i = &ent.Meta{
@@ -38,11 +30,11 @@ func NewItem(ctx context.Context, client *ent.Client, name string) (i *ent.Meta,
 		Favorite:   false,
 	}
 
-	if err = GenerateImageIndices(i); err != nil {
+	if err = GenerateImageIndices(ctx, i); err != nil {
 		return
 	}
 
-	GenerateThumbnail(i, 0, CropDetails{})
+	GenerateThumbnail(ctx, i, 0, CropDetails{})
 
 	return client.Meta.Create().
 		SetName(i.Name).
@@ -53,19 +45,6 @@ func NewItem(ctx context.Context, client *ent.Client, name string) (i *ent.Meta,
 		SetThumbnail(i.Thumbnail).Save(ctx)
 }
 
-func Open(m *ent.Meta) (reader io.ReadCloser, err error) {
-	mutex := new(sync.Mutex)
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	c := configuration.Get()
-
-	fullpath := filepath.Join(c.DataPath, m.Name)
-
-	reader, err = os.Open(fullpath)
-	return
-}
-
 type CropDetails struct {
 	X      int `json:"x"`
 	Y      int `json:"y"`
@@ -73,26 +52,17 @@ type CropDetails struct {
 	Height int `json:"height"`
 }
 
-func GenerateThumbnail(m *ent.Meta, fileIndex int, details CropDetails) error {
-	mutex := new(sync.Mutex)
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	c := configuration.Get()
-
-	fullpath := filepath.Join(c.DataPath, m.Name)
-
-	r, err := zip.OpenReader(fullpath)
-	if err != nil {
-		return err
-	}
-	defer r.Close()
-
+func GenerateThumbnail(ctx context.Context, m *ent.Meta, fileIndex int, details CropDetails) error {
 	if len(m.FileIndices) == 0 {
 		return fmt.Errorf("file list is empty")
 	}
 
-	stream, err := r.File[m.FileIndices[fileIndex]].Open()
+	children, err := data.ListObject(ctx, m.Name)
+	if err != nil {
+		return err
+	}
+
+	stream, err := data.GetObject(ctx, children[m.FileIndices[fileIndex]])
 	if err != nil {
 		return err
 	}
@@ -131,20 +101,12 @@ func GenerateThumbnail(m *ent.Meta, fileIndex int, details CropDetails) error {
 	return nil
 }
 
-func GenerateImageIndices(m *ent.Meta) error {
-	mutex := new(sync.Mutex)
-	mutex.Lock()
-	defer mutex.Unlock()
+func GenerateImageIndices(ctx context.Context, m *ent.Meta) error {
 
-	c := configuration.Get()
-
-	fullpath := c.DataPath + string(os.PathSeparator) + m.Name
-
-	r, err := zip.OpenReader(fullpath)
+	children, err := data.ListObject(ctx, m.Name)
 	if err != nil {
 		return err
 	}
-	defer r.Close()
 
 	type fileIndexPair struct {
 		Index    int
@@ -152,11 +114,11 @@ func GenerateImageIndices(m *ent.Meta) error {
 	}
 
 	var fileNames []fileIndexPair
-	for i, f := range r.File {
-		if filter(f.Name) {
+	for i, f := range children {
+		if filter(f) {
 			fileNames = append(fileNames,
 				fileIndexPair{
-					i, f.Name,
+					i, f,
 				})
 		}
 	}

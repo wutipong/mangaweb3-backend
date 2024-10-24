@@ -52,7 +52,7 @@ func UpdateCover(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		return
 	}
 
-	err = meta.GenerateThumbnail(m, req.Index, req.Details)
+	err = meta.GenerateThumbnail(r.Context(), m, req.Index, req.Details)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return

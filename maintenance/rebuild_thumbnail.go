@@ -15,7 +15,7 @@ func RebuildThumbnail(client *ent.Client) error {
 	}
 
 	for _, m := range allMeta {
-		e := meta.GenerateThumbnail(m, 0, meta.CropDetails{})
+		e := meta.GenerateThumbnail(context.Background(), m, 0, meta.CropDetails{})
 		log.Info().Str("name", m.Name).Msg("Create new thumbnail")
 		if e != nil {
 			log.Error().Str("item", m.Name).AnErr("error", e).Msg("Fails to create thumbnail.")

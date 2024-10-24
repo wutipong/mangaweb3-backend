@@ -1,10 +1,11 @@
 package view
 
 import (
-	"archive/zip"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
+	"path"
 
 	"net/http"
 	"path/filepath"
@@ -14,7 +15,7 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
-	"github.com/wutipong/mangaweb3-backend/configuration"
+	"github.com/wutipong/mangaweb3-backend/data"
 	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
@@ -66,7 +67,7 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 		handler.WriteResponse(w, err)
 		return
 	}
-	data, f, err := OpenZipEntry(m, index)
+	data, f, err := OpenZipEntry(r.Context(), m, index)
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -114,30 +115,18 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 	w.Header().Set("Content-Type", "image/jpeg")
 }
 
-func OpenZipEntry(m *ent.Meta, index int) (content []byte, filename string, err error) {
+func OpenZipEntry(ctx context.Context, m *ent.Meta, index int) (content []byte, filename string, err error) {
 	if len(m.FileIndices) == 0 {
 		err = fmt.Errorf("image file not found")
 	}
 
-	c := configuration.Get()
-
-	fullpath := filepath.Join(c.DataPath, m.Name)
-	r, err := zip.OpenReader(fullpath)
+	children, err := data.ListObject(ctx, m.Name)
 	if err != nil {
 		return
 	}
 
-	defer r.Close()
-
-	zf := r.File[m.FileIndices[index]]
-
-	if zf == nil {
-		err = fmt.Errorf("file not found : %v", index)
-		return
-	}
-
-	filename = zf.Name
-	reader, err := zf.Open()
+	filename = children[m.FileIndices[index]]
+	reader, err := data.GetObject(ctx, path.Join(m.Name, filename))
 	if err != nil {
 		return
 	}

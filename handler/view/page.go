@@ -1,10 +1,9 @@
 package view
 
 import (
-	"archive/zip"
-	"path/filepath"
+	"context"
 
-	"github.com/wutipong/mangaweb3-backend/configuration"
+	"github.com/wutipong/mangaweb3-backend/data"
 	"github.com/wutipong/mangaweb3-backend/ent"
 )
 
@@ -13,25 +12,17 @@ type Page struct {
 	Name  string
 }
 
-func ListPages(m *ent.Meta) (pages []Page, err error) {
+func ListPages(ctx context.Context, m *ent.Meta) (pages []Page, err error) {
 	if len(m.FileIndices) == 0 {
 		return
 	}
 
-	c := configuration.Get()
-
-	fullpath := filepath.Join(c.DataPath, m.Name)
-	r, err := zip.OpenReader(fullpath)
-	if err != nil {
-		return
-	}
-
-	defer r.Close()
+	children, err := data.ListObject(ctx, m.Name)
 
 	pages = make([]Page, len(m.FileIndices))
 	for i, f := range m.FileIndices {
 		pages[i] = Page{
-			Name:  r.File[f].Name,
+			Name:  children[f],
 			Index: i,
 		}
 	}

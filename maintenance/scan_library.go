@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/data"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
@@ -14,7 +15,7 @@ func ScanLibrary(client *ent.Client) error {
 		return err
 	}
 
-	files, err := meta.ListDir("")
+	files, err := data.ListAllItem(context.Background())
 	if err != nil {
 		return err
 	}
