@@ -9,13 +9,12 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"github.com/wutipong/mangaweb3-backend/configuration"
+	"github.com/wutipong/mangaweb3-backend/data"
 	"github.com/wutipong/mangaweb3-backend/database"
 	_ "github.com/wutipong/mangaweb3-backend/docs"
 	"github.com/wutipong/mangaweb3-backend/handler/browse"
@@ -100,42 +99,6 @@ func main() {
 		bucket = value
 	}
 
-	var minioClient *minio.Client
-	if c, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKey, accessSecret, ""),
-		Secure: secure,
-	}); err != nil {
-		log.Fatal().Msg("Unable to create MinIO client.")
-		return
-	} else {
-		minioClient = c
-	}
-
-	if found, err := minioClient.BucketExists(context.Background(), bucket); !found || err != nil {
-		if !found {
-			log.Fatal().Msg("MinIO bucket not found.")
-			return
-		}
-
-		if err != nil {
-			log.Fatal().
-				Err(err).
-				Msg("MinIO error.")
-
-			return
-		}
-	}
-
-	log.Info().
-		Bool("debugMode", debugMode).
-		Str("version", versionString).
-		Str("data_path", dataPath).
-		Str("address", address).
-		Str("minio_endpoint", endpoint).
-		Str("minio_access_key", accessKey).
-		Bool("minio_secure", secure).
-		Msg("Server started.")
-
 	configuration.Init(configuration.Config{
 		DebugMode:           debugMode,
 		VersionString:       versionString,
@@ -146,6 +109,10 @@ func main() {
 		MinIoSecure:         secure,
 		MinIoBucket:         bucket,
 	})
+
+	if err := data.Init(context.Background()); err != nil {
+		return
+	}
 
 	if err := database.Open(context.Background(), connectionStr); err != nil {
 		log.Error().AnErr("error", err).Msg("Connect to Postgres fails")
@@ -158,6 +125,16 @@ func main() {
 		log.Error().AnErr("error", err).Msg("failed creating schema resources.")
 		return
 	}
+
+	log.Info().
+		Bool("debugMode", debugMode).
+		Str("version", versionString).
+		Str("data_path", dataPath).
+		Str("address", address).
+		Str("minio_endpoint", endpoint).
+		Str("minio_access_key", accessKey).
+		Bool("minio_secure", secure).
+		Msg("Server started.")
 
 	go maintenance.UpdateLibrary()
 

@@ -16,7 +16,7 @@ import (
 var minioClient *minio.Client
 var bucket string
 
-func Init(ctx context.Context) {
+func Init(ctx context.Context) error {
 	endpoint := configuration.Get().MinIoEndPoint
 	accessKey := configuration.Get().MinIoAccessKey
 	accessSecret := configuration.Get().MinIoAcessKeySecret
@@ -27,8 +27,10 @@ func Init(ctx context.Context) {
 		Creds:  credentials.NewStaticV4(accessKey, accessSecret, ""),
 		Secure: secure,
 	}); err != nil {
-		log.Fatal().Msg("Unable to create MinIO client.")
-		return
+		log.Fatal().
+			Err(err).
+			Msg("Unable to create MinIO client.")
+		return err
 	} else {
 		minioClient = c
 	}
@@ -36,7 +38,7 @@ func Init(ctx context.Context) {
 	if found, err := minioClient.BucketExists(ctx, bucket); !found || err != nil {
 		if !found {
 			log.Fatal().Msg("MinIO bucket not found.")
-			return
+			return err
 		}
 
 		if err != nil {
@@ -44,9 +46,11 @@ func Init(ctx context.Context) {
 				Err(err).
 				Msg("MinIO error.")
 
-			return
+			return err
 		}
 	}
+
+	return nil
 }
 
 // ListAllItem returns a list all available item.
@@ -78,6 +82,10 @@ func ListObject(ctx context.Context, parent string) (files []string, err error) 
 		Recursive: true,
 	}
 
+	// If prefix ends with .zip, add a slash.
+	if strings.HasSuffix(parent, ".zip") {
+		opts.Prefix = parent + "/"
+	}
 	opts.Set("x-minio-extract", "true")
 
 	objectCh := minioClient.ListObjects(ctx, bucket, opts)

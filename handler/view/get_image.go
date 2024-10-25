@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"path"
 
 	"net/http"
 	"path/filepath"
@@ -126,7 +125,7 @@ func OpenZipEntry(ctx context.Context, m *ent.Meta, index int) (content []byte, 
 	}
 
 	filename = children[m.FileIndices[index]]
-	reader, err := data.GetObject(ctx, path.Join(m.Name, filename))
+	reader, err := data.GetObject(ctx, filename)
 	if err != nil {
 		return
 	}

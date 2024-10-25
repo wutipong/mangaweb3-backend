@@ -102,7 +102,6 @@ func GenerateThumbnail(ctx context.Context, m *ent.Meta, fileIndex int, details 
 }
 
 func GenerateImageIndices(ctx context.Context, m *ent.Meta) error {
-
 	children, err := data.ListObject(ctx, m.Name)
 	if err != nil {
 		return err
