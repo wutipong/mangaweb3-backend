@@ -22,7 +22,7 @@ func ScanLibrary(client *ent.Client) error {
 	for _, file := range files {
 		found := false
 		for _, m := range allMeta {
-			if m.Name == file {
+			if m.Name == file.Name {
 				found = true
 
 				if m.Active {
@@ -35,10 +35,11 @@ func ScanLibrary(client *ent.Client) error {
 		}
 
 		log.Info().
-			Str("file", file).
+			Str("file", file.Name).
+			Str("type", file.Type.String()).
 			Msg("Creating metadata.")
 
-		if item, err := meta.Read(context.Background(), client, file); err == nil {
+		if item, err := meta.Read(context.Background(), client, file.Name); err == nil {
 			item.Active = true
 			if err := meta.Write(context.Background(), client, item); err != nil {
 				log.Error().
@@ -47,7 +48,7 @@ func ScanLibrary(client *ent.Client) error {
 					Msg("Failed to re-activate meta")
 			}
 		} else {
-			item, err := meta.NewItem(context.Background(), client, file)
+			item, err := meta.NewItem(context.Background(), client, file.Name, file.Type)
 			if err != nil {
 				log.
 					Error().
@@ -69,7 +70,7 @@ func ScanLibrary(client *ent.Client) error {
 	for _, m := range allMeta {
 		found := false
 		for _, file := range files {
-			if m.Name == file {
+			if m.Name == file.Name {
 				found = true
 				break
 			}

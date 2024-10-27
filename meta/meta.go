@@ -15,13 +15,14 @@ import (
 	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/container"
 	"github.com/wutipong/mangaweb3-backend/ent"
+	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	tag_util "github.com/wutipong/mangaweb3-backend/tag"
 
 	"golang.org/x/exp/slices"
 	_ "golang.org/x/image/webp"
 )
 
-func NewItem(ctx context.Context, client *ent.Client, name string) (i *ent.Meta, err error) {
+func NewItem(ctx context.Context, client *ent.Client, name string, ct meta.ContainerType) (i *ent.Meta, err error) {
 	createTime := time.Now()
 
 	c := configuration.Get()
@@ -47,6 +48,7 @@ func NewItem(ctx context.Context, client *ent.Client, name string) (i *ent.Meta,
 		SetFavorite(i.Favorite).
 		SetFileIndices(i.FileIndices).
 		SetRead(false).
+		SetContainerType(ct).
 		SetThumbnail(i.Thumbnail).Save(ctx)
 }
 

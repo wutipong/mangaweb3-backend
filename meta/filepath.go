@@ -8,10 +8,16 @@ import (
 
 	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/container"
+	"github.com/wutipong/mangaweb3-backend/ent/meta"
 )
 
+type Container struct {
+	Name string
+	Type meta.ContainerType
+}
+
 // ListDir returns a list of content of a directory.
-func ListDir(path string) (files []string, err error) {
+func ListDir(path string) (files []Container, err error) {
 
 	c := configuration.Get()
 	actualPath := filepath.Join(c.DataPath, path)
@@ -39,12 +45,15 @@ func ListDir(path string) (files []string, err error) {
 			files = append(files, subFiles...)
 		}
 
-		_, valid := container.GuessContainerType(context.Background(), name, f)
+		t, valid := container.GuessContainerType(context.Background(), name, f)
 		if !valid {
 			continue
 		}
 
-		files = append(files, name)
+		files = append(files, Container{
+			Name: name,
+			Type: t,
+		})
 	}
 	return
 }
