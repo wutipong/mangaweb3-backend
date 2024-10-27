@@ -10,27 +10,6 @@ import (
 	"github.com/wutipong/mangaweb3-backend/container"
 )
 
-var filter func(path string) bool
-
-func init() {
-	filter = func(path string) bool {
-		ext := strings.ToLower(filepath.Ext(path))
-		if ext == ".jpeg" {
-			return true
-		}
-		if ext == ".jpg" {
-			return true
-		}
-		if ext == ".png" {
-			return true
-		}
-		if ext == ".webp" {
-			return true
-		}
-		return false
-	}
-}
-
 // ListDir returns a list of content of a directory.
 func ListDir(path string) (files []string, err error) {
 

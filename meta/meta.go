@@ -1,22 +1,19 @@
 package meta
 
 import (
-	"archive/zip"
 	"bytes"
 	"context"
-	"fmt"
 	"image"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
-	"sort"
 	"sync"
 	"time"
 
 	"github.com/disintegration/imaging"
-	"github.com/facette/natsort"
 	"github.com/wutipong/mangaweb3-backend/configuration"
+	"github.com/wutipong/mangaweb3-backend/container"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	tag_util "github.com/wutipong/mangaweb3-backend/tag"
 
@@ -78,21 +75,11 @@ func GenerateThumbnail(m *ent.Meta, fileIndex int, details CropDetails) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	c := configuration.Get()
-
-	fullpath := filepath.Join(c.DataPath, m.Name)
-
-	r, err := zip.OpenReader(fullpath)
+	c, err := container.CreateContainer(m)
 	if err != nil {
 		return err
 	}
-	defer r.Close()
-
-	if len(m.FileIndices) == 0 {
-		return fmt.Errorf("file list is empty")
-	}
-
-	stream, err := r.File[m.FileIndices[fileIndex]].Open()
+	stream, _, err := c.OpenItem(context.Background(), fileIndex)
 	if err != nil {
 		return err
 	}
@@ -136,41 +123,12 @@ func GenerateImageIndices(m *ent.Meta) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	c := configuration.Get()
-
-	fullpath := c.DataPath + string(os.PathSeparator) + m.Name
-
-	r, err := zip.OpenReader(fullpath)
+	c, err := container.CreateContainer(m)
 	if err != nil {
 		return err
 	}
-	defer r.Close()
 
-	type fileIndexPair struct {
-		Index    int
-		FileName string
-	}
-
-	var fileNames []fileIndexPair
-	for i, f := range r.File {
-		if filter(f.Name) {
-			fileNames = append(fileNames,
-				fileIndexPair{
-					i, f.Name,
-				})
-		}
-	}
-
-	sort.Slice(fileNames, func(i, j int) bool {
-		return natsort.Compare(fileNames[i].FileName, fileNames[j].FileName)
-	})
-
-	m.FileIndices = make([]int, len(fileNames))
-	for i, p := range fileNames {
-		m.FileIndices[i] = p.Index
-	}
-
-	return nil
+	return c.PopulateImageIndices(context.Background())
 }
 
 func PopulateTags(ctx context.Context, client *ent.Client, m *ent.Meta) (out *ent.Meta, err error) {

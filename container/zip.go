@@ -6,8 +6,11 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
+	"sort"
 
+	"github.com/facette/natsort"
 	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/ent"
 )
@@ -16,8 +19,23 @@ type ZipContainer struct {
 	Meta *ent.Meta
 }
 
-func (c *ZipContainer) GetSize(ctx context.Context) int {
-	return len(c.Meta.FileIndices)
+func (c *ZipContainer) ListItems(ctx context.Context) (names []string, err error) {
+	m := c.Meta
+
+	fullpath := configuration.Get().DataPath + string(os.PathSeparator) + m.Name
+
+	r, err := zip.OpenReader(fullpath)
+	if err != nil {
+		return
+	}
+	defer r.Close()
+
+	names = make([]string, len(m.FileIndices))
+	for i, f := range m.FileIndices {
+		names[i] = r.File[f].Name
+	}
+
+	return
 }
 
 func (c *ZipContainer) OpenItem(ctx context.Context, index int) (reader io.ReadCloser, name string, err error) {
@@ -31,6 +49,11 @@ func (c *ZipContainer) OpenItem(ctx context.Context, index int) (reader io.ReadC
 	}
 
 	defer r.Close()
+
+	if index >= len(c.Meta.FileIndices) {
+		err = fmt.Errorf("invalid item")
+		return
+	}
 
 	zf := r.File[c.Meta.FileIndices[index]]
 
@@ -54,4 +77,42 @@ func (c *ZipContainer) OpenItem(ctx context.Context, index int) (reader io.ReadC
 	reader = io.NopCloser(bytes.NewBuffer(content))
 
 	return
+}
+
+func (c *ZipContainer) PopulateImageIndices(ctx context.Context) error {
+	m := c.Meta
+
+	fullpath := configuration.Get().DataPath + string(os.PathSeparator) + m.Name
+
+	r, err := zip.OpenReader(fullpath)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+
+	type fileIndexPair struct {
+		Index    int
+		FileName string
+	}
+
+	var fileNames []fileIndexPair
+	for i, f := range r.File {
+		if isValidImageFile(f.Name) {
+			fileNames = append(fileNames,
+				fileIndexPair{
+					i, f.Name,
+				})
+		}
+	}
+
+	sort.Slice(fileNames, func(i, j int) bool {
+		return natsort.Compare(fileNames[i].FileName, fileNames[j].FileName)
+	})
+
+	m.FileIndices = make([]int, len(fileNames))
+	for i, p := range fileNames {
+		m.FileIndices[i] = p.Index
+	}
+
+	return nil
 }

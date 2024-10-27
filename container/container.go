@@ -13,8 +13,9 @@ import (
 )
 
 type Container interface {
-	GetSize(ctx context.Context) int
+	ListItems(ctx context.Context) (names []string, err error)
 	OpenItem(ctx context.Context, index int) (reader io.ReadCloser, name string, err error)
+	PopulateImageIndices(ctx context.Context) error
 }
 
 func GuessContainerType(ctx context.Context, name string, info fs.FileInfo) (t meta.ContainerType, valid bool) {
@@ -66,4 +67,21 @@ func isValidContainerName(name string) bool {
 	}
 
 	return true
+}
+
+func isValidImageFile(name string) bool {
+	ext := strings.ToLower(filepath.Ext(name))
+	if ext == ".jpeg" {
+		return true
+	}
+	if ext == ".jpg" {
+		return true
+	}
+	if ext == ".png" {
+		return true
+	}
+	if ext == ".webp" {
+		return true
+	}
+	return false
 }
