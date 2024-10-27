@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"path/filepath"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
+	"github.com/wutipong/mangaweb3-backend/container"
 	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
@@ -36,7 +36,13 @@ func Download(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 		return
 	}
 
-	reader, err := meta.Open(m)
+	c, err := container.CreateContainer(m)
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
+
+	reader, filename, err := c.Download(r.Context())
 	if err != nil {
 		handler.WriteResponse(w, err)
 		return
@@ -51,7 +57,7 @@ func Download(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 
 	w.Header().Set("Content-Type", "application/zip")
 	w.Header().Set("Content-Length", strconv.Itoa(len(bytes)))
-	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filepath.Base(m.Name)))
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
 	w.WriteHeader(http.StatusOK)
 
 	w.Write(bytes)

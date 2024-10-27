@@ -116,3 +116,11 @@ func (c *ZipContainer) PopulateImageIndices(ctx context.Context) error {
 
 	return nil
 }
+
+func (c *ZipContainer) Download(ctx context.Context) (reader io.ReadCloser, filename string, err error) {
+	fullpath := filepath.Join(configuration.Get().DataPath, c.Meta.Name)
+	reader, err = os.Open(fullpath)
+	filename = filepath.Base(c.Meta.Name)
+
+	return
+}

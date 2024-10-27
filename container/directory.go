@@ -1,6 +1,8 @@
 package container
 
 import (
+	"archive/zip"
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -99,6 +101,7 @@ func (c *DirectoryContainer) OpenItem(ctx context.Context, index int) (reader io
 	fullpath := filepath.Join(configuration.Get().DataPath, c.Meta.Name, zf.Name())
 
 	reader, err = os.Open(fullpath)
+	name = zf.Name()
 
 	return
 }
@@ -136,4 +139,39 @@ func (c *DirectoryContainer) PopulateImageIndices(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (c *DirectoryContainer) Download(ctx context.Context) (reader io.ReadCloser, filename string, err error) {
+	buf := new(bytes.Buffer)
+	w := zip.NewWriter(buf)
+
+	length := len(c.Meta.FileIndices)
+
+	for i := 0; i < length; i++ {
+		img, name, e := c.OpenItem(ctx, i)
+		if e != nil {
+			err = e
+			return
+		}
+		f, e := w.Create(name)
+
+		if e != nil {
+			err = e
+			return
+		}
+
+		_, e = io.Copy(f, img)
+		if e != nil {
+			err = e
+			return
+		}
+	}
+
+	w.Close()
+
+	reader = io.NopCloser(buf)
+
+	filename = fmt.Sprintf("%s.zip", filepath.Base(c.Meta.Name))
+
+	return
 }

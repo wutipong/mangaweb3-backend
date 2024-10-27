@@ -13,6 +13,7 @@ import (
 )
 
 type Container interface {
+	Download(ctx context.Context) (reader io.ReadCloser, filename string, err error)
 	ListItems(ctx context.Context) (names []string, err error)
 	OpenItem(ctx context.Context, index int) (reader io.ReadCloser, name string, err error)
 	PopulateImageIndices(ctx context.Context) error
