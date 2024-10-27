@@ -270,24 +270,24 @@ func ActiveNEQ(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldNEQ(FieldActive, v))
 }
 
-// ObjectTypeEQ applies the EQ predicate on the "object_type" field.
-func ObjectTypeEQ(v ObjectType) predicate.Meta {
-	return predicate.Meta(sql.FieldEQ(FieldObjectType, v))
+// ContainerTypeEQ applies the EQ predicate on the "container_type" field.
+func ContainerTypeEQ(v ContainerType) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldContainerType, v))
 }
 
-// ObjectTypeNEQ applies the NEQ predicate on the "object_type" field.
-func ObjectTypeNEQ(v ObjectType) predicate.Meta {
-	return predicate.Meta(sql.FieldNEQ(FieldObjectType, v))
+// ContainerTypeNEQ applies the NEQ predicate on the "container_type" field.
+func ContainerTypeNEQ(v ContainerType) predicate.Meta {
+	return predicate.Meta(sql.FieldNEQ(FieldContainerType, v))
 }
 
-// ObjectTypeIn applies the In predicate on the "object_type" field.
-func ObjectTypeIn(vs ...ObjectType) predicate.Meta {
-	return predicate.Meta(sql.FieldIn(FieldObjectType, vs...))
+// ContainerTypeIn applies the In predicate on the "container_type" field.
+func ContainerTypeIn(vs ...ContainerType) predicate.Meta {
+	return predicate.Meta(sql.FieldIn(FieldContainerType, vs...))
 }
 
-// ObjectTypeNotIn applies the NotIn predicate on the "object_type" field.
-func ObjectTypeNotIn(vs ...ObjectType) predicate.Meta {
-	return predicate.Meta(sql.FieldNotIn(FieldObjectType, vs...))
+// ContainerTypeNotIn applies the NotIn predicate on the "container_type" field.
+func ContainerTypeNotIn(vs ...ContainerType) predicate.Meta {
+	return predicate.Meta(sql.FieldNotIn(FieldContainerType, vs...))
 }
 
 // HasTags applies the HasEdge predicate on the "tags" edge.

@@ -728,6 +728,14 @@ const docTemplate = `{
                     "description": "Name holds the value of the \"name\" field.",
                     "type": "string"
                 },
+                "object_type": {
+                    "description": "ObjectType holds the value of the \"object_type\" field.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/meta.ObjectType"
+                        }
+                    ]
+                },
                 "read": {
                     "description": "Read holds the value of the \"read\" field.",
                     "type": "boolean"
@@ -832,6 +840,19 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        },
+        "meta.ObjectType": {
+            "type": "string",
+            "enum": [
+                "zip",
+                "zip",
+                "directory"
+            ],
+            "x-enum-varnames": [
+                "DefaultObjectType",
+                "ObjectTypeZip",
+                "ObjectTypeDirectory"
+            ]
         },
         "meta.SortField": {
             "type": "string",

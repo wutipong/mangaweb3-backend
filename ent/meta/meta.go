@@ -29,8 +29,8 @@ const (
 	FieldRead = "read"
 	// FieldActive holds the string denoting the active field in the database.
 	FieldActive = "active"
-	// FieldObjectType holds the string denoting the object_type field in the database.
-	FieldObjectType = "object_type"
+	// FieldContainerType holds the string denoting the container_type field in the database.
+	FieldContainerType = "container_type"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
 	EdgeTags = "tags"
 	// EdgeHistories holds the string denoting the histories edge name in mutations.
@@ -61,7 +61,7 @@ var Columns = []string{
 	FieldThumbnail,
 	FieldRead,
 	FieldActive,
-	FieldObjectType,
+	FieldContainerType,
 }
 
 var (
@@ -95,29 +95,29 @@ var (
 	DefaultActive bool
 )
 
-// ObjectType defines the type for the "object_type" enum field.
-type ObjectType string
+// ContainerType defines the type for the "container_type" enum field.
+type ContainerType string
 
-// ObjectTypeZip is the default value of the ObjectType enum.
-const DefaultObjectType = ObjectTypeZip
+// ContainerTypeZip is the default value of the ContainerType enum.
+const DefaultContainerType = ContainerTypeZip
 
-// ObjectType values.
+// ContainerType values.
 const (
-	ObjectTypeZip       ObjectType = "zip"
-	ObjectTypeDirectory ObjectType = "directory"
+	ContainerTypeZip       ContainerType = "zip"
+	ContainerTypeDirectory ContainerType = "directory"
 )
 
-func (ot ObjectType) String() string {
-	return string(ot)
+func (ct ContainerType) String() string {
+	return string(ct)
 }
 
-// ObjectTypeValidator is a validator for the "object_type" field enum values. It is called by the builders before save.
-func ObjectTypeValidator(ot ObjectType) error {
-	switch ot {
-	case ObjectTypeZip, ObjectTypeDirectory:
+// ContainerTypeValidator is a validator for the "container_type" field enum values. It is called by the builders before save.
+func ContainerTypeValidator(ct ContainerType) error {
+	switch ct {
+	case ContainerTypeZip, ContainerTypeDirectory:
 		return nil
 	default:
-		return fmt.Errorf("meta: invalid enum value for object_type field: %q", ot)
+		return fmt.Errorf("meta: invalid enum value for container_type field: %q", ct)
 	}
 }
 
@@ -154,9 +154,9 @@ func ByActive(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldActive, opts...).ToFunc()
 }
 
-// ByObjectType orders the results by the object_type field.
-func ByObjectType(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldObjectType, opts...).ToFunc()
+// ByContainerType orders the results by the container_type field.
+func ByContainerType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldContainerType, opts...).ToFunc()
 }
 
 // ByTagsCount orders the results by tags count.

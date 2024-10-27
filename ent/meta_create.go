@@ -98,16 +98,16 @@ func (mc *MetaCreate) SetNillableActive(b *bool) *MetaCreate {
 	return mc
 }
 
-// SetObjectType sets the "object_type" field.
-func (mc *MetaCreate) SetObjectType(mt meta.ObjectType) *MetaCreate {
-	mc.mutation.SetObjectType(mt)
+// SetContainerType sets the "container_type" field.
+func (mc *MetaCreate) SetContainerType(mt meta.ContainerType) *MetaCreate {
+	mc.mutation.SetContainerType(mt)
 	return mc
 }
 
-// SetNillableObjectType sets the "object_type" field if the given value is not nil.
-func (mc *MetaCreate) SetNillableObjectType(mt *meta.ObjectType) *MetaCreate {
+// SetNillableContainerType sets the "container_type" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableContainerType(mt *meta.ContainerType) *MetaCreate {
 	if mt != nil {
-		mc.SetObjectType(*mt)
+		mc.SetContainerType(*mt)
 	}
 	return mc
 }
@@ -197,9 +197,9 @@ func (mc *MetaCreate) defaults() {
 		v := meta.DefaultActive
 		mc.mutation.SetActive(v)
 	}
-	if _, ok := mc.mutation.ObjectType(); !ok {
-		v := meta.DefaultObjectType
-		mc.mutation.SetObjectType(v)
+	if _, ok := mc.mutation.ContainerType(); !ok {
+		v := meta.DefaultContainerType
+		mc.mutation.SetContainerType(v)
 	}
 }
 
@@ -228,12 +228,12 @@ func (mc *MetaCreate) check() error {
 	if _, ok := mc.mutation.Active(); !ok {
 		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "Meta.active"`)}
 	}
-	if _, ok := mc.mutation.ObjectType(); !ok {
-		return &ValidationError{Name: "object_type", err: errors.New(`ent: missing required field "Meta.object_type"`)}
+	if _, ok := mc.mutation.ContainerType(); !ok {
+		return &ValidationError{Name: "container_type", err: errors.New(`ent: missing required field "Meta.container_type"`)}
 	}
-	if v, ok := mc.mutation.ObjectType(); ok {
-		if err := meta.ObjectTypeValidator(v); err != nil {
-			return &ValidationError{Name: "object_type", err: fmt.Errorf(`ent: validator failed for field "Meta.object_type": %w`, err)}
+	if v, ok := mc.mutation.ContainerType(); ok {
+		if err := meta.ContainerTypeValidator(v); err != nil {
+			return &ValidationError{Name: "container_type", err: fmt.Errorf(`ent: validator failed for field "Meta.container_type": %w`, err)}
 		}
 	}
 	return nil
@@ -291,9 +291,9 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
 		_node.Active = value
 	}
-	if value, ok := mc.mutation.ObjectType(); ok {
-		_spec.SetField(meta.FieldObjectType, field.TypeEnum, value)
-		_node.ObjectType = value
+	if value, ok := mc.mutation.ContainerType(); ok {
+		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)
+		_node.ContainerType = value
 	}
 	if nodes := mc.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -469,15 +469,15 @@ func (u *MetaUpsert) UpdateActive() *MetaUpsert {
 	return u
 }
 
-// SetObjectType sets the "object_type" field.
-func (u *MetaUpsert) SetObjectType(v meta.ObjectType) *MetaUpsert {
-	u.Set(meta.FieldObjectType, v)
+// SetContainerType sets the "container_type" field.
+func (u *MetaUpsert) SetContainerType(v meta.ContainerType) *MetaUpsert {
+	u.Set(meta.FieldContainerType, v)
 	return u
 }
 
-// UpdateObjectType sets the "object_type" field to the value that was provided on create.
-func (u *MetaUpsert) UpdateObjectType() *MetaUpsert {
-	u.SetExcluded(meta.FieldObjectType)
+// UpdateContainerType sets the "container_type" field to the value that was provided on create.
+func (u *MetaUpsert) UpdateContainerType() *MetaUpsert {
+	u.SetExcluded(meta.FieldContainerType)
 	return u
 }
 
@@ -626,17 +626,17 @@ func (u *MetaUpsertOne) UpdateActive() *MetaUpsertOne {
 	})
 }
 
-// SetObjectType sets the "object_type" field.
-func (u *MetaUpsertOne) SetObjectType(v meta.ObjectType) *MetaUpsertOne {
+// SetContainerType sets the "container_type" field.
+func (u *MetaUpsertOne) SetContainerType(v meta.ContainerType) *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
-		s.SetObjectType(v)
+		s.SetContainerType(v)
 	})
 }
 
-// UpdateObjectType sets the "object_type" field to the value that was provided on create.
-func (u *MetaUpsertOne) UpdateObjectType() *MetaUpsertOne {
+// UpdateContainerType sets the "container_type" field to the value that was provided on create.
+func (u *MetaUpsertOne) UpdateContainerType() *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
-		s.UpdateObjectType()
+		s.UpdateContainerType()
 	})
 }
 
@@ -949,17 +949,17 @@ func (u *MetaUpsertBulk) UpdateActive() *MetaUpsertBulk {
 	})
 }
 
-// SetObjectType sets the "object_type" field.
-func (u *MetaUpsertBulk) SetObjectType(v meta.ObjectType) *MetaUpsertBulk {
+// SetContainerType sets the "container_type" field.
+func (u *MetaUpsertBulk) SetContainerType(v meta.ContainerType) *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
-		s.SetObjectType(v)
+		s.SetContainerType(v)
 	})
 }
 
-// UpdateObjectType sets the "object_type" field to the value that was provided on create.
-func (u *MetaUpsertBulk) UpdateObjectType() *MetaUpsertBulk {
+// UpdateContainerType sets the "container_type" field to the value that was provided on create.
+func (u *MetaUpsertBulk) UpdateContainerType() *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
-		s.UpdateObjectType()
+		s.UpdateContainerType()
 	})
 }
 

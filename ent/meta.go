@@ -32,8 +32,8 @@ type Meta struct {
 	Read bool `json:"read,omitempty"`
 	// Active holds the value of the "active" field.
 	Active bool `json:"active,omitempty"`
-	// ObjectType holds the value of the "object_type" field.
-	ObjectType meta.ObjectType `json:"object_type,omitempty"`
+	// ContainerType holds the value of the "container_type" field.
+	ContainerType meta.ContainerType `json:"container_type,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MetaQuery when eager-loading is set.
 	Edges        MetaEdges `json:"edges"`
@@ -80,7 +80,7 @@ func (*Meta) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case meta.FieldID:
 			values[i] = new(sql.NullInt64)
-		case meta.FieldName, meta.FieldObjectType:
+		case meta.FieldName, meta.FieldContainerType:
 			values[i] = new(sql.NullString)
 		case meta.FieldCreateTime:
 			values[i] = new(sql.NullTime)
@@ -149,11 +149,11 @@ func (m *Meta) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.Active = value.Bool
 			}
-		case meta.FieldObjectType:
+		case meta.FieldContainerType:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field object_type", values[i])
+				return fmt.Errorf("unexpected type %T for field container_type", values[i])
 			} else if value.Valid {
-				m.ObjectType = meta.ObjectType(value.String)
+				m.ContainerType = meta.ContainerType(value.String)
 			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
@@ -221,8 +221,8 @@ func (m *Meta) String() string {
 	builder.WriteString("active=")
 	builder.WriteString(fmt.Sprintf("%v", m.Active))
 	builder.WriteString(", ")
-	builder.WriteString("object_type=")
-	builder.WriteString(fmt.Sprintf("%v", m.ObjectType))
+	builder.WriteString("container_type=")
+	builder.WriteString(fmt.Sprintf("%v", m.ContainerType))
 	builder.WriteByte(')')
 	return builder.String()
 }

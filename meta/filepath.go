@@ -1,11 +1,13 @@
 package meta
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/wutipong/mangaweb3-backend/configuration"
+	"github.com/wutipong/mangaweb3-backend/container"
 )
 
 var filter func(path string) bool
@@ -49,7 +51,6 @@ func ListDir(path string) (files []string, err error) {
 		}
 
 		name := filepath.Join(path, f.Name())
-
 		if f.IsDir() {
 			subFiles, e := ListDir(name)
 			if e != nil {
@@ -59,12 +60,12 @@ func ListDir(path string) (files []string, err error) {
 			files = append(files, subFiles...)
 		}
 
-		ext := strings.ToLower(filepath.Ext(f.Name()))
-
-		if ext == ".zip" || ext == ".cbz" {
-
-			files = append(files, name)
+		_, valid := container.GuessContainerType(context.Background(), name, f)
+		if !valid {
+			continue
 		}
+
+		files = append(files, name)
 	}
 	return
 }

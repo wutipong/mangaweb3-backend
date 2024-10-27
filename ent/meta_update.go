@@ -125,16 +125,16 @@ func (mu *MetaUpdate) SetNillableActive(b *bool) *MetaUpdate {
 	return mu
 }
 
-// SetObjectType sets the "object_type" field.
-func (mu *MetaUpdate) SetObjectType(mt meta.ObjectType) *MetaUpdate {
-	mu.mutation.SetObjectType(mt)
+// SetContainerType sets the "container_type" field.
+func (mu *MetaUpdate) SetContainerType(mt meta.ContainerType) *MetaUpdate {
+	mu.mutation.SetContainerType(mt)
 	return mu
 }
 
-// SetNillableObjectType sets the "object_type" field if the given value is not nil.
-func (mu *MetaUpdate) SetNillableObjectType(mt *meta.ObjectType) *MetaUpdate {
+// SetNillableContainerType sets the "container_type" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableContainerType(mt *meta.ContainerType) *MetaUpdate {
 	if mt != nil {
-		mu.SetObjectType(*mt)
+		mu.SetContainerType(*mt)
 	}
 	return mu
 }
@@ -250,9 +250,9 @@ func (mu *MetaUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Meta.name": %w`, err)}
 		}
 	}
-	if v, ok := mu.mutation.ObjectType(); ok {
-		if err := meta.ObjectTypeValidator(v); err != nil {
-			return &ValidationError{Name: "object_type", err: fmt.Errorf(`ent: validator failed for field "Meta.object_type": %w`, err)}
+	if v, ok := mu.mutation.ContainerType(); ok {
+		if err := meta.ContainerTypeValidator(v); err != nil {
+			return &ValidationError{Name: "container_type", err: fmt.Errorf(`ent: validator failed for field "Meta.container_type": %w`, err)}
 		}
 	}
 	return nil
@@ -299,8 +299,8 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.Active(); ok {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
 	}
-	if value, ok := mu.mutation.ObjectType(); ok {
-		_spec.SetField(meta.FieldObjectType, field.TypeEnum, value)
+	if value, ok := mu.mutation.ContainerType(); ok {
+		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)
 	}
 	if mu.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -506,16 +506,16 @@ func (muo *MetaUpdateOne) SetNillableActive(b *bool) *MetaUpdateOne {
 	return muo
 }
 
-// SetObjectType sets the "object_type" field.
-func (muo *MetaUpdateOne) SetObjectType(mt meta.ObjectType) *MetaUpdateOne {
-	muo.mutation.SetObjectType(mt)
+// SetContainerType sets the "container_type" field.
+func (muo *MetaUpdateOne) SetContainerType(mt meta.ContainerType) *MetaUpdateOne {
+	muo.mutation.SetContainerType(mt)
 	return muo
 }
 
-// SetNillableObjectType sets the "object_type" field if the given value is not nil.
-func (muo *MetaUpdateOne) SetNillableObjectType(mt *meta.ObjectType) *MetaUpdateOne {
+// SetNillableContainerType sets the "container_type" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableContainerType(mt *meta.ContainerType) *MetaUpdateOne {
 	if mt != nil {
-		muo.SetObjectType(*mt)
+		muo.SetContainerType(*mt)
 	}
 	return muo
 }
@@ -644,9 +644,9 @@ func (muo *MetaUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Meta.name": %w`, err)}
 		}
 	}
-	if v, ok := muo.mutation.ObjectType(); ok {
-		if err := meta.ObjectTypeValidator(v); err != nil {
-			return &ValidationError{Name: "object_type", err: fmt.Errorf(`ent: validator failed for field "Meta.object_type": %w`, err)}
+	if v, ok := muo.mutation.ContainerType(); ok {
+		if err := meta.ContainerTypeValidator(v); err != nil {
+			return &ValidationError{Name: "container_type", err: fmt.Errorf(`ent: validator failed for field "Meta.container_type": %w`, err)}
 		}
 	}
 	return nil
@@ -710,8 +710,8 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	if value, ok := muo.mutation.Active(); ok {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
 	}
-	if value, ok := muo.mutation.ObjectType(); ok {
-		_spec.SetField(meta.FieldObjectType, field.TypeEnum, value)
+	if value, ok := muo.mutation.ContainerType(); ok {
+		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)
 	}
 	if muo.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
