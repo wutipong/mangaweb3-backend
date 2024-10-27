@@ -3,7 +3,6 @@ package configuration
 type Config struct {
 	VersionString       string
 	DebugMode           bool
-	DataPath            string
 	MinIoEndPoint       string
 	MinIoAccessKey      string
 	MinIoAcessKeySecret string

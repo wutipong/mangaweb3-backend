@@ -45,10 +45,6 @@ func main() {
 		address = value
 	}
 
-	dataPath := "./data"
-	if value, valid := os.LookupEnv("MANGAWEB_DATA_PATH"); valid {
-		dataPath = value
-	}
 	connectionStr := "postgres://postgres:password@localhost:5432/manga"
 	if value, valid := os.LookupEnv("MANGAWEB_DB"); valid {
 		connectionStr = value
@@ -102,7 +98,6 @@ func main() {
 	configuration.Init(configuration.Config{
 		DebugMode:           debugMode,
 		VersionString:       versionString,
-		DataPath:            dataPath,
 		MinIoEndPoint:       endpoint,
 		MinIoAccessKey:      accessKey,
 		MinIoAcessKeySecret: accessSecret,
@@ -129,7 +124,6 @@ func main() {
 	log.Info().
 		Bool("debugMode", debugMode).
 		Str("version", versionString).
-		Str("data_path", dataPath).
 		Str("address", address).
 		Str("minio_endpoint", endpoint).
 		Str("minio_access_key", accessKey).
