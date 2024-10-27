@@ -26,10 +26,8 @@ func GuessContainerType(ctx context.Context, name string, info fs.FileInfo) (t m
 	}
 
 	if info.IsDir() {
-		///TODO: add support for directory type
-
 		t = meta.ContainerTypeDirectory
-		valid = false
+		valid = isValidDirectory(name)
 
 		return
 	}
@@ -50,6 +48,13 @@ func CreateContainer(m *ent.Meta) (c Container, err error) {
 	switch m.ContainerType {
 	case meta.ContainerTypeZip:
 		c = &ZipContainer{
+			Meta: m,
+		}
+
+		return
+
+	case meta.ContainerTypeDirectory:
+		c = &DirectoryContainer{
 			Meta: m,
 		}
 

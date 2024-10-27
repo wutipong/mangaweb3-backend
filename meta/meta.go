@@ -31,9 +31,10 @@ func NewItem(ctx context.Context, client *ent.Client, name string, ct meta.Conta
 	}
 
 	i = &ent.Meta{
-		Name:       name,
-		CreateTime: createTime,
-		Favorite:   false,
+		Name:          name,
+		CreateTime:    createTime,
+		Favorite:      false,
+		ContainerType: ct,
 	}
 
 	if err = GenerateImageIndices(i); err != nil {
