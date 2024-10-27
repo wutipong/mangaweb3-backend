@@ -270,6 +270,26 @@ func ActiveNEQ(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldNEQ(FieldActive, v))
 }
 
+// ObjectTypeEQ applies the EQ predicate on the "object_type" field.
+func ObjectTypeEQ(v ObjectType) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldObjectType, v))
+}
+
+// ObjectTypeNEQ applies the NEQ predicate on the "object_type" field.
+func ObjectTypeNEQ(v ObjectType) predicate.Meta {
+	return predicate.Meta(sql.FieldNEQ(FieldObjectType, v))
+}
+
+// ObjectTypeIn applies the In predicate on the "object_type" field.
+func ObjectTypeIn(vs ...ObjectType) predicate.Meta {
+	return predicate.Meta(sql.FieldIn(FieldObjectType, vs...))
+}
+
+// ObjectTypeNotIn applies the NotIn predicate on the "object_type" field.
+func ObjectTypeNotIn(vs ...ObjectType) predicate.Meta {
+	return predicate.Meta(sql.FieldNotIn(FieldObjectType, vs...))
+}
+
 // HasTags applies the HasEdge predicate on the "tags" edge.
 func HasTags() predicate.Meta {
 	return predicate.Meta(func(s *sql.Selector) {

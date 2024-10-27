@@ -98,6 +98,20 @@ func (mc *MetaCreate) SetNillableActive(b *bool) *MetaCreate {
 	return mc
 }
 
+// SetObjectType sets the "object_type" field.
+func (mc *MetaCreate) SetObjectType(mt meta.ObjectType) *MetaCreate {
+	mc.mutation.SetObjectType(mt)
+	return mc
+}
+
+// SetNillableObjectType sets the "object_type" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableObjectType(mt *meta.ObjectType) *MetaCreate {
+	if mt != nil {
+		mc.SetObjectType(*mt)
+	}
+	return mc
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (mc *MetaCreate) AddTagIDs(ids ...int) *MetaCreate {
 	mc.mutation.AddTagIDs(ids...)
@@ -183,6 +197,10 @@ func (mc *MetaCreate) defaults() {
 		v := meta.DefaultActive
 		mc.mutation.SetActive(v)
 	}
+	if _, ok := mc.mutation.ObjectType(); !ok {
+		v := meta.DefaultObjectType
+		mc.mutation.SetObjectType(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -209,6 +227,14 @@ func (mc *MetaCreate) check() error {
 	}
 	if _, ok := mc.mutation.Active(); !ok {
 		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "Meta.active"`)}
+	}
+	if _, ok := mc.mutation.ObjectType(); !ok {
+		return &ValidationError{Name: "object_type", err: errors.New(`ent: missing required field "Meta.object_type"`)}
+	}
+	if v, ok := mc.mutation.ObjectType(); ok {
+		if err := meta.ObjectTypeValidator(v); err != nil {
+			return &ValidationError{Name: "object_type", err: fmt.Errorf(`ent: validator failed for field "Meta.object_type": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -264,6 +290,10 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.Active(); ok {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
 		_node.Active = value
+	}
+	if value, ok := mc.mutation.ObjectType(); ok {
+		_spec.SetField(meta.FieldObjectType, field.TypeEnum, value)
+		_node.ObjectType = value
 	}
 	if nodes := mc.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -439,6 +469,18 @@ func (u *MetaUpsert) UpdateActive() *MetaUpsert {
 	return u
 }
 
+// SetObjectType sets the "object_type" field.
+func (u *MetaUpsert) SetObjectType(v meta.ObjectType) *MetaUpsert {
+	u.Set(meta.FieldObjectType, v)
+	return u
+}
+
+// UpdateObjectType sets the "object_type" field to the value that was provided on create.
+func (u *MetaUpsert) UpdateObjectType() *MetaUpsert {
+	u.SetExcluded(meta.FieldObjectType)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -581,6 +623,20 @@ func (u *MetaUpsertOne) SetActive(v bool) *MetaUpsertOne {
 func (u *MetaUpsertOne) UpdateActive() *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateActive()
+	})
+}
+
+// SetObjectType sets the "object_type" field.
+func (u *MetaUpsertOne) SetObjectType(v meta.ObjectType) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetObjectType(v)
+	})
+}
+
+// UpdateObjectType sets the "object_type" field to the value that was provided on create.
+func (u *MetaUpsertOne) UpdateObjectType() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateObjectType()
 	})
 }
 
@@ -890,6 +946,20 @@ func (u *MetaUpsertBulk) SetActive(v bool) *MetaUpsertBulk {
 func (u *MetaUpsertBulk) UpdateActive() *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateActive()
+	})
+}
+
+// SetObjectType sets the "object_type" field.
+func (u *MetaUpsertBulk) SetObjectType(v meta.ObjectType) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetObjectType(v)
+	})
+}
+
+// UpdateObjectType sets the "object_type" field to the value that was provided on create.
+func (u *MetaUpsertBulk) UpdateObjectType() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateObjectType()
 	})
 }
 

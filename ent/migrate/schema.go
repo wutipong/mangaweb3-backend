@@ -38,6 +38,7 @@ var (
 		{Name: "thumbnail", Type: field.TypeBytes, Nullable: true},
 		{Name: "read", Type: field.TypeBool, Default: false},
 		{Name: "active", Type: field.TypeBool, Default: true},
+		{Name: "object_type", Type: field.TypeEnum, Enums: []string{"zip", "directory"}, Default: "zip"},
 	}
 	// MetaTable holds the schema information for the "meta" table.
 	MetaTable = &schema.Table{

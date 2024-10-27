@@ -438,6 +438,7 @@ type MetaMutation struct {
 	thumbnail          *[]byte
 	read               *bool
 	active             *bool
+	object_type        *meta.ObjectType
 	clearedFields      map[string]struct{}
 	tags               map[int]struct{}
 	removedtags        map[int]struct{}
@@ -828,6 +829,42 @@ func (m *MetaMutation) ResetActive() {
 	m.active = nil
 }
 
+// SetObjectType sets the "object_type" field.
+func (m *MetaMutation) SetObjectType(mt meta.ObjectType) {
+	m.object_type = &mt
+}
+
+// ObjectType returns the value of the "object_type" field in the mutation.
+func (m *MetaMutation) ObjectType() (r meta.ObjectType, exists bool) {
+	v := m.object_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldObjectType returns the old "object_type" field's value of the Meta entity.
+// If the Meta object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MetaMutation) OldObjectType(ctx context.Context) (v meta.ObjectType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldObjectType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldObjectType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldObjectType: %w", err)
+	}
+	return oldValue.ObjectType, nil
+}
+
+// ResetObjectType resets all changes to the "object_type" field.
+func (m *MetaMutation) ResetObjectType() {
+	m.object_type = nil
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by ids.
 func (m *MetaMutation) AddTagIDs(ids ...int) {
 	if m.tags == nil {
@@ -970,7 +1007,7 @@ func (m *MetaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MetaMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.name != nil {
 		fields = append(fields, meta.FieldName)
 	}
@@ -991,6 +1028,9 @@ func (m *MetaMutation) Fields() []string {
 	}
 	if m.active != nil {
 		fields = append(fields, meta.FieldActive)
+	}
+	if m.object_type != nil {
+		fields = append(fields, meta.FieldObjectType)
 	}
 	return fields
 }
@@ -1014,6 +1054,8 @@ func (m *MetaMutation) Field(name string) (ent.Value, bool) {
 		return m.Read()
 	case meta.FieldActive:
 		return m.Active()
+	case meta.FieldObjectType:
+		return m.ObjectType()
 	}
 	return nil, false
 }
@@ -1037,6 +1079,8 @@ func (m *MetaMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldRead(ctx)
 	case meta.FieldActive:
 		return m.OldActive(ctx)
+	case meta.FieldObjectType:
+		return m.OldObjectType(ctx)
 	}
 	return nil, fmt.Errorf("unknown Meta field %s", name)
 }
@@ -1094,6 +1138,13 @@ func (m *MetaMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetActive(v)
+		return nil
+	case meta.FieldObjectType:
+		v, ok := value.(meta.ObjectType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetObjectType(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Meta field %s", name)
@@ -1173,6 +1224,9 @@ func (m *MetaMutation) ResetField(name string) error {
 		return nil
 	case meta.FieldActive:
 		m.ResetActive()
+		return nil
+	case meta.FieldObjectType:
+		m.ResetObjectType()
 		return nil
 	}
 	return fmt.Errorf("unknown Meta field %s", name)

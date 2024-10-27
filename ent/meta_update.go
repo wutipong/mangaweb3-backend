@@ -125,6 +125,20 @@ func (mu *MetaUpdate) SetNillableActive(b *bool) *MetaUpdate {
 	return mu
 }
 
+// SetObjectType sets the "object_type" field.
+func (mu *MetaUpdate) SetObjectType(mt meta.ObjectType) *MetaUpdate {
+	mu.mutation.SetObjectType(mt)
+	return mu
+}
+
+// SetNillableObjectType sets the "object_type" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableObjectType(mt *meta.ObjectType) *MetaUpdate {
+	if mt != nil {
+		mu.SetObjectType(*mt)
+	}
+	return mu
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (mu *MetaUpdate) AddTagIDs(ids ...int) *MetaUpdate {
 	mu.mutation.AddTagIDs(ids...)
@@ -236,6 +250,11 @@ func (mu *MetaUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Meta.name": %w`, err)}
 		}
 	}
+	if v, ok := mu.mutation.ObjectType(); ok {
+		if err := meta.ObjectTypeValidator(v); err != nil {
+			return &ValidationError{Name: "object_type", err: fmt.Errorf(`ent: validator failed for field "Meta.object_type": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -279,6 +298,9 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := mu.mutation.Active(); ok {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
+	}
+	if value, ok := mu.mutation.ObjectType(); ok {
+		_spec.SetField(meta.FieldObjectType, field.TypeEnum, value)
 	}
 	if mu.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -484,6 +506,20 @@ func (muo *MetaUpdateOne) SetNillableActive(b *bool) *MetaUpdateOne {
 	return muo
 }
 
+// SetObjectType sets the "object_type" field.
+func (muo *MetaUpdateOne) SetObjectType(mt meta.ObjectType) *MetaUpdateOne {
+	muo.mutation.SetObjectType(mt)
+	return muo
+}
+
+// SetNillableObjectType sets the "object_type" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableObjectType(mt *meta.ObjectType) *MetaUpdateOne {
+	if mt != nil {
+		muo.SetObjectType(*mt)
+	}
+	return muo
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (muo *MetaUpdateOne) AddTagIDs(ids ...int) *MetaUpdateOne {
 	muo.mutation.AddTagIDs(ids...)
@@ -608,6 +644,11 @@ func (muo *MetaUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Meta.name": %w`, err)}
 		}
 	}
+	if v, ok := muo.mutation.ObjectType(); ok {
+		if err := meta.ObjectTypeValidator(v); err != nil {
+			return &ValidationError{Name: "object_type", err: fmt.Errorf(`ent: validator failed for field "Meta.object_type": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -668,6 +709,9 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	}
 	if value, ok := muo.mutation.Active(); ok {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
+	}
+	if value, ok := muo.mutation.ObjectType(); ok {
+		_spec.SetField(meta.FieldObjectType, field.TypeEnum, value)
 	}
 	if muo.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
