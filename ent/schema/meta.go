@@ -23,6 +23,7 @@ func (Meta) Fields() []ent.Field {
 		field.Bytes("thumbnail").Optional().Sensitive(),
 		field.Bool("read").Default(false),
 		field.Bool("active").Default(true),
+		field.Enum("container_type").Values("zip", "directory").Default("zip"),
 	}
 }
 

@@ -3,6 +3,7 @@
 package meta
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -28,6 +29,8 @@ const (
 	FieldRead = "read"
 	// FieldActive holds the string denoting the active field in the database.
 	FieldActive = "active"
+	// FieldContainerType holds the string denoting the container_type field in the database.
+	FieldContainerType = "container_type"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
 	EdgeTags = "tags"
 	// EdgeHistories holds the string denoting the histories edge name in mutations.
@@ -58,6 +61,7 @@ var Columns = []string{
 	FieldThumbnail,
 	FieldRead,
 	FieldActive,
+	FieldContainerType,
 }
 
 var (
@@ -91,6 +95,32 @@ var (
 	DefaultActive bool
 )
 
+// ContainerType defines the type for the "container_type" enum field.
+type ContainerType string
+
+// ContainerTypeZip is the default value of the ContainerType enum.
+const DefaultContainerType = ContainerTypeZip
+
+// ContainerType values.
+const (
+	ContainerTypeZip       ContainerType = "zip"
+	ContainerTypeDirectory ContainerType = "directory"
+)
+
+func (ct ContainerType) String() string {
+	return string(ct)
+}
+
+// ContainerTypeValidator is a validator for the "container_type" field enum values. It is called by the builders before save.
+func ContainerTypeValidator(ct ContainerType) error {
+	switch ct {
+	case ContainerTypeZip, ContainerTypeDirectory:
+		return nil
+	default:
+		return fmt.Errorf("meta: invalid enum value for container_type field: %q", ct)
+	}
+}
+
 // OrderOption defines the ordering options for the Meta queries.
 type OrderOption func(*sql.Selector)
 
@@ -122,6 +152,11 @@ func ByRead(opts ...sql.OrderTermOption) OrderOption {
 // ByActive orders the results by the active field.
 func ByActive(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldActive, opts...).ToFunc()
+}
+
+// ByContainerType orders the results by the container_type field.
+func ByContainerType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldContainerType, opts...).ToFunc()
 }
 
 // ByTagsCount orders the results by tags count.

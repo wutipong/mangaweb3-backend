@@ -125,6 +125,20 @@ func (mu *MetaUpdate) SetNillableActive(b *bool) *MetaUpdate {
 	return mu
 }
 
+// SetContainerType sets the "container_type" field.
+func (mu *MetaUpdate) SetContainerType(mt meta.ContainerType) *MetaUpdate {
+	mu.mutation.SetContainerType(mt)
+	return mu
+}
+
+// SetNillableContainerType sets the "container_type" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableContainerType(mt *meta.ContainerType) *MetaUpdate {
+	if mt != nil {
+		mu.SetContainerType(*mt)
+	}
+	return mu
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (mu *MetaUpdate) AddTagIDs(ids ...int) *MetaUpdate {
 	mu.mutation.AddTagIDs(ids...)
@@ -236,6 +250,11 @@ func (mu *MetaUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Meta.name": %w`, err)}
 		}
 	}
+	if v, ok := mu.mutation.ContainerType(); ok {
+		if err := meta.ContainerTypeValidator(v); err != nil {
+			return &ValidationError{Name: "container_type", err: fmt.Errorf(`ent: validator failed for field "Meta.container_type": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -279,6 +298,9 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := mu.mutation.Active(); ok {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
+	}
+	if value, ok := mu.mutation.ContainerType(); ok {
+		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)
 	}
 	if mu.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -484,6 +506,20 @@ func (muo *MetaUpdateOne) SetNillableActive(b *bool) *MetaUpdateOne {
 	return muo
 }
 
+// SetContainerType sets the "container_type" field.
+func (muo *MetaUpdateOne) SetContainerType(mt meta.ContainerType) *MetaUpdateOne {
+	muo.mutation.SetContainerType(mt)
+	return muo
+}
+
+// SetNillableContainerType sets the "container_type" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableContainerType(mt *meta.ContainerType) *MetaUpdateOne {
+	if mt != nil {
+		muo.SetContainerType(*mt)
+	}
+	return muo
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (muo *MetaUpdateOne) AddTagIDs(ids ...int) *MetaUpdateOne {
 	muo.mutation.AddTagIDs(ids...)
@@ -608,6 +644,11 @@ func (muo *MetaUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Meta.name": %w`, err)}
 		}
 	}
+	if v, ok := muo.mutation.ContainerType(); ok {
+		if err := meta.ContainerTypeValidator(v); err != nil {
+			return &ValidationError{Name: "container_type", err: fmt.Errorf(`ent: validator failed for field "Meta.container_type": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -668,6 +709,9 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	}
 	if value, ok := muo.mutation.Active(); ok {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
+	}
+	if value, ok := muo.mutation.ContainerType(); ok {
+		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)
 	}
 	if muo.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{

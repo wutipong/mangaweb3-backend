@@ -154,6 +154,10 @@ definitions:
       name:
         description: Name holds the value of the "name" field.
         type: string
+      object_type:
+        allOf:
+        - $ref: '#/definitions/meta.ObjectType'
+        description: ObjectType holds the value of the "object_type" field.
       read:
         description: Read holds the value of the "read" field.
         type: boolean
@@ -226,6 +230,16 @@ definitions:
       "y":
         type: integer
     type: object
+  meta.ObjectType:
+    enum:
+    - zip
+    - zip
+    - directory
+    type: string
+    x-enum-varnames:
+    - DefaultObjectType
+    - ObjectTypeZip
+    - ObjectTypeDirectory
   meta.SortField:
     enum:
     - name

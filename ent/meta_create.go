@@ -98,6 +98,20 @@ func (mc *MetaCreate) SetNillableActive(b *bool) *MetaCreate {
 	return mc
 }
 
+// SetContainerType sets the "container_type" field.
+func (mc *MetaCreate) SetContainerType(mt meta.ContainerType) *MetaCreate {
+	mc.mutation.SetContainerType(mt)
+	return mc
+}
+
+// SetNillableContainerType sets the "container_type" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableContainerType(mt *meta.ContainerType) *MetaCreate {
+	if mt != nil {
+		mc.SetContainerType(*mt)
+	}
+	return mc
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (mc *MetaCreate) AddTagIDs(ids ...int) *MetaCreate {
 	mc.mutation.AddTagIDs(ids...)
@@ -183,6 +197,10 @@ func (mc *MetaCreate) defaults() {
 		v := meta.DefaultActive
 		mc.mutation.SetActive(v)
 	}
+	if _, ok := mc.mutation.ContainerType(); !ok {
+		v := meta.DefaultContainerType
+		mc.mutation.SetContainerType(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -209,6 +227,14 @@ func (mc *MetaCreate) check() error {
 	}
 	if _, ok := mc.mutation.Active(); !ok {
 		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "Meta.active"`)}
+	}
+	if _, ok := mc.mutation.ContainerType(); !ok {
+		return &ValidationError{Name: "container_type", err: errors.New(`ent: missing required field "Meta.container_type"`)}
+	}
+	if v, ok := mc.mutation.ContainerType(); ok {
+		if err := meta.ContainerTypeValidator(v); err != nil {
+			return &ValidationError{Name: "container_type", err: fmt.Errorf(`ent: validator failed for field "Meta.container_type": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -264,6 +290,10 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.Active(); ok {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
 		_node.Active = value
+	}
+	if value, ok := mc.mutation.ContainerType(); ok {
+		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)
+		_node.ContainerType = value
 	}
 	if nodes := mc.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -439,6 +469,18 @@ func (u *MetaUpsert) UpdateActive() *MetaUpsert {
 	return u
 }
 
+// SetContainerType sets the "container_type" field.
+func (u *MetaUpsert) SetContainerType(v meta.ContainerType) *MetaUpsert {
+	u.Set(meta.FieldContainerType, v)
+	return u
+}
+
+// UpdateContainerType sets the "container_type" field to the value that was provided on create.
+func (u *MetaUpsert) UpdateContainerType() *MetaUpsert {
+	u.SetExcluded(meta.FieldContainerType)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -581,6 +623,20 @@ func (u *MetaUpsertOne) SetActive(v bool) *MetaUpsertOne {
 func (u *MetaUpsertOne) UpdateActive() *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateActive()
+	})
+}
+
+// SetContainerType sets the "container_type" field.
+func (u *MetaUpsertOne) SetContainerType(v meta.ContainerType) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetContainerType(v)
+	})
+}
+
+// UpdateContainerType sets the "container_type" field to the value that was provided on create.
+func (u *MetaUpsertOne) UpdateContainerType() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateContainerType()
 	})
 }
 
@@ -890,6 +946,20 @@ func (u *MetaUpsertBulk) SetActive(v bool) *MetaUpsertBulk {
 func (u *MetaUpsertBulk) UpdateActive() *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateActive()
+	})
+}
+
+// SetContainerType sets the "container_type" field.
+func (u *MetaUpsertBulk) SetContainerType(v meta.ContainerType) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetContainerType(v)
+	})
+}
+
+// UpdateContainerType sets the "container_type" field to the value that was provided on create.
+func (u *MetaUpsertBulk) UpdateContainerType() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateContainerType()
 	})
 }
 

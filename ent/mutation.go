@@ -438,6 +438,7 @@ type MetaMutation struct {
 	thumbnail          *[]byte
 	read               *bool
 	active             *bool
+	container_type     *meta.ContainerType
 	clearedFields      map[string]struct{}
 	tags               map[int]struct{}
 	removedtags        map[int]struct{}
@@ -828,6 +829,42 @@ func (m *MetaMutation) ResetActive() {
 	m.active = nil
 }
 
+// SetContainerType sets the "container_type" field.
+func (m *MetaMutation) SetContainerType(mt meta.ContainerType) {
+	m.container_type = &mt
+}
+
+// ContainerType returns the value of the "container_type" field in the mutation.
+func (m *MetaMutation) ContainerType() (r meta.ContainerType, exists bool) {
+	v := m.container_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContainerType returns the old "container_type" field's value of the Meta entity.
+// If the Meta object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MetaMutation) OldContainerType(ctx context.Context) (v meta.ContainerType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContainerType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContainerType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContainerType: %w", err)
+	}
+	return oldValue.ContainerType, nil
+}
+
+// ResetContainerType resets all changes to the "container_type" field.
+func (m *MetaMutation) ResetContainerType() {
+	m.container_type = nil
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by ids.
 func (m *MetaMutation) AddTagIDs(ids ...int) {
 	if m.tags == nil {
@@ -970,7 +1007,7 @@ func (m *MetaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MetaMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.name != nil {
 		fields = append(fields, meta.FieldName)
 	}
@@ -991,6 +1028,9 @@ func (m *MetaMutation) Fields() []string {
 	}
 	if m.active != nil {
 		fields = append(fields, meta.FieldActive)
+	}
+	if m.container_type != nil {
+		fields = append(fields, meta.FieldContainerType)
 	}
 	return fields
 }
@@ -1014,6 +1054,8 @@ func (m *MetaMutation) Field(name string) (ent.Value, bool) {
 		return m.Read()
 	case meta.FieldActive:
 		return m.Active()
+	case meta.FieldContainerType:
+		return m.ContainerType()
 	}
 	return nil, false
 }
@@ -1037,6 +1079,8 @@ func (m *MetaMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldRead(ctx)
 	case meta.FieldActive:
 		return m.OldActive(ctx)
+	case meta.FieldContainerType:
+		return m.OldContainerType(ctx)
 	}
 	return nil, fmt.Errorf("unknown Meta field %s", name)
 }
@@ -1094,6 +1138,13 @@ func (m *MetaMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetActive(v)
+		return nil
+	case meta.FieldContainerType:
+		v, ok := value.(meta.ContainerType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContainerType(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Meta field %s", name)
@@ -1173,6 +1224,9 @@ func (m *MetaMutation) ResetField(name string) error {
 		return nil
 	case meta.FieldActive:
 		m.ResetActive()
+		return nil
+	case meta.FieldContainerType:
+		m.ResetContainerType()
 		return nil
 	}
 	return fmt.Errorf("unknown Meta field %s", name)

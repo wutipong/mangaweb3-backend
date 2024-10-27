@@ -123,6 +123,7 @@ func Write(ctx context.Context, client *ent.Client, m *ent.Meta) error {
 		SetThumbnail(m.Thumbnail).
 		SetRead(m.Read).
 		SetActive(m.Active).
+		SetContainerType(m.ContainerType).
 		OnConflict(sql.ConflictColumns(meta.FieldName)).
 		UpdateNewValues().Exec(ctx)
 }

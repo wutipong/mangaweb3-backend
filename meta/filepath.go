@@ -1,36 +1,23 @@
 package meta
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/wutipong/mangaweb3-backend/configuration"
+	"github.com/wutipong/mangaweb3-backend/container"
+	"github.com/wutipong/mangaweb3-backend/ent/meta"
 )
 
-var filter func(path string) bool
-
-func init() {
-	filter = func(path string) bool {
-		ext := strings.ToLower(filepath.Ext(path))
-		if ext == ".jpeg" {
-			return true
-		}
-		if ext == ".jpg" {
-			return true
-		}
-		if ext == ".png" {
-			return true
-		}
-		if ext == ".webp" {
-			return true
-		}
-		return false
-	}
+type Container struct {
+	Name string
+	Type meta.ContainerType
 }
 
 // ListDir returns a list of content of a directory.
-func ListDir(path string) (files []string, err error) {
+func ListDir(path string) (files []Container, err error) {
 
 	c := configuration.Get()
 	actualPath := filepath.Join(c.DataPath, path)
@@ -49,7 +36,6 @@ func ListDir(path string) (files []string, err error) {
 		}
 
 		name := filepath.Join(path, f.Name())
-
 		if f.IsDir() {
 			subFiles, e := ListDir(name)
 			if e != nil {
@@ -59,12 +45,15 @@ func ListDir(path string) (files []string, err error) {
 			files = append(files, subFiles...)
 		}
 
-		ext := strings.ToLower(filepath.Ext(f.Name()))
-
-		if ext == ".zip" || ext == ".cbz" {
-
-			files = append(files, name)
+		t, valid := container.GuessContainerType(context.Background(), name, f)
+		if !valid {
+			continue
 		}
+
+		files = append(files, Container{
+			Name: name,
+			Type: t,
+		})
 	}
 	return
 }
