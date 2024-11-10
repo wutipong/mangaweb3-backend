@@ -22,6 +22,8 @@ const (
 	FieldThumbnail = "thumbnail"
 	// EdgeMeta holds the string denoting the meta edge name in mutations.
 	EdgeMeta = "meta"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
 	// Table holds the table name of the tag in the database.
 	Table = "tags"
 	// MetaTable is the table that holds the meta relation/edge. The primary key declared below.
@@ -29,6 +31,11 @@ const (
 	// MetaInverseTable is the table name for the Meta entity.
 	// It exists in this package in order to avoid circular dependency with the "meta" package.
 	MetaInverseTable = "meta"
+	// UserTable is the table that holds the user relation/edge. The primary key declared below.
+	UserTable = "user_favorite_tags"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
 )
 
 // Columns holds all SQL columns for tag fields.
@@ -44,6 +51,9 @@ var (
 	// MetaPrimaryKey and MetaColumn2 are the table columns denoting the
 	// primary key for the meta relation (M2M).
 	MetaPrimaryKey = []string{"meta_id", "tag_id"}
+	// UserPrimaryKey and UserColumn2 are the table columns denoting the
+	// primary key for the user relation (M2M).
+	UserPrimaryKey = []string{"user_id", "tag_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -101,10 +111,31 @@ func ByMeta(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newMetaStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByUserCount orders the results by user count.
+func ByUserCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserStep(), opts...)
+	}
+}
+
+// ByUser orders the results by user terms.
+func ByUser(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newMetaStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MetaInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, MetaTable, MetaPrimaryKey...),
+	)
+}
+func newUserStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, UserTable, UserPrimaryKey...),
 	)
 }

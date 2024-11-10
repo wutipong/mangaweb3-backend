@@ -9,6 +9,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/schema"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -61,4 +62,14 @@ func init() {
 	tagDescHidden := tagFields[2].Descriptor()
 	// tag.DefaultHidden holds the default value on creation for the hidden field.
 	tag.DefaultHidden = tagDescHidden.Default.(bool)
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescEmail is the schema descriptor for email field.
+	userDescEmail := userFields[0].Descriptor()
+	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	user.EmailValidator = userDescEmail.Validators[0].(func(string) error)
+	// userDescActive is the schema descriptor for active field.
+	userDescActive := userFields[1].Descriptor()
+	// user.DefaultActive holds the default value on creation for the active field.
+	user.DefaultActive = userDescActive.Default.(bool)
 }

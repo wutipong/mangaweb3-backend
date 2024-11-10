@@ -14,6 +14,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 // MetaCreate is the builder for creating a Meta entity.
@@ -140,6 +141,21 @@ func (mc *MetaCreate) AddHistories(h ...*History) *MetaCreate {
 		ids[i] = h[i].ID
 	}
 	return mc.AddHistoryIDs(ids...)
+}
+
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (mc *MetaCreate) AddUserIDs(ids ...int) *MetaCreate {
+	mc.mutation.AddUserIDs(ids...)
+	return mc
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (mc *MetaCreate) AddUser(u ...*User) *MetaCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return mc.AddUserIDs(ids...)
 }
 
 // Mutation returns the MetaMutation object of the builder.
@@ -320,6 +336,22 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   meta.UserTable,
+			Columns: meta.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

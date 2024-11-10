@@ -32,5 +32,6 @@ func (Meta) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("tags", Tag.Type),
 		edge.To("histories", History.Type),
+		edge.From("user", User.Type).Ref("favorite_items"),
 	}
 }

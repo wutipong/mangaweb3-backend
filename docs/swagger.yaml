@@ -131,6 +131,10 @@ definitions:
       active:
         description: Active holds the value of the "active" field.
         type: boolean
+      container_type:
+        allOf:
+        - $ref: '#/definitions/meta.ContainerType'
+        description: ContainerType holds the value of the "container_type" field.
       create_time:
         description: CreateTime holds the value of the "create_time" field.
         type: string
@@ -154,10 +158,6 @@ definitions:
       name:
         description: Name holds the value of the "name" field.
         type: string
-      object_type:
-        allOf:
-        - $ref: '#/definitions/meta.ObjectType'
-        description: ObjectType holds the value of the "object_type" field.
       read:
         description: Read holds the value of the "read" field.
         type: boolean
@@ -203,6 +203,42 @@ definitions:
         items:
           $ref: '#/definitions/ent.Meta'
         type: array
+      user:
+        description: User holds the value of the user edge.
+        items:
+          $ref: '#/definitions/ent.User'
+        type: array
+    type: object
+  ent.User:
+    properties:
+      active:
+        description: Active holds the value of the "active" field.
+        type: boolean
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.UserEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the UserQuery when eager-loading is set.
+      email:
+        description: Email holds the value of the "email" field.
+        type: string
+      id:
+        description: ID of the ent.
+        type: integer
+    type: object
+  ent.UserEdges:
+    properties:
+      favorite_items:
+        description: FavoriteItems holds the value of the favorite_items edge.
+        items:
+          $ref: '#/definitions/ent.Meta'
+        type: array
+      favorite_tags:
+        description: FavoriteTags holds the value of the favorite_tags edge.
+        items:
+          $ref: '#/definitions/ent.Tag'
+        type: array
     type: object
   errors.Error:
     properties:
@@ -219,6 +255,16 @@ definitions:
       result:
         type: boolean
     type: object
+  meta.ContainerType:
+    enum:
+    - zip
+    - zip
+    - directory
+    type: string
+    x-enum-varnames:
+    - DefaultContainerType
+    - ContainerTypeZip
+    - ContainerTypeDirectory
   meta.CropDetails:
     properties:
       height:
@@ -230,16 +276,6 @@ definitions:
       "y":
         type: integer
     type: object
-  meta.ObjectType:
-    enum:
-    - zip
-    - zip
-    - directory
-    type: string
-    x-enum-varnames:
-    - DefaultObjectType
-    - ObjectTypeZip
-    - ObjectTypeDirectory
   meta.SortField:
     enum:
     - name

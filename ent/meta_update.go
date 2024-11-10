@@ -16,6 +16,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 // MetaUpdate is the builder for updating Meta entities.
@@ -169,6 +170,21 @@ func (mu *MetaUpdate) AddHistories(h ...*History) *MetaUpdate {
 	return mu.AddHistoryIDs(ids...)
 }
 
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (mu *MetaUpdate) AddUserIDs(ids ...int) *MetaUpdate {
+	mu.mutation.AddUserIDs(ids...)
+	return mu
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (mu *MetaUpdate) AddUser(u ...*User) *MetaUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return mu.AddUserIDs(ids...)
+}
+
 // Mutation returns the MetaMutation object of the builder.
 func (mu *MetaUpdate) Mutation() *MetaMutation {
 	return mu.mutation
@@ -214,6 +230,27 @@ func (mu *MetaUpdate) RemoveHistories(h ...*History) *MetaUpdate {
 		ids[i] = h[i].ID
 	}
 	return mu.RemoveHistoryIDs(ids...)
+}
+
+// ClearUser clears all "user" edges to the User entity.
+func (mu *MetaUpdate) ClearUser() *MetaUpdate {
+	mu.mutation.ClearUser()
+	return mu
+}
+
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
+func (mu *MetaUpdate) RemoveUserIDs(ids ...int) *MetaUpdate {
+	mu.mutation.RemoveUserIDs(ids...)
+	return mu
+}
+
+// RemoveUser removes "user" edges to User entities.
+func (mu *MetaUpdate) RemoveUser(u ...*User) *MetaUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return mu.RemoveUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -392,6 +429,51 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if mu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   meta.UserTable,
+			Columns: meta.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.RemovedUserIDs(); len(nodes) > 0 && !mu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   meta.UserTable,
+			Columns: meta.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   meta.UserTable,
+			Columns: meta.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{meta.Label}
@@ -550,6 +632,21 @@ func (muo *MetaUpdateOne) AddHistories(h ...*History) *MetaUpdateOne {
 	return muo.AddHistoryIDs(ids...)
 }
 
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (muo *MetaUpdateOne) AddUserIDs(ids ...int) *MetaUpdateOne {
+	muo.mutation.AddUserIDs(ids...)
+	return muo
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (muo *MetaUpdateOne) AddUser(u ...*User) *MetaUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return muo.AddUserIDs(ids...)
+}
+
 // Mutation returns the MetaMutation object of the builder.
 func (muo *MetaUpdateOne) Mutation() *MetaMutation {
 	return muo.mutation
@@ -595,6 +692,27 @@ func (muo *MetaUpdateOne) RemoveHistories(h ...*History) *MetaUpdateOne {
 		ids[i] = h[i].ID
 	}
 	return muo.RemoveHistoryIDs(ids...)
+}
+
+// ClearUser clears all "user" edges to the User entity.
+func (muo *MetaUpdateOne) ClearUser() *MetaUpdateOne {
+	muo.mutation.ClearUser()
+	return muo
+}
+
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
+func (muo *MetaUpdateOne) RemoveUserIDs(ids ...int) *MetaUpdateOne {
+	muo.mutation.RemoveUserIDs(ids...)
+	return muo
+}
+
+// RemoveUser removes "user" edges to User entities.
+func (muo *MetaUpdateOne) RemoveUser(u ...*User) *MetaUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return muo.RemoveUserIDs(ids...)
 }
 
 // Where appends a list predicates to the MetaUpdate builder.
@@ -796,6 +914,51 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if muo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   meta.UserTable,
+			Columns: meta.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.RemovedUserIDs(); len(nodes) > 0 && !muo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   meta.UserTable,
+			Columns: meta.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   meta.UserTable,
+			Columns: meta.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -33,6 +33,8 @@ var versionString string = "development"
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
+	ctx := context.Background()
+
 	useEnvFile := false
 	if err := godotenv.Overload(); err == nil {
 		useEnvFile = true
@@ -79,14 +81,14 @@ func main() {
 		DataPath:      dataPath,
 	})
 
-	if err := database.Open(context.Background(), connectionStr); err != nil {
+	if err := database.Open(ctx, connectionStr); err != nil {
 		log.Error().AnErr("error", err).Msg("Connect to Postgres fails")
 		return
 	} else {
 		defer database.Close()
 	}
 
-	if err := database.CreateSchema(); err != nil {
+	if err := database.CreateSchema(ctx); err != nil {
 		log.Error().AnErr("error", err).Msg("failed creating schema resources.")
 		return
 	}

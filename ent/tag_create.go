@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 // TagCreate is the builder for creating a Tag entity.
@@ -75,6 +76,21 @@ func (tc *TagCreate) AddMeta(m ...*Meta) *TagCreate {
 		ids[i] = m[i].ID
 	}
 	return tc.AddMetumIDs(ids...)
+}
+
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (tc *TagCreate) AddUserIDs(ids ...int) *TagCreate {
+	tc.mutation.AddUserIDs(ids...)
+	return tc
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (tc *TagCreate) AddUser(u ...*User) *TagCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return tc.AddUserIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
@@ -190,6 +206,22 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.UserTable,
+			Columns: tag.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

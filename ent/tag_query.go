@@ -14,6 +14,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 // TagQuery is the builder for querying Tag entities.
@@ -24,6 +25,7 @@ type TagQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Tag
 	withMeta   *MetaQuery
+	withUser   *UserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -75,6 +77,28 @@ func (tq *TagQuery) QueryMeta() *MetaQuery {
 			sqlgraph.From(tag.Table, tag.FieldID, selector),
 			sqlgraph.To(meta.Table, meta.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, tag.MetaTable, tag.MetaPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUser chains the current query on the "user" edge.
+func (tq *TagQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tag.Table, tag.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, tag.UserTable, tag.UserPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -275,6 +299,7 @@ func (tq *TagQuery) Clone() *TagQuery {
 		inters:     append([]Interceptor{}, tq.inters...),
 		predicates: append([]predicate.Tag{}, tq.predicates...),
 		withMeta:   tq.withMeta.Clone(),
+		withUser:   tq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
@@ -289,6 +314,17 @@ func (tq *TagQuery) WithMeta(opts ...func(*MetaQuery)) *TagQuery {
 		opt(query)
 	}
 	tq.withMeta = query
+	return tq
+}
+
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TagQuery) WithUser(opts ...func(*UserQuery)) *TagQuery {
+	query := (&UserClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withUser = query
 	return tq
 }
 
@@ -370,8 +406,9 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 	var (
 		nodes       = []*Tag{}
 		_spec       = tq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			tq.withMeta != nil,
+			tq.withUser != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -396,6 +433,13 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 		if err := tq.loadMeta(ctx, query, nodes,
 			func(n *Tag) { n.Edges.Meta = []*Meta{} },
 			func(n *Tag, e *Meta) { n.Edges.Meta = append(n.Edges.Meta, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := tq.withUser; query != nil {
+		if err := tq.loadUser(ctx, query, nodes,
+			func(n *Tag) { n.Edges.User = []*User{} },
+			func(n *Tag, e *User) { n.Edges.User = append(n.Edges.User, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -456,6 +500,67 @@ func (tq *TagQuery) loadMeta(ctx context.Context, query *MetaQuery, nodes []*Tag
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "meta" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (tq *TagQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *User)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Tag)
+	nids := make(map[int]map[*Tag]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(tag.UserTable)
+		s.Join(joinT).On(s.C(user.FieldID), joinT.C(tag.UserPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(tag.UserPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(tag.UserPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Tag]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "user" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
