@@ -20,6 +20,8 @@ const (
 	EdgeFavoriteItems = "favorite_items"
 	// EdgeFavoriteTags holds the string denoting the favorite_tags edge name in mutations.
 	EdgeFavoriteTags = "favorite_tags"
+	// EdgeHistories holds the string denoting the histories edge name in mutations.
+	EdgeHistories = "histories"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// FavoriteItemsTable is the table that holds the favorite_items relation/edge. The primary key declared below.
@@ -32,6 +34,13 @@ const (
 	// FavoriteTagsInverseTable is the table name for the Tag entity.
 	// It exists in this package in order to avoid circular dependency with the "tag" package.
 	FavoriteTagsInverseTable = "tags"
+	// HistoriesTable is the table that holds the histories relation/edge.
+	HistoriesTable = "histories"
+	// HistoriesInverseTable is the table name for the History entity.
+	// It exists in this package in order to avoid circular dependency with the "history" package.
+	HistoriesInverseTable = "histories"
+	// HistoriesColumn is the table column denoting the histories relation/edge.
+	HistoriesColumn = "user_histories"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -112,6 +121,20 @@ func ByFavoriteTags(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newFavoriteTagsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByHistoriesCount orders the results by histories count.
+func ByHistoriesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newHistoriesStep(), opts...)
+	}
+}
+
+// ByHistories orders the results by histories terms.
+func ByHistories(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newHistoriesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newFavoriteItemsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -124,5 +147,12 @@ func newFavoriteTagsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(FavoriteTagsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, FavoriteTagsTable, FavoriteTagsPrimaryKey...),
+	)
+}
+func newHistoriesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(HistoriesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, HistoriesTable, HistoriesColumn),
 	)
 }

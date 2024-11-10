@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
@@ -87,6 +88,21 @@ func (uu *UserUpdate) AddFavoriteTags(t ...*Tag) *UserUpdate {
 	return uu.AddFavoriteTagIDs(ids...)
 }
 
+// AddHistoryIDs adds the "histories" edge to the History entity by IDs.
+func (uu *UserUpdate) AddHistoryIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddHistoryIDs(ids...)
+	return uu
+}
+
+// AddHistories adds the "histories" edges to the History entity.
+func (uu *UserUpdate) AddHistories(h ...*History) *UserUpdate {
+	ids := make([]int, len(h))
+	for i := range h {
+		ids[i] = h[i].ID
+	}
+	return uu.AddHistoryIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -132,6 +148,27 @@ func (uu *UserUpdate) RemoveFavoriteTags(t ...*Tag) *UserUpdate {
 		ids[i] = t[i].ID
 	}
 	return uu.RemoveFavoriteTagIDs(ids...)
+}
+
+// ClearHistories clears all "histories" edges to the History entity.
+func (uu *UserUpdate) ClearHistories() *UserUpdate {
+	uu.mutation.ClearHistories()
+	return uu
+}
+
+// RemoveHistoryIDs removes the "histories" edge to History entities by IDs.
+func (uu *UserUpdate) RemoveHistoryIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveHistoryIDs(ids...)
+	return uu
+}
+
+// RemoveHistories removes "histories" edges to History entities.
+func (uu *UserUpdate) RemoveHistories(h ...*History) *UserUpdate {
+	ids := make([]int, len(h))
+	for i := range h {
+		ids[i] = h[i].ID
+	}
+	return uu.RemoveHistoryIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -279,6 +316,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.HistoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.HistoriesTable,
+			Columns: []string{user.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedHistoriesIDs(); len(nodes) > 0 && !uu.mutation.HistoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.HistoriesTable,
+			Columns: []string{user.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.HistoriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.HistoriesTable,
+			Columns: []string{user.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -357,6 +439,21 @@ func (uuo *UserUpdateOne) AddFavoriteTags(t ...*Tag) *UserUpdateOne {
 	return uuo.AddFavoriteTagIDs(ids...)
 }
 
+// AddHistoryIDs adds the "histories" edge to the History entity by IDs.
+func (uuo *UserUpdateOne) AddHistoryIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddHistoryIDs(ids...)
+	return uuo
+}
+
+// AddHistories adds the "histories" edges to the History entity.
+func (uuo *UserUpdateOne) AddHistories(h ...*History) *UserUpdateOne {
+	ids := make([]int, len(h))
+	for i := range h {
+		ids[i] = h[i].ID
+	}
+	return uuo.AddHistoryIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -402,6 +499,27 @@ func (uuo *UserUpdateOne) RemoveFavoriteTags(t ...*Tag) *UserUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return uuo.RemoveFavoriteTagIDs(ids...)
+}
+
+// ClearHistories clears all "histories" edges to the History entity.
+func (uuo *UserUpdateOne) ClearHistories() *UserUpdateOne {
+	uuo.mutation.ClearHistories()
+	return uuo
+}
+
+// RemoveHistoryIDs removes the "histories" edge to History entities by IDs.
+func (uuo *UserUpdateOne) RemoveHistoryIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveHistoryIDs(ids...)
+	return uuo
+}
+
+// RemoveHistories removes "histories" edges to History entities.
+func (uuo *UserUpdateOne) RemoveHistories(h ...*History) *UserUpdateOne {
+	ids := make([]int, len(h))
+	for i := range h {
+		ids[i] = h[i].ID
+	}
+	return uuo.RemoveHistoryIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -572,6 +690,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.HistoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.HistoriesTable,
+			Columns: []string{user.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedHistoriesIDs(); len(nodes) > 0 && !uuo.mutation.HistoriesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.HistoriesTable,
+			Columns: []string{user.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.HistoriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.HistoriesTable,
+			Columns: []string{user.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

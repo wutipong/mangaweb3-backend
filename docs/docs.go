@@ -758,6 +758,13 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/ent.Tag"
                     }
+                },
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.User"
+                    }
                 }
             }
         },

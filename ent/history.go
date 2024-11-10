@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 // History is the model entity for the History schema.
@@ -24,6 +25,7 @@ type History struct {
 	// The values are being populated by the HistoryQuery when eager-loading is set.
 	Edges          HistoryEdges `json:"edges"`
 	meta_histories *int
+	user_histories *int
 	selectValues   sql.SelectValues
 }
 
@@ -31,9 +33,11 @@ type History struct {
 type HistoryEdges struct {
 	// Item holds the value of the item edge.
 	Item *Meta `json:"item,omitempty"`
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // ItemOrErr returns the Item value or an error if the edge
@@ -47,6 +51,17 @@ func (e HistoryEdges) ItemOrErr() (*Meta, error) {
 	return nil, &NotLoadedError{edge: "item"}
 }
 
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e HistoryEdges) UserOrErr() (*User, error) {
+	if e.User != nil {
+		return e.User, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: user.Label}
+	}
+	return nil, &NotLoadedError{edge: "user"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*History) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -57,6 +72,8 @@ func (*History) scanValues(columns []string) ([]any, error) {
 		case history.FieldCreateTime:
 			values[i] = new(sql.NullTime)
 		case history.ForeignKeys[0]: // meta_histories
+			values[i] = new(sql.NullInt64)
+		case history.ForeignKeys[1]: // user_histories
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -92,6 +109,13 @@ func (h *History) assignValues(columns []string, values []any) error {
 				h.meta_histories = new(int)
 				*h.meta_histories = int(value.Int64)
 			}
+		case history.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field user_histories", value)
+			} else if value.Valid {
+				h.user_histories = new(int)
+				*h.user_histories = int(value.Int64)
+			}
 		default:
 			h.selectValues.Set(columns[i], values[i])
 		}
@@ -108,6 +132,11 @@ func (h *History) Value(name string) (ent.Value, error) {
 // QueryItem queries the "item" edge of the History entity.
 func (h *History) QueryItem() *MetaQuery {
 	return NewHistoryClient(h.config).QueryItem(h)
+}
+
+// QueryUser queries the "user" edge of the History entity.
+func (h *History) QueryUser() *UserQuery {
+	return NewHistoryClient(h.config).QueryUser(h)
 }
 
 // Update returns a builder for updating this History.

@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/ent/user"
@@ -71,6 +72,21 @@ func (uc *UserCreate) AddFavoriteTags(t ...*Tag) *UserCreate {
 		ids[i] = t[i].ID
 	}
 	return uc.AddFavoriteTagIDs(ids...)
+}
+
+// AddHistoryIDs adds the "histories" edge to the History entity by IDs.
+func (uc *UserCreate) AddHistoryIDs(ids ...int) *UserCreate {
+	uc.mutation.AddHistoryIDs(ids...)
+	return uc
+}
+
+// AddHistories adds the "histories" edges to the History entity.
+func (uc *UserCreate) AddHistories(h ...*History) *UserCreate {
+	ids := make([]int, len(h))
+	for i := range h {
+		ids[i] = h[i].ID
+	}
+	return uc.AddHistoryIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -187,6 +203,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.HistoriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.HistoriesTable,
+			Columns: []string{user.HistoriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

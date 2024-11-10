@@ -32,9 +32,11 @@ type UserEdges struct {
 	FavoriteItems []*Meta `json:"favorite_items,omitempty"`
 	// FavoriteTags holds the value of the favorite_tags edge.
 	FavoriteTags []*Tag `json:"favorite_tags,omitempty"`
+	// Histories holds the value of the histories edge.
+	Histories []*History `json:"histories,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // FavoriteItemsOrErr returns the FavoriteItems value or an error if the edge
@@ -53,6 +55,15 @@ func (e UserEdges) FavoriteTagsOrErr() ([]*Tag, error) {
 		return e.FavoriteTags, nil
 	}
 	return nil, &NotLoadedError{edge: "favorite_tags"}
+}
+
+// HistoriesOrErr returns the Histories value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) HistoriesOrErr() ([]*History, error) {
+	if e.loadedTypes[2] {
+		return e.Histories, nil
+	}
+	return nil, &NotLoadedError{edge: "histories"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -120,6 +131,11 @@ func (u *User) QueryFavoriteItems() *MetaQuery {
 // QueryFavoriteTags queries the "favorite_tags" edge of the User entity.
 func (u *User) QueryFavoriteTags() *TagQuery {
 	return NewUserClient(u.config).QueryFavoriteTags(u)
+}
+
+// QueryHistories queries the "histories" edge of the User entity.
+func (u *User) QueryHistories() *HistoryQuery {
+	return NewUserClient(u.config).QueryHistories(u)
 }
 
 // Update returns a builder for updating this User.

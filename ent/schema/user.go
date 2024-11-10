@@ -24,5 +24,6 @@ func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("favorite_items", Meta.Type),
 		edge.To("favorite_tags", Tag.Type),
+		edge.To("histories", History.Type),
 	}
 }

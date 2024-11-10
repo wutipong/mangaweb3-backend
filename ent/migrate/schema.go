@@ -13,6 +13,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "meta_histories", Type: field.TypeInt, Nullable: true},
+		{Name: "user_histories", Type: field.TypeInt, Nullable: true},
 	}
 	// HistoriesTable holds the schema information for the "histories" table.
 	HistoriesTable = &schema.Table{
@@ -24,6 +25,12 @@ var (
 				Symbol:     "histories_meta_histories",
 				Columns:    []*schema.Column{HistoriesColumns[2]},
 				RefColumns: []*schema.Column{MetaColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "histories_users_histories",
+				Columns:    []*schema.Column{HistoriesColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -161,6 +168,7 @@ var (
 
 func init() {
 	HistoriesTable.ForeignKeys[0].RefTable = MetaTable
+	HistoriesTable.ForeignKeys[1].RefTable = UsersTable
 	MetaTagsTable.ForeignKeys[0].RefTable = MetaTable
 	MetaTagsTable.ForeignKeys[1].RefTable = TagsTable
 	UserFavoriteItemsTable.ForeignKeys[0].RefTable = UsersTable

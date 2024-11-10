@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 // HistoryCreate is the builder for creating a History entity.
@@ -54,6 +55,25 @@ func (hc *HistoryCreate) SetNillableItemID(id *int) *HistoryCreate {
 // SetItem sets the "item" edge to the Meta entity.
 func (hc *HistoryCreate) SetItem(m *Meta) *HistoryCreate {
 	return hc.SetItemID(m.ID)
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (hc *HistoryCreate) SetUserID(id int) *HistoryCreate {
+	hc.mutation.SetUserID(id)
+	return hc
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (hc *HistoryCreate) SetNillableUserID(id *int) *HistoryCreate {
+	if id != nil {
+		hc = hc.SetUserID(*id)
+	}
+	return hc
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (hc *HistoryCreate) SetUser(u *User) *HistoryCreate {
+	return hc.SetUserID(u.ID)
 }
 
 // Mutation returns the HistoryMutation object of the builder.
@@ -148,6 +168,23 @@ func (hc *HistoryCreate) createSpec() (*History, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.meta_histories = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := hc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   history.UserTable,
+			Columns: []string{history.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.user_histories = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

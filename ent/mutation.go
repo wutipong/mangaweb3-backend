@@ -43,6 +43,8 @@ type HistoryMutation struct {
 	clearedFields map[string]struct{}
 	item          *int
 	cleareditem   bool
+	user          *int
+	cleareduser   bool
 	done          bool
 	oldValue      func(context.Context) (*History, error)
 	predicates    []predicate.History
@@ -221,6 +223,45 @@ func (m *HistoryMutation) ResetItem() {
 	m.cleareditem = false
 }
 
+// SetUserID sets the "user" edge to the User entity by id.
+func (m *HistoryMutation) SetUserID(id int) {
+	m.user = &id
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *HistoryMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *HistoryMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserID returns the "user" edge ID in the mutation.
+func (m *HistoryMutation) UserID() (id int, exists bool) {
+	if m.user != nil {
+		return *m.user, true
+	}
+	return
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *HistoryMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *HistoryMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
 // Where appends a list predicates to the HistoryMutation builder.
 func (m *HistoryMutation) Where(ps ...predicate.History) {
 	m.predicates = append(m.predicates, ps...)
@@ -354,9 +395,12 @@ func (m *HistoryMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *HistoryMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.item != nil {
 		edges = append(edges, history.EdgeItem)
+	}
+	if m.user != nil {
+		edges = append(edges, history.EdgeUser)
 	}
 	return edges
 }
@@ -369,13 +413,17 @@ func (m *HistoryMutation) AddedIDs(name string) []ent.Value {
 		if id := m.item; id != nil {
 			return []ent.Value{*id}
 		}
+	case history.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *HistoryMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -387,9 +435,12 @@ func (m *HistoryMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *HistoryMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.cleareditem {
 		edges = append(edges, history.EdgeItem)
+	}
+	if m.cleareduser {
+		edges = append(edges, history.EdgeUser)
 	}
 	return edges
 }
@@ -400,6 +451,8 @@ func (m *HistoryMutation) EdgeCleared(name string) bool {
 	switch name {
 	case history.EdgeItem:
 		return m.cleareditem
+	case history.EdgeUser:
+		return m.cleareduser
 	}
 	return false
 }
@@ -411,6 +464,9 @@ func (m *HistoryMutation) ClearEdge(name string) error {
 	case history.EdgeItem:
 		m.ClearItem()
 		return nil
+	case history.EdgeUser:
+		m.ClearUser()
+		return nil
 	}
 	return fmt.Errorf("unknown History unique edge %s", name)
 }
@@ -421,6 +477,9 @@ func (m *HistoryMutation) ResetEdge(name string) error {
 	switch name {
 	case history.EdgeItem:
 		m.ResetItem()
+		return nil
+	case history.EdgeUser:
+		m.ResetUser()
 		return nil
 	}
 	return fmt.Errorf("unknown History edge %s", name)
@@ -2128,6 +2187,9 @@ type UserMutation struct {
 	favorite_tags         map[int]struct{}
 	removedfavorite_tags  map[int]struct{}
 	clearedfavorite_tags  bool
+	histories             map[int]struct{}
+	removedhistories      map[int]struct{}
+	clearedhistories      bool
 	done                  bool
 	oldValue              func(context.Context) (*User, error)
 	predicates            []predicate.User
@@ -2411,6 +2473,60 @@ func (m *UserMutation) ResetFavoriteTags() {
 	m.removedfavorite_tags = nil
 }
 
+// AddHistoryIDs adds the "histories" edge to the History entity by ids.
+func (m *UserMutation) AddHistoryIDs(ids ...int) {
+	if m.histories == nil {
+		m.histories = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.histories[ids[i]] = struct{}{}
+	}
+}
+
+// ClearHistories clears the "histories" edge to the History entity.
+func (m *UserMutation) ClearHistories() {
+	m.clearedhistories = true
+}
+
+// HistoriesCleared reports if the "histories" edge to the History entity was cleared.
+func (m *UserMutation) HistoriesCleared() bool {
+	return m.clearedhistories
+}
+
+// RemoveHistoryIDs removes the "histories" edge to the History entity by IDs.
+func (m *UserMutation) RemoveHistoryIDs(ids ...int) {
+	if m.removedhistories == nil {
+		m.removedhistories = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.histories, ids[i])
+		m.removedhistories[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedHistories returns the removed IDs of the "histories" edge to the History entity.
+func (m *UserMutation) RemovedHistoriesIDs() (ids []int) {
+	for id := range m.removedhistories {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// HistoriesIDs returns the "histories" edge IDs in the mutation.
+func (m *UserMutation) HistoriesIDs() (ids []int) {
+	for id := range m.histories {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetHistories resets all changes to the "histories" edge.
+func (m *UserMutation) ResetHistories() {
+	m.histories = nil
+	m.clearedhistories = false
+	m.removedhistories = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -2561,12 +2677,15 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.favorite_items != nil {
 		edges = append(edges, user.EdgeFavoriteItems)
 	}
 	if m.favorite_tags != nil {
 		edges = append(edges, user.EdgeFavoriteTags)
+	}
+	if m.histories != nil {
+		edges = append(edges, user.EdgeHistories)
 	}
 	return edges
 }
@@ -2587,18 +2706,27 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeHistories:
+		ids := make([]ent.Value, 0, len(m.histories))
+		for id := range m.histories {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedfavorite_items != nil {
 		edges = append(edges, user.EdgeFavoriteItems)
 	}
 	if m.removedfavorite_tags != nil {
 		edges = append(edges, user.EdgeFavoriteTags)
+	}
+	if m.removedhistories != nil {
+		edges = append(edges, user.EdgeHistories)
 	}
 	return edges
 }
@@ -2619,18 +2747,27 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeHistories:
+		ids := make([]ent.Value, 0, len(m.removedhistories))
+		for id := range m.removedhistories {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedfavorite_items {
 		edges = append(edges, user.EdgeFavoriteItems)
 	}
 	if m.clearedfavorite_tags {
 		edges = append(edges, user.EdgeFavoriteTags)
+	}
+	if m.clearedhistories {
+		edges = append(edges, user.EdgeHistories)
 	}
 	return edges
 }
@@ -2643,6 +2780,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedfavorite_items
 	case user.EdgeFavoriteTags:
 		return m.clearedfavorite_tags
+	case user.EdgeHistories:
+		return m.clearedhistories
 	}
 	return false
 }
@@ -2664,6 +2803,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeFavoriteTags:
 		m.ResetFavoriteTags()
+		return nil
+	case user.EdgeHistories:
+		m.ResetHistories()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)
