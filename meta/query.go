@@ -8,6 +8,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 type SortField string
@@ -32,7 +33,7 @@ type QueryParams struct {
 	ItemPerPage  int
 }
 
-func CreateQuery(ctx context.Context, client *ent.Client, q QueryParams) (query *ent.MetaQuery, err error) {
+func CreateQuery(ctx context.Context, client *ent.Client, u *ent.User, q QueryParams) (query *ent.MetaQuery, err error) {
 	if q.SearchTag != "" {
 		t, e := client.Tag.Query().Where(tag.Name(q.SearchTag)).Only(ctx)
 		if e != nil {
@@ -52,7 +53,9 @@ func CreateQuery(ctx context.Context, client *ent.Client, q QueryParams) (query 
 	}
 
 	if q.FavoriteOnly {
-		query = query.Where(meta.Favorite(true))
+		query = query.Where(
+			meta.HasUserWith(user.ID(u.ID)),
+		)
 	}
 
 	field := ""
@@ -87,8 +90,8 @@ func CreateQuery(ctx context.Context, client *ent.Client, q QueryParams) (query 
 	return
 }
 
-func ReadPage(ctx context.Context, client *ent.Client, q QueryParams) (items []*ent.Meta, err error) {
-	query, err := CreateQuery(ctx, client, q)
+func ReadPage(ctx context.Context, client *ent.Client, u *ent.User, q QueryParams) (items []*ent.Meta, err error) {
+	query, err := CreateQuery(ctx, client, u, q)
 	if err != nil {
 		return
 	}
@@ -96,8 +99,8 @@ func ReadPage(ctx context.Context, client *ent.Client, q QueryParams) (items []*
 	return query.All(ctx)
 }
 
-func Count(ctx context.Context, client *ent.Client, q QueryParams) (count int, err error) {
-	query, err := CreateQuery(ctx, client, q)
+func Count(ctx context.Context, client *ent.Client, u *ent.User, q QueryParams) (count int, err error) {
+	query, err := CreateQuery(ctx, client, u, q)
 	if err != nil {
 		return
 	}

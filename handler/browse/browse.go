@@ -6,9 +6,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/database"
+	ent_meta "github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/tag"
+	"github.com/wutipong/mangaweb3-backend/user"
 )
 
 const (
@@ -16,6 +18,7 @@ const (
 )
 
 type browseRequest struct {
+	User         string         `json:"user"`
 	Tag          string         `json:"tag"`
 	FavoriteOnly bool           `json:"favorite_only"`
 	Page         int            `json:"page"`
@@ -75,8 +78,15 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	client := database.CreateEntClient()
 	defer client.Close()
 
+	u, err := user.GetUser(r.Context(), client, req.User)
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
+
 	allMeta, err := meta.ReadPage(r.Context(),
 		client,
+		u,
 		meta.QueryParams{
 			SearchName:   req.Search,
 			FavoriteOnly: req.FavoriteOnly,
@@ -96,8 +106,8 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		items[i] = browseItem{
 			ID:        m.ID,
 			Name:      m.Name,
-			Favorite:  m.Favorite,
-			Read:      m.Read,
+			Favorite:  u.QueryFavoriteItems().Where(ent_meta.ID(m.ID)).ExistX(r.Context()),
+			Read:      u.QueryHistories().QueryItem().Where(ent_meta.ID(m.ID)).ExistX(r.Context()),
 			PageCount: len(m.FileIndices),
 		}
 
@@ -117,6 +127,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
 	count, err := meta.Count(r.Context(),
 		client,
+		u,
 		meta.QueryParams{
 			SearchName:   req.Search,
 			FavoriteOnly: req.FavoriteOnly,
