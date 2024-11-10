@@ -19,7 +19,7 @@ const (
 )
 
 type historyRequest struct {
-	User        string `json:"user`
+	User        string `json:"user"`
 	Page        int    `json:"page"`
 	ItemPerPage int    `json:"item_per_page" default:"30"`
 }
