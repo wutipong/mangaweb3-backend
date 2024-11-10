@@ -10,9 +10,11 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
+	"github.com/wutipong/mangaweb3-backend/user"
 )
 
 type viewRequest struct {
+	User string `json:"user"`
 	Name string `json:"name"`
 }
 
@@ -79,7 +81,14 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		PageCount: len(m.FileIndices),
 	}
 
+	u, err := user.GetUser(r.Context(), client, req.User)
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
+
 	client.History.Create().
+		SetUser(u).
 		SetItem(m).
 		Save(r.Context())
 
