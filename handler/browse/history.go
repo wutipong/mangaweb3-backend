@@ -10,6 +10,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/handler"
+	"github.com/wutipong/mangaweb3-backend/user"
 )
 
 const (
@@ -17,8 +18,9 @@ const (
 )
 
 type historyRequest struct {
-	Page        int `json:"page"`
-	ItemPerPage int `json:"item_per_page" default:"30"`
+	User        string `json:"user`
+	Page        int    `json:"page"`
+	ItemPerPage int    `json:"item_per_page" default:"30"`
 }
 
 type historyResponse struct {
@@ -66,13 +68,20 @@ func historyHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 	client := database.CreateEntClient()
 	defer client.Close()
 
-	histories, err := client.History.Query().
+	u, err := user.GetUser(r.Context(), client, req.User)
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
+
+	histories, err := client.User.QueryHistories(u).
 		Order(history.ByCreateTime(sql.OrderDesc())).
 		Limit(req.ItemPerPage).
 		Offset(req.ItemPerPage * req.Page).All(r.Context())
 
 	if err != nil {
 		handler.WriteResponse(w, err)
+		return
 	}
 
 	items := make([]historyItem, len(histories))
