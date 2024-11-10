@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/ent/history"
+	ent_meta "github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/user"
 )
@@ -97,8 +98,8 @@ func historyHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		items[i] = historyItem{
 			ID:         m.ID,
 			Name:       m.Name,
-			Favorite:   m.Favorite,
-			Read:       m.Read,
+			Favorite:   u.QueryFavoriteItems().Where(ent_meta.ID(m.ID)).ExistX(r.Context()),
+			Read:       true,
 			PageCount:  len(m.FileIndices),
 			AccessTime: h.CreateTime,
 		}
