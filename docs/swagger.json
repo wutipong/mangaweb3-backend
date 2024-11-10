@@ -547,6 +547,9 @@
                 },
                 "tag": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -612,6 +615,9 @@
                 },
                 "page": {
                     "type": "integer"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -677,6 +683,14 @@
                     "allOf": [
                         {
                             "$ref": "#/definitions/ent.Meta"
+                        }
+                    ]
+                },
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.User"
                         }
                     ]
                 }
@@ -849,6 +863,13 @@
                     "items": {
                         "$ref": "#/definitions/ent.Tag"
                     }
+                },
+                "histories": {
+                    "description": "Histories holds the value of the histories edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.History"
+                    }
                 }
             }
         },
@@ -957,6 +978,9 @@
                 },
                 "search": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -1063,6 +1087,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -1106,6 +1133,9 @@
             "type": "object",
             "properties": {
                 "name": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }

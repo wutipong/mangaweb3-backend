@@ -37,6 +37,8 @@ definitions:
         $ref: '#/definitions/meta.SortField'
       tag:
         type: string
+      user:
+        type: string
     type: object
   browse.browseResponse:
     properties:
@@ -82,6 +84,8 @@ definitions:
         type: integer
       page:
         type: integer
+      user:
+        type: string
     type: object
   browse.historyResponse:
     properties:
@@ -125,6 +129,10 @@ definitions:
         allOf:
         - $ref: '#/definitions/ent.Meta'
         description: Item holds the value of the item edge.
+      user:
+        allOf:
+        - $ref: '#/definitions/ent.User'
+        description: User holds the value of the user edge.
     type: object
   ent.Meta:
     properties:
@@ -244,6 +252,11 @@ definitions:
         items:
           $ref: '#/definitions/ent.Tag'
         type: array
+      histories:
+        description: Histories holds the value of the histories edge.
+        items:
+          $ref: '#/definitions/ent.History'
+        type: array
     type: object
   errors.Error:
     properties:
@@ -319,6 +332,8 @@ definitions:
         type: integer
       search:
         type: string
+      user:
+        type: string
     type: object
   tag.listResponse:
     properties:
@@ -387,6 +402,8 @@ definitions:
         type: boolean
       name:
         type: string
+      user:
+        type: string
     type: object
   view.setFavoriteResponse:
     properties:
@@ -414,6 +431,8 @@ definitions:
   view.viewRequest:
     properties:
       name:
+        type: string
+      user:
         type: string
     type: object
   view.viewResponse:

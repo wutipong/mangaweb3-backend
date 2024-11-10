@@ -6,11 +6,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/database"
+	ent_tag "github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/tag"
+	"github.com/wutipong/mangaweb3-backend/user"
 )
 
 type listRequest struct {
+	User         string `json:"user"`
 	FavoriteOnly bool   `json:"favorite_only"`
 	Search       string `json:"search"`
 	Page         int    `json:"page"`
@@ -60,7 +63,13 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 	client := database.CreateEntClient()
 	defer client.Close()
 
-	allTags, err := tag.ReadPage(r.Context(), client,
+	u, err := user.GetUser(r.Context(), client, req.User)
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
+
+	allTags, err := tag.ReadPage(r.Context(), client, u,
 		tag.QueryParams{
 			FavoriteOnly: req.FavoriteOnly,
 			Search:       req.Search,
@@ -73,7 +82,7 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		return
 	}
 
-	total, err := tag.Count(r.Context(), client,
+	total, err := tag.Count(r.Context(), client, u,
 		tag.QueryParams{
 			FavoriteOnly: req.FavoriteOnly,
 			Search:       req.Search,
@@ -100,7 +109,7 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		}
 		data.Tags[i] = Tag{
 			Name:      t.Name,
-			Favorite:  t.Favorite,
+			Favorite:  u.QueryFavoriteTags().Where(ent_tag.ID(t.ID)).ExistX(r.Context()),
 			ItemCount: len(items),
 		}
 	}

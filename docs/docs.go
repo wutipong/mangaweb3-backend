@@ -555,6 +555,9 @@ const docTemplate = `{
                 },
                 "tag": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -620,6 +623,9 @@ const docTemplate = `{
                 },
                 "page": {
                     "type": "integer"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -685,6 +691,14 @@ const docTemplate = `{
                     "allOf": [
                         {
                             "$ref": "#/definitions/ent.Meta"
+                        }
+                    ]
+                },
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.User"
                         }
                     ]
                 }
@@ -857,6 +871,13 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/ent.Tag"
                     }
+                },
+                "histories": {
+                    "description": "Histories holds the value of the histories edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.History"
+                    }
                 }
             }
         },
@@ -965,6 +986,9 @@ const docTemplate = `{
                 },
                 "search": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -1071,6 +1095,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -1114,6 +1141,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "name": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }

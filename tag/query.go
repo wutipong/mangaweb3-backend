@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 func IsTagExist(ctx context.Context, client *ent.Client, name string) bool {
@@ -32,7 +33,7 @@ type QueryParams struct {
 	ItemPerPage  int
 }
 
-func CreateQuery(client *ent.Client, q QueryParams) *ent.TagQuery {
+func CreateQuery(client *ent.Client, u *ent.User, q QueryParams) *ent.TagQuery {
 	query := client.Tag.Query().Order(tag.ByName())
 	if q.ItemPerPage > 0 {
 		query = query.Limit(q.ItemPerPage).
@@ -40,9 +41,8 @@ func CreateQuery(client *ent.Client, q QueryParams) *ent.TagQuery {
 	}
 
 	if q.FavoriteOnly {
-		query = query.Where(tag.Favorite(true))
+		query = query.Where(tag.HasUserWith(user.ID(u.ID)))
 	}
-
 	if q.Search != "" {
 		query = query.Where(tag.NameContainsFold(q.Search))
 	}
@@ -50,13 +50,13 @@ func CreateQuery(client *ent.Client, q QueryParams) *ent.TagQuery {
 	return query
 }
 
-func ReadPage(ctx context.Context, client *ent.Client, q QueryParams) (tags []*ent.Tag, err error) {
-	query := CreateQuery(client, q)
+func ReadPage(ctx context.Context, client *ent.Client, u *ent.User, q QueryParams) (tags []*ent.Tag, err error) {
+	query := CreateQuery(client, u, q)
 	return query.All(ctx)
 }
 
-func Count(ctx context.Context, client *ent.Client, q QueryParams) (count int, err error) {
-	query := CreateQuery(client, q)
+func Count(ctx context.Context, client *ent.Client, u *ent.User, q QueryParams) (count int, err error) {
+	query := CreateQuery(client, u, q)
 
 	return query.Count(ctx)
 }

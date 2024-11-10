@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/database"
 	ent_meta "github.com/wutipong/mangaweb3-backend/ent/meta"
+	ent_tag "github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/tag"
@@ -118,7 +119,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		}
 
 		for _, t := range tags {
-			if t.Favorite {
+			if u.QueryFavoriteTags().Where(ent_tag.ID(t.ID)).ExistX(r.Context()) {
 				items[i].TagFavorite = true
 				break
 			}
@@ -168,7 +169,7 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 			return
 		}
 
-		data.TagFavorite = tagObj.Favorite
+		data.TagFavorite = u.QueryFavoriteTags().Where(ent_tag.ID(tagObj.ID)).ExistX(r.Context())
 	}
 
 	handler.WriteResponse(w, data)
