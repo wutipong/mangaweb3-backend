@@ -9,7 +9,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/ent/history"
+	ent_meta "github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/handler"
+	"github.com/wutipong/mangaweb3-backend/user"
 )
 
 const (
@@ -17,8 +19,9 @@ const (
 )
 
 type historyRequest struct {
-	Page        int `json:"page"`
-	ItemPerPage int `json:"item_per_page" default:"30"`
+	User        string `json:"user"`
+	Page        int    `json:"page"`
+	ItemPerPage int    `json:"item_per_page" default:"30"`
 }
 
 type historyResponse struct {
@@ -66,13 +69,20 @@ func historyHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 	client := database.CreateEntClient()
 	defer client.Close()
 
-	histories, err := client.History.Query().
+	u, err := user.GetUser(r.Context(), client, req.User)
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
+
+	histories, err := client.User.QueryHistories(u).
 		Order(history.ByCreateTime(sql.OrderDesc())).
 		Limit(req.ItemPerPage).
 		Offset(req.ItemPerPage * req.Page).All(r.Context())
 
 	if err != nil {
 		handler.WriteResponse(w, err)
+		return
 	}
 
 	items := make([]historyItem, len(histories))
@@ -88,8 +98,8 @@ func historyHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		items[i] = historyItem{
 			ID:         m.ID,
 			Name:       m.Name,
-			Favorite:   m.Favorite,
-			Read:       m.Read,
+			Favorite:   u.QueryFavoriteItems().Where(ent_meta.ID(m.ID)).ExistX(r.Context()),
+			Read:       true,
 			PageCount:  len(m.FileIndices),
 			AccessTime: h.CreateTime,
 		}

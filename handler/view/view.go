@@ -8,11 +8,14 @@ import (
 	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/ent"
+	ent_meta "github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
+	"github.com/wutipong/mangaweb3-backend/user"
 )
 
 type viewRequest struct {
+	User string `json:"user"`
 	Name string `json:"name"`
 }
 
@@ -68,18 +71,24 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	c := configuration.Get()
+	u, err := user.GetUser(r.Context(), client, req.User)
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
 
+	c := configuration.Get()
 	data := viewResponse{
 		Request:   req,
 		Name:      item,
 		Version:   c.VersionString,
-		Favorite:  m.Favorite,
+		Favorite:  u.QueryFavoriteItems().Where(ent_meta.ID(m.ID)).ExistX(r.Context()),
 		Tags:      tags,
 		PageCount: len(m.FileIndices),
 	}
 
 	client.History.Create().
+		SetUser(u).
 		SetItem(m).
 		Save(r.Context())
 

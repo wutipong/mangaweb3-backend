@@ -8,9 +8,11 @@ import (
 	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/tag"
+	"github.com/wutipong/mangaweb3-backend/user"
 )
 
 type setFavoriteRequest struct {
+	User     string `json:"user"`
 	Tag      string `json:"tag"`
 	Favorite bool   `json:"favorite"`
 }
@@ -46,14 +48,25 @@ func SetFavoriteHandler(w http.ResponseWriter, r *http.Request, params httproute
 		return
 	}
 
-	if req.Favorite != m.Favorite {
-		m.Favorite = req.Favorite
-		tag.Write(r.Context(), client, m)
+	u, err := user.GetUser(r.Context(), client, req.User)
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
+
+	if req.Favorite {
+		_, err = u.Update().AddFavoriteTags(m).Save(r.Context())
+	} else {
+		_, err = u.Update().RemoveFavoriteTags(m).Save(r.Context())
+	}
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
 	}
 
 	response := setFavoriteResponse{
 		Request:  req,
-		Favorite: m.Favorite,
+		Favorite: req.Favorite,
 	}
 
 	handler.WriteResponse(w, response)

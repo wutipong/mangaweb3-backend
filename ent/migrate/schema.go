@@ -13,6 +13,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "meta_histories", Type: field.TypeInt, Nullable: true},
+		{Name: "user_histories", Type: field.TypeInt, Nullable: true},
 	}
 	// HistoriesTable holds the schema information for the "histories" table.
 	HistoriesTable = &schema.Table{
@@ -24,6 +25,12 @@ var (
 				Symbol:     "histories_meta_histories",
 				Columns:    []*schema.Column{HistoriesColumns[2]},
 				RefColumns: []*schema.Column{MetaColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "histories_users_histories",
+				Columns:    []*schema.Column{HistoriesColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -60,6 +67,18 @@ var (
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
 	}
+	// UsersColumns holds the columns for the "users" table.
+	UsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "email", Type: field.TypeString, Unique: true},
+		{Name: "active", Type: field.TypeBool, Default: true},
+	}
+	// UsersTable holds the schema information for the "users" table.
+	UsersTable = &schema.Table{
+		Name:       "users",
+		Columns:    UsersColumns,
+		PrimaryKey: []*schema.Column{UsersColumns[0]},
+	}
 	// MetaTagsColumns holds the columns for the "meta_tags" table.
 	MetaTagsColumns = []*schema.Column{
 		{Name: "meta_id", Type: field.TypeInt},
@@ -85,17 +104,75 @@ var (
 			},
 		},
 	}
+	// UserFavoriteItemsColumns holds the columns for the "user_favorite_items" table.
+	UserFavoriteItemsColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "meta_id", Type: field.TypeInt},
+	}
+	// UserFavoriteItemsTable holds the schema information for the "user_favorite_items" table.
+	UserFavoriteItemsTable = &schema.Table{
+		Name:       "user_favorite_items",
+		Columns:    UserFavoriteItemsColumns,
+		PrimaryKey: []*schema.Column{UserFavoriteItemsColumns[0], UserFavoriteItemsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_favorite_items_user_id",
+				Columns:    []*schema.Column{UserFavoriteItemsColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_favorite_items_meta_id",
+				Columns:    []*schema.Column{UserFavoriteItemsColumns[1]},
+				RefColumns: []*schema.Column{MetaColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// UserFavoriteTagsColumns holds the columns for the "user_favorite_tags" table.
+	UserFavoriteTagsColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "tag_id", Type: field.TypeInt},
+	}
+	// UserFavoriteTagsTable holds the schema information for the "user_favorite_tags" table.
+	UserFavoriteTagsTable = &schema.Table{
+		Name:       "user_favorite_tags",
+		Columns:    UserFavoriteTagsColumns,
+		PrimaryKey: []*schema.Column{UserFavoriteTagsColumns[0], UserFavoriteTagsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_favorite_tags_user_id",
+				Columns:    []*schema.Column{UserFavoriteTagsColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_favorite_tags_tag_id",
+				Columns:    []*schema.Column{UserFavoriteTagsColumns[1]},
+				RefColumns: []*schema.Column{TagsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		HistoriesTable,
 		MetaTable,
 		TagsTable,
+		UsersTable,
 		MetaTagsTable,
+		UserFavoriteItemsTable,
+		UserFavoriteTagsTable,
 	}
 )
 
 func init() {
 	HistoriesTable.ForeignKeys[0].RefTable = MetaTable
+	HistoriesTable.ForeignKeys[1].RefTable = UsersTable
 	MetaTagsTable.ForeignKeys[0].RefTable = MetaTable
 	MetaTagsTable.ForeignKeys[1].RefTable = TagsTable
+	UserFavoriteItemsTable.ForeignKeys[0].RefTable = UsersTable
+	UserFavoriteItemsTable.ForeignKeys[1].RefTable = MetaTable
+	UserFavoriteTagsTable.ForeignKeys[0].RefTable = UsersTable
+	UserFavoriteTagsTable.ForeignKeys[1].RefTable = TagsTable
 }

@@ -18,6 +18,8 @@ const (
 	FieldCreateTime = "create_time"
 	// EdgeItem holds the string denoting the item edge name in mutations.
 	EdgeItem = "item"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
 	// Table holds the table name of the history in the database.
 	Table = "histories"
 	// ItemTable is the table that holds the item relation/edge.
@@ -27,6 +29,13 @@ const (
 	ItemInverseTable = "meta"
 	// ItemColumn is the table column denoting the item relation/edge.
 	ItemColumn = "meta_histories"
+	// UserTable is the table that holds the user relation/edge.
+	UserTable = "histories"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "user_histories"
 )
 
 // Columns holds all SQL columns for history fields.
@@ -39,6 +48,7 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"meta_histories",
+	"user_histories",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -80,10 +90,24 @@ func ByItemField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newItemStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByUserField orders the results by user field.
+func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newItemStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ItemInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, ItemTable, ItemColumn),
+	)
+}
+func newUserStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
 	)
 }

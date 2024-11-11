@@ -555,6 +555,9 @@ const docTemplate = `{
                 },
                 "tag": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -620,6 +623,9 @@ const docTemplate = `{
                 },
                 "page": {
                     "type": "integer"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -687,6 +693,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/ent.Meta"
                         }
                     ]
+                },
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.User"
+                        }
+                    ]
                 }
             }
         },
@@ -696,6 +710,14 @@ const docTemplate = `{
                 "active": {
                     "description": "Active holds the value of the \"active\" field.",
                     "type": "boolean"
+                },
+                "container_type": {
+                    "description": "ContainerType holds the value of the \"container_type\" field.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/meta.ContainerType"
+                        }
+                    ]
                 },
                 "create_time": {
                     "description": "CreateTime holds the value of the \"create_time\" field.",
@@ -728,14 +750,6 @@ const docTemplate = `{
                     "description": "Name holds the value of the \"name\" field.",
                     "type": "string"
                 },
-                "object_type": {
-                    "description": "ObjectType holds the value of the \"object_type\" field.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/meta.ObjectType"
-                        }
-                    ]
-                },
                 "read": {
                     "description": "Read holds the value of the \"read\" field.",
                     "type": "boolean"
@@ -757,6 +771,13 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ent.Tag"
+                    }
+                },
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.User"
                     }
                 }
             }
@@ -799,6 +820,64 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/ent.Meta"
                     }
+                },
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.User"
+                    }
+                }
+            }
+        },
+        "ent.User": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "description": "Active holds the value of the \"active\" field.",
+                    "type": "boolean"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the UserQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.UserEdges"
+                        }
+                    ]
+                },
+                "email": {
+                    "description": "Email holds the value of the \"email\" field.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.UserEdges": {
+            "type": "object",
+            "properties": {
+                "favorite_items": {
+                    "description": "FavoriteItems holds the value of the favorite_items edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Meta"
+                    }
+                },
+                "favorite_tags": {
+                    "description": "FavoriteTags holds the value of the favorite_tags edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Tag"
+                    }
+                },
+                "histories": {
+                    "description": "Histories holds the value of the histories edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.History"
+                    }
                 }
             }
         },
@@ -824,6 +903,19 @@ const docTemplate = `{
                 }
             }
         },
+        "meta.ContainerType": {
+            "type": "string",
+            "enum": [
+                "zip",
+                "zip",
+                "directory"
+            ],
+            "x-enum-varnames": [
+                "DefaultContainerType",
+                "ContainerTypeZip",
+                "ContainerTypeDirectory"
+            ]
+        },
         "meta.CropDetails": {
             "type": "object",
             "properties": {
@@ -840,19 +932,6 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
-        },
-        "meta.ObjectType": {
-            "type": "string",
-            "enum": [
-                "zip",
-                "zip",
-                "directory"
-            ],
-            "x-enum-varnames": [
-                "DefaultObjectType",
-                "ObjectTypeZip",
-                "ObjectTypeDirectory"
-            ]
         },
         "meta.SortField": {
             "type": "string",
@@ -906,6 +985,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "search": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }
@@ -1013,6 +1095,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -1056,6 +1141,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "name": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }

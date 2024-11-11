@@ -14,6 +14,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 // HistoryUpdate is the builder for updating History entities.
@@ -62,6 +63,25 @@ func (hu *HistoryUpdate) SetItem(m *Meta) *HistoryUpdate {
 	return hu.SetItemID(m.ID)
 }
 
+// SetUserID sets the "user" edge to the User entity by ID.
+func (hu *HistoryUpdate) SetUserID(id int) *HistoryUpdate {
+	hu.mutation.SetUserID(id)
+	return hu
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (hu *HistoryUpdate) SetNillableUserID(id *int) *HistoryUpdate {
+	if id != nil {
+		hu = hu.SetUserID(*id)
+	}
+	return hu
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (hu *HistoryUpdate) SetUser(u *User) *HistoryUpdate {
+	return hu.SetUserID(u.ID)
+}
+
 // Mutation returns the HistoryMutation object of the builder.
 func (hu *HistoryUpdate) Mutation() *HistoryMutation {
 	return hu.mutation
@@ -70,6 +90,12 @@ func (hu *HistoryUpdate) Mutation() *HistoryMutation {
 // ClearItem clears the "item" edge to the Meta entity.
 func (hu *HistoryUpdate) ClearItem() *HistoryUpdate {
 	hu.mutation.ClearItem()
+	return hu
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (hu *HistoryUpdate) ClearUser() *HistoryUpdate {
+	hu.mutation.ClearUser()
 	return hu
 }
 
@@ -141,6 +167,35 @@ func (hu *HistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if hu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   history.UserTable,
+			Columns: []string{history.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := hu.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   history.UserTable,
+			Columns: []string{history.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, hu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{history.Label}
@@ -194,6 +249,25 @@ func (huo *HistoryUpdateOne) SetItem(m *Meta) *HistoryUpdateOne {
 	return huo.SetItemID(m.ID)
 }
 
+// SetUserID sets the "user" edge to the User entity by ID.
+func (huo *HistoryUpdateOne) SetUserID(id int) *HistoryUpdateOne {
+	huo.mutation.SetUserID(id)
+	return huo
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (huo *HistoryUpdateOne) SetNillableUserID(id *int) *HistoryUpdateOne {
+	if id != nil {
+		huo = huo.SetUserID(*id)
+	}
+	return huo
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (huo *HistoryUpdateOne) SetUser(u *User) *HistoryUpdateOne {
+	return huo.SetUserID(u.ID)
+}
+
 // Mutation returns the HistoryMutation object of the builder.
 func (huo *HistoryUpdateOne) Mutation() *HistoryMutation {
 	return huo.mutation
@@ -202,6 +276,12 @@ func (huo *HistoryUpdateOne) Mutation() *HistoryMutation {
 // ClearItem clears the "item" edge to the Meta entity.
 func (huo *HistoryUpdateOne) ClearItem() *HistoryUpdateOne {
 	huo.mutation.ClearItem()
+	return huo
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (huo *HistoryUpdateOne) ClearUser() *HistoryUpdateOne {
+	huo.mutation.ClearUser()
 	return huo
 }
 
@@ -296,6 +376,35 @@ func (huo *HistoryUpdateOne) sqlSave(ctx context.Context) (_node *History, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if huo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   history.UserTable,
+			Columns: []string{history.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := huo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   history.UserTable,
+			Columns: []string{history.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

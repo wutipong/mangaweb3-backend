@@ -2,9 +2,11 @@ package database
 
 import (
 	"context"
+	"fmt"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/schema"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/rs/zerolog/log"
@@ -56,9 +58,17 @@ func CreateEntClient() *ent.Client {
 	return client
 }
 
-func CreateSchema() error {
+func CreateSchema(ctx context.Context) error {
 	client := CreateEntClient()
 	defer client.Close()
 
-	return client.Schema.Create(context.Background())
+	return client.Schema.Create(
+		ctx,
+		schema.WithHooks(func(next schema.Creator) schema.Creator {
+			return schema.CreateFunc(func(ctx context.Context, tables ...*schema.Table) error {
+				fmt.Println("Tables", tables)
+				return next.Create(ctx, tables...)
+			})
+		}),
+	)
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 // HistoryQuery is the builder for querying History entities.
@@ -23,6 +24,7 @@ type HistoryQuery struct {
 	inters     []Interceptor
 	predicates []predicate.History
 	withItem   *MetaQuery
+	withUser   *UserQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -75,6 +77,28 @@ func (hq *HistoryQuery) QueryItem() *MetaQuery {
 			sqlgraph.From(history.Table, history.FieldID, selector),
 			sqlgraph.To(meta.Table, meta.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, history.ItemTable, history.ItemColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(hq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUser chains the current query on the "user" edge.
+func (hq *HistoryQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: hq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := hq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := hq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(history.Table, history.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, history.UserTable, history.UserColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(hq.driver.Dialect(), step)
 		return fromU, nil
@@ -275,6 +299,7 @@ func (hq *HistoryQuery) Clone() *HistoryQuery {
 		inters:     append([]Interceptor{}, hq.inters...),
 		predicates: append([]predicate.History{}, hq.predicates...),
 		withItem:   hq.withItem.Clone(),
+		withUser:   hq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  hq.sql.Clone(),
 		path: hq.path,
@@ -289,6 +314,17 @@ func (hq *HistoryQuery) WithItem(opts ...func(*MetaQuery)) *HistoryQuery {
 		opt(query)
 	}
 	hq.withItem = query
+	return hq
+}
+
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (hq *HistoryQuery) WithUser(opts ...func(*UserQuery)) *HistoryQuery {
+	query := (&UserClient{config: hq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	hq.withUser = query
 	return hq
 }
 
@@ -371,11 +407,12 @@ func (hq *HistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Hist
 		nodes       = []*History{}
 		withFKs     = hq.withFKs
 		_spec       = hq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			hq.withItem != nil,
+			hq.withUser != nil,
 		}
 	)
-	if hq.withItem != nil {
+	if hq.withItem != nil || hq.withUser != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -402,6 +439,12 @@ func (hq *HistoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Hist
 	if query := hq.withItem; query != nil {
 		if err := hq.loadItem(ctx, query, nodes, nil,
 			func(n *History, e *Meta) { n.Edges.Item = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := hq.withUser; query != nil {
+		if err := hq.loadUser(ctx, query, nodes, nil,
+			func(n *History, e *User) { n.Edges.User = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -433,6 +476,38 @@ func (hq *HistoryQuery) loadItem(ctx context.Context, query *MetaQuery, nodes []
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "meta_histories" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (hq *HistoryQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*History, init func(*History), assign func(*History, *User)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*History)
+	for i := range nodes {
+		if nodes[i].user_histories == nil {
+			continue
+		}
+		fk := *nodes[i].user_histories
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(user.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "user_histories" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

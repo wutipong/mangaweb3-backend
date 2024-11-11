@@ -24,5 +24,6 @@ func (History) Fields() []ent.Field {
 func (History) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("item", Meta.Type).Ref("histories").Unique(),
+		edge.From("user", User.Type).Ref("histories").Unique(),
 	}
 }

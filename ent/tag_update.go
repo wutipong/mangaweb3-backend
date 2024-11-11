@@ -13,6 +13,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
+	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
 // TagUpdate is the builder for updating Tag entities.
@@ -97,6 +98,21 @@ func (tu *TagUpdate) AddMeta(m ...*Meta) *TagUpdate {
 	return tu.AddMetumIDs(ids...)
 }
 
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (tu *TagUpdate) AddUserIDs(ids ...int) *TagUpdate {
+	tu.mutation.AddUserIDs(ids...)
+	return tu
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (tu *TagUpdate) AddUser(u ...*User) *TagUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return tu.AddUserIDs(ids...)
+}
+
 // Mutation returns the TagMutation object of the builder.
 func (tu *TagUpdate) Mutation() *TagMutation {
 	return tu.mutation
@@ -121,6 +137,27 @@ func (tu *TagUpdate) RemoveMeta(m ...*Meta) *TagUpdate {
 		ids[i] = m[i].ID
 	}
 	return tu.RemoveMetumIDs(ids...)
+}
+
+// ClearUser clears all "user" edges to the User entity.
+func (tu *TagUpdate) ClearUser() *TagUpdate {
+	tu.mutation.ClearUser()
+	return tu
+}
+
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
+func (tu *TagUpdate) RemoveUserIDs(ids ...int) *TagUpdate {
+	tu.mutation.RemoveUserIDs(ids...)
+	return tu
+}
+
+// RemoveUser removes "user" edges to User entities.
+func (tu *TagUpdate) RemoveUser(u ...*User) *TagUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return tu.RemoveUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -232,6 +269,51 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if tu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.UserTable,
+			Columns: tag.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.RemovedUserIDs(); len(nodes) > 0 && !tu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.UserTable,
+			Columns: tag.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.UserTable,
+			Columns: tag.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{tag.Label}
@@ -321,6 +403,21 @@ func (tuo *TagUpdateOne) AddMeta(m ...*Meta) *TagUpdateOne {
 	return tuo.AddMetumIDs(ids...)
 }
 
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (tuo *TagUpdateOne) AddUserIDs(ids ...int) *TagUpdateOne {
+	tuo.mutation.AddUserIDs(ids...)
+	return tuo
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (tuo *TagUpdateOne) AddUser(u ...*User) *TagUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return tuo.AddUserIDs(ids...)
+}
+
 // Mutation returns the TagMutation object of the builder.
 func (tuo *TagUpdateOne) Mutation() *TagMutation {
 	return tuo.mutation
@@ -345,6 +442,27 @@ func (tuo *TagUpdateOne) RemoveMeta(m ...*Meta) *TagUpdateOne {
 		ids[i] = m[i].ID
 	}
 	return tuo.RemoveMetumIDs(ids...)
+}
+
+// ClearUser clears all "user" edges to the User entity.
+func (tuo *TagUpdateOne) ClearUser() *TagUpdateOne {
+	tuo.mutation.ClearUser()
+	return tuo
+}
+
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
+func (tuo *TagUpdateOne) RemoveUserIDs(ids ...int) *TagUpdateOne {
+	tuo.mutation.RemoveUserIDs(ids...)
+	return tuo
+}
+
+// RemoveUser removes "user" edges to User entities.
+func (tuo *TagUpdateOne) RemoveUser(u ...*User) *TagUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return tuo.RemoveUserIDs(ids...)
 }
 
 // Where appends a list predicates to the TagUpdate builder.
@@ -479,6 +597,51 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(meta.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.UserTable,
+			Columns: tag.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.RemovedUserIDs(); len(nodes) > 0 && !tuo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.UserTable,
+			Columns: tag.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   tag.UserTable,
+			Columns: tag.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

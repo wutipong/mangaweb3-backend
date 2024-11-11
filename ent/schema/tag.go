@@ -25,5 +25,6 @@ func (Tag) Fields() []ent.Field {
 func (Tag) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("meta", Meta.Type).Ref("tags"),
+		edge.From("user", User.Type).Ref("favorite_tags"),
 	}
 }

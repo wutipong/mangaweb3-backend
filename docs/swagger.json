@@ -547,6 +547,9 @@
                 },
                 "tag": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -612,6 +615,9 @@
                 },
                 "page": {
                     "type": "integer"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -679,6 +685,14 @@
                             "$ref": "#/definitions/ent.Meta"
                         }
                     ]
+                },
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.User"
+                        }
+                    ]
                 }
             }
         },
@@ -688,6 +702,14 @@
                 "active": {
                     "description": "Active holds the value of the \"active\" field.",
                     "type": "boolean"
+                },
+                "container_type": {
+                    "description": "ContainerType holds the value of the \"container_type\" field.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/meta.ContainerType"
+                        }
+                    ]
                 },
                 "create_time": {
                     "description": "CreateTime holds the value of the \"create_time\" field.",
@@ -720,14 +742,6 @@
                     "description": "Name holds the value of the \"name\" field.",
                     "type": "string"
                 },
-                "object_type": {
-                    "description": "ObjectType holds the value of the \"object_type\" field.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/meta.ObjectType"
-                        }
-                    ]
-                },
                 "read": {
                     "description": "Read holds the value of the \"read\" field.",
                     "type": "boolean"
@@ -749,6 +763,13 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ent.Tag"
+                    }
+                },
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.User"
                     }
                 }
             }
@@ -791,6 +812,64 @@
                     "items": {
                         "$ref": "#/definitions/ent.Meta"
                     }
+                },
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.User"
+                    }
+                }
+            }
+        },
+        "ent.User": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "description": "Active holds the value of the \"active\" field.",
+                    "type": "boolean"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the UserQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.UserEdges"
+                        }
+                    ]
+                },
+                "email": {
+                    "description": "Email holds the value of the \"email\" field.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.UserEdges": {
+            "type": "object",
+            "properties": {
+                "favorite_items": {
+                    "description": "FavoriteItems holds the value of the favorite_items edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Meta"
+                    }
+                },
+                "favorite_tags": {
+                    "description": "FavoriteTags holds the value of the favorite_tags edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Tag"
+                    }
+                },
+                "histories": {
+                    "description": "Histories holds the value of the histories edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.History"
+                    }
                 }
             }
         },
@@ -816,6 +895,19 @@
                 }
             }
         },
+        "meta.ContainerType": {
+            "type": "string",
+            "enum": [
+                "zip",
+                "zip",
+                "directory"
+            ],
+            "x-enum-varnames": [
+                "DefaultContainerType",
+                "ContainerTypeZip",
+                "ContainerTypeDirectory"
+            ]
+        },
         "meta.CropDetails": {
             "type": "object",
             "properties": {
@@ -832,19 +924,6 @@
                     "type": "integer"
                 }
             }
-        },
-        "meta.ObjectType": {
-            "type": "string",
-            "enum": [
-                "zip",
-                "zip",
-                "directory"
-            ],
-            "x-enum-varnames": [
-                "DefaultObjectType",
-                "ObjectTypeZip",
-                "ObjectTypeDirectory"
-            ]
         },
         "meta.SortField": {
             "type": "string",
@@ -898,6 +977,9 @@
                     "type": "integer"
                 },
                 "search": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }
@@ -1005,6 +1087,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },
@@ -1048,6 +1133,9 @@
             "type": "object",
             "properties": {
                 "name": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }
