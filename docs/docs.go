@@ -190,24 +190,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/tag/recreate_thumbnails": {
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/browse.recreateThumbnailsResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/tag/set_favorite": {
             "post": {
                 "consumes": [
@@ -753,6 +735,26 @@ const docTemplate = `{
                 "read": {
                     "description": "Read holds the value of the \"read\" field.",
                     "type": "boolean"
+                },
+                "thumbnail_height": {
+                    "description": "ThumbnailHeight holds the value of the \"thumbnail_height\" field.",
+                    "type": "integer"
+                },
+                "thumbnail_index": {
+                    "description": "ThumbnailIndex holds the value of the \"thumbnail_index\" field.",
+                    "type": "integer"
+                },
+                "thumbnail_width": {
+                    "description": "ThumbnailWidth holds the value of the \"thumbnail_width\" field.",
+                    "type": "integer"
+                },
+                "thumbnail_x": {
+                    "description": "ThumbnailX holds the value of the \"thumbnail_x\" field.",
+                    "type": "integer"
+                },
+                "thumbnail_y": {
+                    "description": "ThumbnailY holds the value of the \"thumbnail_y\" field.",
+                    "type": "integer"
                 }
             }
         },
@@ -1016,6 +1018,9 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "tag": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }

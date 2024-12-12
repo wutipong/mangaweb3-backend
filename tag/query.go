@@ -66,7 +66,6 @@ func Write(ctx context.Context, client *ent.Client, t *ent.Tag) error {
 		SetName(t.Name).
 		SetHidden(t.Hidden).
 		SetFavorite(t.Favorite).
-		SetThumbnail(t.Thumbnail).
 		OnConflict(sql.ConflictColumns(tag.FieldName)).
 		UpdateNewValues().
 		Exec(ctx)

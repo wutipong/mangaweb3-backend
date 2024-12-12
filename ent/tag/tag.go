@@ -18,8 +18,6 @@ const (
 	FieldFavorite = "favorite"
 	// FieldHidden holds the string denoting the hidden field in the database.
 	FieldHidden = "hidden"
-	// FieldThumbnail holds the string denoting the thumbnail field in the database.
-	FieldThumbnail = "thumbnail"
 	// EdgeMeta holds the string denoting the meta edge name in mutations.
 	EdgeMeta = "meta"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -44,7 +42,6 @@ var Columns = []string{
 	FieldName,
 	FieldFavorite,
 	FieldHidden,
-	FieldThumbnail,
 }
 
 var (

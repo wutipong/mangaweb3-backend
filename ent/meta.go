@@ -26,14 +26,22 @@ type Meta struct {
 	Favorite bool `json:"favorite,omitempty"`
 	// FileIndices holds the value of the "file_indices" field.
 	FileIndices []int `json:"file_indices,omitempty"`
-	// Thumbnail holds the value of the "thumbnail" field.
-	Thumbnail []byte `json:"-"`
 	// Read holds the value of the "read" field.
 	Read bool `json:"read,omitempty"`
 	// Active holds the value of the "active" field.
 	Active bool `json:"active,omitempty"`
 	// ContainerType holds the value of the "container_type" field.
 	ContainerType meta.ContainerType `json:"container_type,omitempty"`
+	// ThumbnailIndex holds the value of the "thumbnail_index" field.
+	ThumbnailIndex int `json:"thumbnail_index,omitempty"`
+	// ThumbnailX holds the value of the "thumbnail_x" field.
+	ThumbnailX int `json:"thumbnail_x,omitempty"`
+	// ThumbnailY holds the value of the "thumbnail_y" field.
+	ThumbnailY int `json:"thumbnail_y,omitempty"`
+	// ThumbnailWidth holds the value of the "thumbnail_width" field.
+	ThumbnailWidth int `json:"thumbnail_width,omitempty"`
+	// ThumbnailHeight holds the value of the "thumbnail_height" field.
+	ThumbnailHeight int `json:"thumbnail_height,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MetaQuery when eager-loading is set.
 	Edges        MetaEdges `json:"edges"`
@@ -85,11 +93,11 @@ func (*Meta) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case meta.FieldFileIndices, meta.FieldThumbnail:
+		case meta.FieldFileIndices:
 			values[i] = new([]byte)
 		case meta.FieldFavorite, meta.FieldRead, meta.FieldActive:
 			values[i] = new(sql.NullBool)
-		case meta.FieldID:
+		case meta.FieldID, meta.FieldThumbnailIndex, meta.FieldThumbnailX, meta.FieldThumbnailY, meta.FieldThumbnailWidth, meta.FieldThumbnailHeight:
 			values[i] = new(sql.NullInt64)
 		case meta.FieldName, meta.FieldContainerType:
 			values[i] = new(sql.NullString)
@@ -142,12 +150,6 @@ func (m *Meta) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field file_indices: %w", err)
 				}
 			}
-		case meta.FieldThumbnail:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field thumbnail", values[i])
-			} else if value != nil {
-				m.Thumbnail = *value
-			}
 		case meta.FieldRead:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field read", values[i])
@@ -165,6 +167,36 @@ func (m *Meta) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field container_type", values[i])
 			} else if value.Valid {
 				m.ContainerType = meta.ContainerType(value.String)
+			}
+		case meta.FieldThumbnailIndex:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field thumbnail_index", values[i])
+			} else if value.Valid {
+				m.ThumbnailIndex = int(value.Int64)
+			}
+		case meta.FieldThumbnailX:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field thumbnail_x", values[i])
+			} else if value.Valid {
+				m.ThumbnailX = int(value.Int64)
+			}
+		case meta.FieldThumbnailY:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field thumbnail_y", values[i])
+			} else if value.Valid {
+				m.ThumbnailY = int(value.Int64)
+			}
+		case meta.FieldThumbnailWidth:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field thumbnail_width", values[i])
+			} else if value.Valid {
+				m.ThumbnailWidth = int(value.Int64)
+			}
+		case meta.FieldThumbnailHeight:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field thumbnail_height", values[i])
+			} else if value.Valid {
+				m.ThumbnailHeight = int(value.Int64)
 			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
@@ -229,8 +261,6 @@ func (m *Meta) String() string {
 	builder.WriteString("file_indices=")
 	builder.WriteString(fmt.Sprintf("%v", m.FileIndices))
 	builder.WriteString(", ")
-	builder.WriteString("thumbnail=<sensitive>")
-	builder.WriteString(", ")
 	builder.WriteString("read=")
 	builder.WriteString(fmt.Sprintf("%v", m.Read))
 	builder.WriteString(", ")
@@ -239,6 +269,21 @@ func (m *Meta) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("container_type=")
 	builder.WriteString(fmt.Sprintf("%v", m.ContainerType))
+	builder.WriteString(", ")
+	builder.WriteString("thumbnail_index=")
+	builder.WriteString(fmt.Sprintf("%v", m.ThumbnailIndex))
+	builder.WriteString(", ")
+	builder.WriteString("thumbnail_x=")
+	builder.WriteString(fmt.Sprintf("%v", m.ThumbnailX))
+	builder.WriteString(", ")
+	builder.WriteString("thumbnail_y=")
+	builder.WriteString(fmt.Sprintf("%v", m.ThumbnailY))
+	builder.WriteString(", ")
+	builder.WriteString("thumbnail_width=")
+	builder.WriteString(fmt.Sprintf("%v", m.ThumbnailWidth))
+	builder.WriteString(", ")
+	builder.WriteString("thumbnail_height=")
+	builder.WriteString(fmt.Sprintf("%v", m.ThumbnailHeight))
 	builder.WriteByte(')')
 	return builder.String()
 }

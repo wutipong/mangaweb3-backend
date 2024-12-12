@@ -123,10 +123,14 @@ func Write(ctx context.Context, client *ent.Client, m *ent.Meta) error {
 		SetCreateTime(m.CreateTime).
 		SetFavorite(m.Favorite).
 		SetFileIndices(m.FileIndices).
-		SetThumbnail(m.Thumbnail).
 		SetRead(m.Read).
 		SetActive(m.Active).
 		SetContainerType(m.ContainerType).
+		SetThumbnailIndex(m.ThumbnailIndex).
+		SetThumbnailX(m.ThumbnailX).
+		SetThumbnailY(m.ThumbnailY).
+		SetThumbnailWidth(m.ThumbnailWidth).
+		SetThumbnailHeight(m.ThumbnailHeight).
 		OnConflict(sql.ConflictColumns(meta.FieldName)).
 		UpdateNewValues().Exec(ctx)
 }

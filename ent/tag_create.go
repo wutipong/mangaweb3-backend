@@ -57,12 +57,6 @@ func (tc *TagCreate) SetNillableHidden(b *bool) *TagCreate {
 	return tc
 }
 
-// SetThumbnail sets the "thumbnail" field.
-func (tc *TagCreate) SetThumbnail(b []byte) *TagCreate {
-	tc.mutation.SetThumbnail(b)
-	return tc
-}
-
 // AddMetumIDs adds the "meta" edge to the Meta entity by IDs.
 func (tc *TagCreate) AddMetumIDs(ids ...int) *TagCreate {
 	tc.mutation.AddMetumIDs(ids...)
@@ -193,10 +187,6 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 		_spec.SetField(tag.FieldHidden, field.TypeBool, value)
 		_node.Hidden = value
 	}
-	if value, ok := tc.mutation.Thumbnail(); ok {
-		_spec.SetField(tag.FieldThumbnail, field.TypeBytes, value)
-		_node.Thumbnail = value
-	}
 	if nodes := tc.mutation.MetaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -317,24 +307,6 @@ func (u *TagUpsert) UpdateHidden() *TagUpsert {
 	return u
 }
 
-// SetThumbnail sets the "thumbnail" field.
-func (u *TagUpsert) SetThumbnail(v []byte) *TagUpsert {
-	u.Set(tag.FieldThumbnail, v)
-	return u
-}
-
-// UpdateThumbnail sets the "thumbnail" field to the value that was provided on create.
-func (u *TagUpsert) UpdateThumbnail() *TagUpsert {
-	u.SetExcluded(tag.FieldThumbnail)
-	return u
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (u *TagUpsert) ClearThumbnail() *TagUpsert {
-	u.SetNull(tag.FieldThumbnail)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -414,27 +386,6 @@ func (u *TagUpsertOne) SetHidden(v bool) *TagUpsertOne {
 func (u *TagUpsertOne) UpdateHidden() *TagUpsertOne {
 	return u.Update(func(s *TagUpsert) {
 		s.UpdateHidden()
-	})
-}
-
-// SetThumbnail sets the "thumbnail" field.
-func (u *TagUpsertOne) SetThumbnail(v []byte) *TagUpsertOne {
-	return u.Update(func(s *TagUpsert) {
-		s.SetThumbnail(v)
-	})
-}
-
-// UpdateThumbnail sets the "thumbnail" field to the value that was provided on create.
-func (u *TagUpsertOne) UpdateThumbnail() *TagUpsertOne {
-	return u.Update(func(s *TagUpsert) {
-		s.UpdateThumbnail()
-	})
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (u *TagUpsertOne) ClearThumbnail() *TagUpsertOne {
-	return u.Update(func(s *TagUpsert) {
-		s.ClearThumbnail()
 	})
 }
 
@@ -681,27 +632,6 @@ func (u *TagUpsertBulk) SetHidden(v bool) *TagUpsertBulk {
 func (u *TagUpsertBulk) UpdateHidden() *TagUpsertBulk {
 	return u.Update(func(s *TagUpsert) {
 		s.UpdateHidden()
-	})
-}
-
-// SetThumbnail sets the "thumbnail" field.
-func (u *TagUpsertBulk) SetThumbnail(v []byte) *TagUpsertBulk {
-	return u.Update(func(s *TagUpsert) {
-		s.SetThumbnail(v)
-	})
-}
-
-// UpdateThumbnail sets the "thumbnail" field to the value that was provided on create.
-func (u *TagUpsertBulk) UpdateThumbnail() *TagUpsertBulk {
-	return u.Update(func(s *TagUpsert) {
-		s.UpdateThumbnail()
-	})
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (u *TagUpsertBulk) ClearThumbnail() *TagUpsertBulk {
-	return u.Update(func(s *TagUpsert) {
-		s.ClearThumbnail()
 	})
 }
 

@@ -70,11 +70,6 @@ func Favorite(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldEQ(FieldFavorite, v))
 }
 
-// Thumbnail applies equality check predicate on the "thumbnail" field. It's identical to ThumbnailEQ.
-func Thumbnail(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldEQ(FieldThumbnail, v))
-}
-
 // Read applies equality check predicate on the "read" field. It's identical to ReadEQ.
 func Read(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldEQ(FieldRead, v))
@@ -83,6 +78,31 @@ func Read(v bool) predicate.Meta {
 // Active applies equality check predicate on the "active" field. It's identical to ActiveEQ.
 func Active(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldEQ(FieldActive, v))
+}
+
+// ThumbnailIndex applies equality check predicate on the "thumbnail_index" field. It's identical to ThumbnailIndexEQ.
+func ThumbnailIndex(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldThumbnailIndex, v))
+}
+
+// ThumbnailX applies equality check predicate on the "thumbnail_x" field. It's identical to ThumbnailXEQ.
+func ThumbnailX(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldThumbnailX, v))
+}
+
+// ThumbnailY applies equality check predicate on the "thumbnail_y" field. It's identical to ThumbnailYEQ.
+func ThumbnailY(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldThumbnailY, v))
+}
+
+// ThumbnailWidth applies equality check predicate on the "thumbnail_width" field. It's identical to ThumbnailWidthEQ.
+func ThumbnailWidth(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldThumbnailWidth, v))
+}
+
+// ThumbnailHeight applies equality check predicate on the "thumbnail_height" field. It's identical to ThumbnailHeightEQ.
+func ThumbnailHeight(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldThumbnailHeight, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -200,56 +220,6 @@ func FavoriteNEQ(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldNEQ(FieldFavorite, v))
 }
 
-// ThumbnailEQ applies the EQ predicate on the "thumbnail" field.
-func ThumbnailEQ(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldEQ(FieldThumbnail, v))
-}
-
-// ThumbnailNEQ applies the NEQ predicate on the "thumbnail" field.
-func ThumbnailNEQ(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldNEQ(FieldThumbnail, v))
-}
-
-// ThumbnailIn applies the In predicate on the "thumbnail" field.
-func ThumbnailIn(vs ...[]byte) predicate.Meta {
-	return predicate.Meta(sql.FieldIn(FieldThumbnail, vs...))
-}
-
-// ThumbnailNotIn applies the NotIn predicate on the "thumbnail" field.
-func ThumbnailNotIn(vs ...[]byte) predicate.Meta {
-	return predicate.Meta(sql.FieldNotIn(FieldThumbnail, vs...))
-}
-
-// ThumbnailGT applies the GT predicate on the "thumbnail" field.
-func ThumbnailGT(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldGT(FieldThumbnail, v))
-}
-
-// ThumbnailGTE applies the GTE predicate on the "thumbnail" field.
-func ThumbnailGTE(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldGTE(FieldThumbnail, v))
-}
-
-// ThumbnailLT applies the LT predicate on the "thumbnail" field.
-func ThumbnailLT(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldLT(FieldThumbnail, v))
-}
-
-// ThumbnailLTE applies the LTE predicate on the "thumbnail" field.
-func ThumbnailLTE(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldLTE(FieldThumbnail, v))
-}
-
-// ThumbnailIsNil applies the IsNil predicate on the "thumbnail" field.
-func ThumbnailIsNil() predicate.Meta {
-	return predicate.Meta(sql.FieldIsNull(FieldThumbnail))
-}
-
-// ThumbnailNotNil applies the NotNil predicate on the "thumbnail" field.
-func ThumbnailNotNil() predicate.Meta {
-	return predicate.Meta(sql.FieldNotNull(FieldThumbnail))
-}
-
 // ReadEQ applies the EQ predicate on the "read" field.
 func ReadEQ(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldEQ(FieldRead, v))
@@ -288,6 +258,256 @@ func ContainerTypeIn(vs ...ContainerType) predicate.Meta {
 // ContainerTypeNotIn applies the NotIn predicate on the "container_type" field.
 func ContainerTypeNotIn(vs ...ContainerType) predicate.Meta {
 	return predicate.Meta(sql.FieldNotIn(FieldContainerType, vs...))
+}
+
+// ThumbnailIndexEQ applies the EQ predicate on the "thumbnail_index" field.
+func ThumbnailIndexEQ(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldThumbnailIndex, v))
+}
+
+// ThumbnailIndexNEQ applies the NEQ predicate on the "thumbnail_index" field.
+func ThumbnailIndexNEQ(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldNEQ(FieldThumbnailIndex, v))
+}
+
+// ThumbnailIndexIn applies the In predicate on the "thumbnail_index" field.
+func ThumbnailIndexIn(vs ...int) predicate.Meta {
+	return predicate.Meta(sql.FieldIn(FieldThumbnailIndex, vs...))
+}
+
+// ThumbnailIndexNotIn applies the NotIn predicate on the "thumbnail_index" field.
+func ThumbnailIndexNotIn(vs ...int) predicate.Meta {
+	return predicate.Meta(sql.FieldNotIn(FieldThumbnailIndex, vs...))
+}
+
+// ThumbnailIndexGT applies the GT predicate on the "thumbnail_index" field.
+func ThumbnailIndexGT(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldGT(FieldThumbnailIndex, v))
+}
+
+// ThumbnailIndexGTE applies the GTE predicate on the "thumbnail_index" field.
+func ThumbnailIndexGTE(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldGTE(FieldThumbnailIndex, v))
+}
+
+// ThumbnailIndexLT applies the LT predicate on the "thumbnail_index" field.
+func ThumbnailIndexLT(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldLT(FieldThumbnailIndex, v))
+}
+
+// ThumbnailIndexLTE applies the LTE predicate on the "thumbnail_index" field.
+func ThumbnailIndexLTE(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldLTE(FieldThumbnailIndex, v))
+}
+
+// ThumbnailIndexIsNil applies the IsNil predicate on the "thumbnail_index" field.
+func ThumbnailIndexIsNil() predicate.Meta {
+	return predicate.Meta(sql.FieldIsNull(FieldThumbnailIndex))
+}
+
+// ThumbnailIndexNotNil applies the NotNil predicate on the "thumbnail_index" field.
+func ThumbnailIndexNotNil() predicate.Meta {
+	return predicate.Meta(sql.FieldNotNull(FieldThumbnailIndex))
+}
+
+// ThumbnailXEQ applies the EQ predicate on the "thumbnail_x" field.
+func ThumbnailXEQ(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldThumbnailX, v))
+}
+
+// ThumbnailXNEQ applies the NEQ predicate on the "thumbnail_x" field.
+func ThumbnailXNEQ(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldNEQ(FieldThumbnailX, v))
+}
+
+// ThumbnailXIn applies the In predicate on the "thumbnail_x" field.
+func ThumbnailXIn(vs ...int) predicate.Meta {
+	return predicate.Meta(sql.FieldIn(FieldThumbnailX, vs...))
+}
+
+// ThumbnailXNotIn applies the NotIn predicate on the "thumbnail_x" field.
+func ThumbnailXNotIn(vs ...int) predicate.Meta {
+	return predicate.Meta(sql.FieldNotIn(FieldThumbnailX, vs...))
+}
+
+// ThumbnailXGT applies the GT predicate on the "thumbnail_x" field.
+func ThumbnailXGT(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldGT(FieldThumbnailX, v))
+}
+
+// ThumbnailXGTE applies the GTE predicate on the "thumbnail_x" field.
+func ThumbnailXGTE(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldGTE(FieldThumbnailX, v))
+}
+
+// ThumbnailXLT applies the LT predicate on the "thumbnail_x" field.
+func ThumbnailXLT(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldLT(FieldThumbnailX, v))
+}
+
+// ThumbnailXLTE applies the LTE predicate on the "thumbnail_x" field.
+func ThumbnailXLTE(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldLTE(FieldThumbnailX, v))
+}
+
+// ThumbnailXIsNil applies the IsNil predicate on the "thumbnail_x" field.
+func ThumbnailXIsNil() predicate.Meta {
+	return predicate.Meta(sql.FieldIsNull(FieldThumbnailX))
+}
+
+// ThumbnailXNotNil applies the NotNil predicate on the "thumbnail_x" field.
+func ThumbnailXNotNil() predicate.Meta {
+	return predicate.Meta(sql.FieldNotNull(FieldThumbnailX))
+}
+
+// ThumbnailYEQ applies the EQ predicate on the "thumbnail_y" field.
+func ThumbnailYEQ(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldThumbnailY, v))
+}
+
+// ThumbnailYNEQ applies the NEQ predicate on the "thumbnail_y" field.
+func ThumbnailYNEQ(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldNEQ(FieldThumbnailY, v))
+}
+
+// ThumbnailYIn applies the In predicate on the "thumbnail_y" field.
+func ThumbnailYIn(vs ...int) predicate.Meta {
+	return predicate.Meta(sql.FieldIn(FieldThumbnailY, vs...))
+}
+
+// ThumbnailYNotIn applies the NotIn predicate on the "thumbnail_y" field.
+func ThumbnailYNotIn(vs ...int) predicate.Meta {
+	return predicate.Meta(sql.FieldNotIn(FieldThumbnailY, vs...))
+}
+
+// ThumbnailYGT applies the GT predicate on the "thumbnail_y" field.
+func ThumbnailYGT(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldGT(FieldThumbnailY, v))
+}
+
+// ThumbnailYGTE applies the GTE predicate on the "thumbnail_y" field.
+func ThumbnailYGTE(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldGTE(FieldThumbnailY, v))
+}
+
+// ThumbnailYLT applies the LT predicate on the "thumbnail_y" field.
+func ThumbnailYLT(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldLT(FieldThumbnailY, v))
+}
+
+// ThumbnailYLTE applies the LTE predicate on the "thumbnail_y" field.
+func ThumbnailYLTE(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldLTE(FieldThumbnailY, v))
+}
+
+// ThumbnailYIsNil applies the IsNil predicate on the "thumbnail_y" field.
+func ThumbnailYIsNil() predicate.Meta {
+	return predicate.Meta(sql.FieldIsNull(FieldThumbnailY))
+}
+
+// ThumbnailYNotNil applies the NotNil predicate on the "thumbnail_y" field.
+func ThumbnailYNotNil() predicate.Meta {
+	return predicate.Meta(sql.FieldNotNull(FieldThumbnailY))
+}
+
+// ThumbnailWidthEQ applies the EQ predicate on the "thumbnail_width" field.
+func ThumbnailWidthEQ(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldThumbnailWidth, v))
+}
+
+// ThumbnailWidthNEQ applies the NEQ predicate on the "thumbnail_width" field.
+func ThumbnailWidthNEQ(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldNEQ(FieldThumbnailWidth, v))
+}
+
+// ThumbnailWidthIn applies the In predicate on the "thumbnail_width" field.
+func ThumbnailWidthIn(vs ...int) predicate.Meta {
+	return predicate.Meta(sql.FieldIn(FieldThumbnailWidth, vs...))
+}
+
+// ThumbnailWidthNotIn applies the NotIn predicate on the "thumbnail_width" field.
+func ThumbnailWidthNotIn(vs ...int) predicate.Meta {
+	return predicate.Meta(sql.FieldNotIn(FieldThumbnailWidth, vs...))
+}
+
+// ThumbnailWidthGT applies the GT predicate on the "thumbnail_width" field.
+func ThumbnailWidthGT(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldGT(FieldThumbnailWidth, v))
+}
+
+// ThumbnailWidthGTE applies the GTE predicate on the "thumbnail_width" field.
+func ThumbnailWidthGTE(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldGTE(FieldThumbnailWidth, v))
+}
+
+// ThumbnailWidthLT applies the LT predicate on the "thumbnail_width" field.
+func ThumbnailWidthLT(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldLT(FieldThumbnailWidth, v))
+}
+
+// ThumbnailWidthLTE applies the LTE predicate on the "thumbnail_width" field.
+func ThumbnailWidthLTE(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldLTE(FieldThumbnailWidth, v))
+}
+
+// ThumbnailWidthIsNil applies the IsNil predicate on the "thumbnail_width" field.
+func ThumbnailWidthIsNil() predicate.Meta {
+	return predicate.Meta(sql.FieldIsNull(FieldThumbnailWidth))
+}
+
+// ThumbnailWidthNotNil applies the NotNil predicate on the "thumbnail_width" field.
+func ThumbnailWidthNotNil() predicate.Meta {
+	return predicate.Meta(sql.FieldNotNull(FieldThumbnailWidth))
+}
+
+// ThumbnailHeightEQ applies the EQ predicate on the "thumbnail_height" field.
+func ThumbnailHeightEQ(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldThumbnailHeight, v))
+}
+
+// ThumbnailHeightNEQ applies the NEQ predicate on the "thumbnail_height" field.
+func ThumbnailHeightNEQ(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldNEQ(FieldThumbnailHeight, v))
+}
+
+// ThumbnailHeightIn applies the In predicate on the "thumbnail_height" field.
+func ThumbnailHeightIn(vs ...int) predicate.Meta {
+	return predicate.Meta(sql.FieldIn(FieldThumbnailHeight, vs...))
+}
+
+// ThumbnailHeightNotIn applies the NotIn predicate on the "thumbnail_height" field.
+func ThumbnailHeightNotIn(vs ...int) predicate.Meta {
+	return predicate.Meta(sql.FieldNotIn(FieldThumbnailHeight, vs...))
+}
+
+// ThumbnailHeightGT applies the GT predicate on the "thumbnail_height" field.
+func ThumbnailHeightGT(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldGT(FieldThumbnailHeight, v))
+}
+
+// ThumbnailHeightGTE applies the GTE predicate on the "thumbnail_height" field.
+func ThumbnailHeightGTE(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldGTE(FieldThumbnailHeight, v))
+}
+
+// ThumbnailHeightLT applies the LT predicate on the "thumbnail_height" field.
+func ThumbnailHeightLT(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldLT(FieldThumbnailHeight, v))
+}
+
+// ThumbnailHeightLTE applies the LTE predicate on the "thumbnail_height" field.
+func ThumbnailHeightLTE(v int) predicate.Meta {
+	return predicate.Meta(sql.FieldLTE(FieldThumbnailHeight, v))
+}
+
+// ThumbnailHeightIsNil applies the IsNil predicate on the "thumbnail_height" field.
+func ThumbnailHeightIsNil() predicate.Meta {
+	return predicate.Meta(sql.FieldIsNull(FieldThumbnailHeight))
+}
+
+// ThumbnailHeightNotNil applies the NotNil predicate on the "thumbnail_height" field.
+func ThumbnailHeightNotNil() predicate.Meta {
+	return predicate.Meta(sql.FieldNotNull(FieldThumbnailHeight))
 }
 
 // HasTags applies the HasEdge predicate on the "tags" edge.

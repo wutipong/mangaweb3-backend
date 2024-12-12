@@ -22,8 +22,6 @@ type Tag struct {
 	Favorite bool `json:"favorite,omitempty"`
 	// Hidden holds the value of the "hidden" field.
 	Hidden bool `json:"hidden,omitempty"`
-	// Thumbnail holds the value of the "thumbnail" field.
-	Thumbnail []byte `json:"-"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TagQuery when eager-loading is set.
 	Edges        TagEdges `json:"edges"`
@@ -64,8 +62,6 @@ func (*Tag) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case tag.FieldThumbnail:
-			values[i] = new([]byte)
 		case tag.FieldFavorite, tag.FieldHidden:
 			values[i] = new(sql.NullBool)
 		case tag.FieldID:
@@ -110,12 +106,6 @@ func (t *Tag) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field hidden", values[i])
 			} else if value.Valid {
 				t.Hidden = value.Bool
-			}
-		case tag.FieldThumbnail:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field thumbnail", values[i])
-			} else if value != nil {
-				t.Thumbnail = *value
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])
@@ -171,8 +161,6 @@ func (t *Tag) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("hidden=")
 	builder.WriteString(fmt.Sprintf("%v", t.Hidden))
-	builder.WriteString(", ")
-	builder.WriteString("thumbnail=<sensitive>")
 	builder.WriteByte(')')
 	return builder.String()
 }

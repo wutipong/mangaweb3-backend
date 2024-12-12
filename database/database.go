@@ -10,6 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/ent"
+	"github.com/wutipong/mangaweb3-backend/ent/migrate"
 )
 
 var pool *pgxpool.Pool
@@ -60,5 +61,5 @@ func CreateSchema(ctx context.Context) error {
 	client := CreateEntClient()
 	defer client.Close()
 
-	return client.Schema.Create(ctx)
+	return client.Schema.Create(ctx, migrate.WithDropColumn(true), migrate.WithDropIndex(true))
 }

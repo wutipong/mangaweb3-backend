@@ -23,14 +23,22 @@ const (
 	FieldFavorite = "favorite"
 	// FieldFileIndices holds the string denoting the file_indices field in the database.
 	FieldFileIndices = "file_indices"
-	// FieldThumbnail holds the string denoting the thumbnail field in the database.
-	FieldThumbnail = "thumbnail"
 	// FieldRead holds the string denoting the read field in the database.
 	FieldRead = "read"
 	// FieldActive holds the string denoting the active field in the database.
 	FieldActive = "active"
 	// FieldContainerType holds the string denoting the container_type field in the database.
 	FieldContainerType = "container_type"
+	// FieldThumbnailIndex holds the string denoting the thumbnail_index field in the database.
+	FieldThumbnailIndex = "thumbnail_index"
+	// FieldThumbnailX holds the string denoting the thumbnail_x field in the database.
+	FieldThumbnailX = "thumbnail_x"
+	// FieldThumbnailY holds the string denoting the thumbnail_y field in the database.
+	FieldThumbnailY = "thumbnail_y"
+	// FieldThumbnailWidth holds the string denoting the thumbnail_width field in the database.
+	FieldThumbnailWidth = "thumbnail_width"
+	// FieldThumbnailHeight holds the string denoting the thumbnail_height field in the database.
+	FieldThumbnailHeight = "thumbnail_height"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
 	EdgeTags = "tags"
 	// EdgeHistories holds the string denoting the histories edge name in mutations.
@@ -65,10 +73,14 @@ var Columns = []string{
 	FieldCreateTime,
 	FieldFavorite,
 	FieldFileIndices,
-	FieldThumbnail,
 	FieldRead,
 	FieldActive,
 	FieldContainerType,
+	FieldThumbnailIndex,
+	FieldThumbnailX,
+	FieldThumbnailY,
+	FieldThumbnailWidth,
+	FieldThumbnailHeight,
 }
 
 var (
@@ -103,6 +115,16 @@ var (
 	DefaultRead bool
 	// DefaultActive holds the default value on creation for the "active" field.
 	DefaultActive bool
+	// DefaultThumbnailIndex holds the default value on creation for the "thumbnail_index" field.
+	DefaultThumbnailIndex int
+	// DefaultThumbnailX holds the default value on creation for the "thumbnail_x" field.
+	DefaultThumbnailX int
+	// DefaultThumbnailY holds the default value on creation for the "thumbnail_y" field.
+	DefaultThumbnailY int
+	// DefaultThumbnailWidth holds the default value on creation for the "thumbnail_width" field.
+	DefaultThumbnailWidth int
+	// DefaultThumbnailHeight holds the default value on creation for the "thumbnail_height" field.
+	DefaultThumbnailHeight int
 )
 
 // ContainerType defines the type for the "container_type" enum field.
@@ -167,6 +189,31 @@ func ByActive(opts ...sql.OrderTermOption) OrderOption {
 // ByContainerType orders the results by the container_type field.
 func ByContainerType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldContainerType, opts...).ToFunc()
+}
+
+// ByThumbnailIndex orders the results by the thumbnail_index field.
+func ByThumbnailIndex(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThumbnailIndex, opts...).ToFunc()
+}
+
+// ByThumbnailX orders the results by the thumbnail_x field.
+func ByThumbnailX(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThumbnailX, opts...).ToFunc()
+}
+
+// ByThumbnailY orders the results by the thumbnail_y field.
+func ByThumbnailY(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThumbnailY, opts...).ToFunc()
+}
+
+// ByThumbnailWidth orders the results by the thumbnail_width field.
+func ByThumbnailWidth(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThumbnailWidth, opts...).ToFunc()
+}
+
+// ByThumbnailHeight orders the results by the thumbnail_height field.
+func ByThumbnailHeight(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThumbnailHeight, opts...).ToFunc()
 }
 
 // ByTagsCount orders the results by tags count.

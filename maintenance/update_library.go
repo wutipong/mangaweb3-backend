@@ -13,6 +13,4 @@ func UpdateLibrary() {
 	ScanLibrary(client)
 	log.Info().Msg("Update tag list.")
 	UpdateTags(client)
-	log.Info().Msg("Update missing thumbnails.")
-	UpdateMissingThumbnail(client)
 }
