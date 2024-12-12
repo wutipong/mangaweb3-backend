@@ -49,6 +49,12 @@ func main() {
 	if value, valid := os.LookupEnv("MANGAWEB_DATA_PATH"); valid {
 		dataPath = value
 	}
+
+	cachePath := "./cache"
+	if value, valid := os.LookupEnv("MANGAWEB_CACHE_PATH"); valid {
+		cachePath = value
+	}
+
 	connectionStr := "postgres://postgres:password@localhost:5432/manga"
 	if value, valid := os.LookupEnv("MANGAWEB_DB"); valid {
 		connectionStr = value
@@ -72,6 +78,7 @@ func main() {
 		Bool("debugMode", debugMode).
 		Str("version", versionString).
 		Str("data_path", dataPath).
+		Str("cache_path", cachePath).
 		Str("address", address).
 		Msg("Server started.")
 
@@ -79,6 +86,7 @@ func main() {
 		DebugMode:     debugMode,
 		VersionString: versionString,
 		DataPath:      dataPath,
+		CachePath:     cachePath,
 	})
 
 	if err := database.Open(ctx, connectionStr); err != nil {
