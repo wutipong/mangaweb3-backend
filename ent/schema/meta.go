@@ -24,6 +24,11 @@ func (Meta) Fields() []ent.Field {
 		field.Bool("read").Default(false),
 		field.Bool("active").Default(true),
 		field.Enum("container_type").Values("zip", "directory").Default("zip"),
+		field.Int("thumbnail_index").Default(0).Optional(),
+		field.Int("thumbnail_x").Default(0).Optional(),
+		field.Int("thumbnmail_y").Default(0).Optional(),
+		field.Int("thumbnail_width").Default(0).Optional(),
+		field.Int("thumbnail_height").Default(0).Optional(),
 	}
 }
 

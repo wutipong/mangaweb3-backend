@@ -1017,6 +1017,9 @@ const docTemplate = `{
                 },
                 "tag": {
                     "type": "string"
+                },
+                "user": {
+                    "type": "string"
                 }
             }
         },

@@ -113,6 +113,76 @@ func (mc *MetaCreate) SetNillableContainerType(mt *meta.ContainerType) *MetaCrea
 	return mc
 }
 
+// SetThumbnailIndex sets the "thumbnail_index" field.
+func (mc *MetaCreate) SetThumbnailIndex(i int) *MetaCreate {
+	mc.mutation.SetThumbnailIndex(i)
+	return mc
+}
+
+// SetNillableThumbnailIndex sets the "thumbnail_index" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableThumbnailIndex(i *int) *MetaCreate {
+	if i != nil {
+		mc.SetThumbnailIndex(*i)
+	}
+	return mc
+}
+
+// SetThumbnailX sets the "thumbnail_x" field.
+func (mc *MetaCreate) SetThumbnailX(i int) *MetaCreate {
+	mc.mutation.SetThumbnailX(i)
+	return mc
+}
+
+// SetNillableThumbnailX sets the "thumbnail_x" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableThumbnailX(i *int) *MetaCreate {
+	if i != nil {
+		mc.SetThumbnailX(*i)
+	}
+	return mc
+}
+
+// SetThumbnmailY sets the "thumbnmail_y" field.
+func (mc *MetaCreate) SetThumbnmailY(i int) *MetaCreate {
+	mc.mutation.SetThumbnmailY(i)
+	return mc
+}
+
+// SetNillableThumbnmailY sets the "thumbnmail_y" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableThumbnmailY(i *int) *MetaCreate {
+	if i != nil {
+		mc.SetThumbnmailY(*i)
+	}
+	return mc
+}
+
+// SetThumbnailWidth sets the "thumbnail_width" field.
+func (mc *MetaCreate) SetThumbnailWidth(i int) *MetaCreate {
+	mc.mutation.SetThumbnailWidth(i)
+	return mc
+}
+
+// SetNillableThumbnailWidth sets the "thumbnail_width" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableThumbnailWidth(i *int) *MetaCreate {
+	if i != nil {
+		mc.SetThumbnailWidth(*i)
+	}
+	return mc
+}
+
+// SetThumbnailHeight sets the "thumbnail_height" field.
+func (mc *MetaCreate) SetThumbnailHeight(i int) *MetaCreate {
+	mc.mutation.SetThumbnailHeight(i)
+	return mc
+}
+
+// SetNillableThumbnailHeight sets the "thumbnail_height" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableThumbnailHeight(i *int) *MetaCreate {
+	if i != nil {
+		mc.SetThumbnailHeight(*i)
+	}
+	return mc
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (mc *MetaCreate) AddTagIDs(ids ...int) *MetaCreate {
 	mc.mutation.AddTagIDs(ids...)
@@ -217,6 +287,26 @@ func (mc *MetaCreate) defaults() {
 		v := meta.DefaultContainerType
 		mc.mutation.SetContainerType(v)
 	}
+	if _, ok := mc.mutation.ThumbnailIndex(); !ok {
+		v := meta.DefaultThumbnailIndex
+		mc.mutation.SetThumbnailIndex(v)
+	}
+	if _, ok := mc.mutation.ThumbnailX(); !ok {
+		v := meta.DefaultThumbnailX
+		mc.mutation.SetThumbnailX(v)
+	}
+	if _, ok := mc.mutation.ThumbnmailY(); !ok {
+		v := meta.DefaultThumbnmailY
+		mc.mutation.SetThumbnmailY(v)
+	}
+	if _, ok := mc.mutation.ThumbnailWidth(); !ok {
+		v := meta.DefaultThumbnailWidth
+		mc.mutation.SetThumbnailWidth(v)
+	}
+	if _, ok := mc.mutation.ThumbnailHeight(); !ok {
+		v := meta.DefaultThumbnailHeight
+		mc.mutation.SetThumbnailHeight(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -310,6 +400,26 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.ContainerType(); ok {
 		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)
 		_node.ContainerType = value
+	}
+	if value, ok := mc.mutation.ThumbnailIndex(); ok {
+		_spec.SetField(meta.FieldThumbnailIndex, field.TypeInt, value)
+		_node.ThumbnailIndex = value
+	}
+	if value, ok := mc.mutation.ThumbnailX(); ok {
+		_spec.SetField(meta.FieldThumbnailX, field.TypeInt, value)
+		_node.ThumbnailX = value
+	}
+	if value, ok := mc.mutation.ThumbnmailY(); ok {
+		_spec.SetField(meta.FieldThumbnmailY, field.TypeInt, value)
+		_node.ThumbnmailY = value
+	}
+	if value, ok := mc.mutation.ThumbnailWidth(); ok {
+		_spec.SetField(meta.FieldThumbnailWidth, field.TypeInt, value)
+		_node.ThumbnailWidth = value
+	}
+	if value, ok := mc.mutation.ThumbnailHeight(); ok {
+		_spec.SetField(meta.FieldThumbnailHeight, field.TypeInt, value)
+		_node.ThumbnailHeight = value
 	}
 	if nodes := mc.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -513,6 +623,126 @@ func (u *MetaUpsert) UpdateContainerType() *MetaUpsert {
 	return u
 }
 
+// SetThumbnailIndex sets the "thumbnail_index" field.
+func (u *MetaUpsert) SetThumbnailIndex(v int) *MetaUpsert {
+	u.Set(meta.FieldThumbnailIndex, v)
+	return u
+}
+
+// UpdateThumbnailIndex sets the "thumbnail_index" field to the value that was provided on create.
+func (u *MetaUpsert) UpdateThumbnailIndex() *MetaUpsert {
+	u.SetExcluded(meta.FieldThumbnailIndex)
+	return u
+}
+
+// AddThumbnailIndex adds v to the "thumbnail_index" field.
+func (u *MetaUpsert) AddThumbnailIndex(v int) *MetaUpsert {
+	u.Add(meta.FieldThumbnailIndex, v)
+	return u
+}
+
+// ClearThumbnailIndex clears the value of the "thumbnail_index" field.
+func (u *MetaUpsert) ClearThumbnailIndex() *MetaUpsert {
+	u.SetNull(meta.FieldThumbnailIndex)
+	return u
+}
+
+// SetThumbnailX sets the "thumbnail_x" field.
+func (u *MetaUpsert) SetThumbnailX(v int) *MetaUpsert {
+	u.Set(meta.FieldThumbnailX, v)
+	return u
+}
+
+// UpdateThumbnailX sets the "thumbnail_x" field to the value that was provided on create.
+func (u *MetaUpsert) UpdateThumbnailX() *MetaUpsert {
+	u.SetExcluded(meta.FieldThumbnailX)
+	return u
+}
+
+// AddThumbnailX adds v to the "thumbnail_x" field.
+func (u *MetaUpsert) AddThumbnailX(v int) *MetaUpsert {
+	u.Add(meta.FieldThumbnailX, v)
+	return u
+}
+
+// ClearThumbnailX clears the value of the "thumbnail_x" field.
+func (u *MetaUpsert) ClearThumbnailX() *MetaUpsert {
+	u.SetNull(meta.FieldThumbnailX)
+	return u
+}
+
+// SetThumbnmailY sets the "thumbnmail_y" field.
+func (u *MetaUpsert) SetThumbnmailY(v int) *MetaUpsert {
+	u.Set(meta.FieldThumbnmailY, v)
+	return u
+}
+
+// UpdateThumbnmailY sets the "thumbnmail_y" field to the value that was provided on create.
+func (u *MetaUpsert) UpdateThumbnmailY() *MetaUpsert {
+	u.SetExcluded(meta.FieldThumbnmailY)
+	return u
+}
+
+// AddThumbnmailY adds v to the "thumbnmail_y" field.
+func (u *MetaUpsert) AddThumbnmailY(v int) *MetaUpsert {
+	u.Add(meta.FieldThumbnmailY, v)
+	return u
+}
+
+// ClearThumbnmailY clears the value of the "thumbnmail_y" field.
+func (u *MetaUpsert) ClearThumbnmailY() *MetaUpsert {
+	u.SetNull(meta.FieldThumbnmailY)
+	return u
+}
+
+// SetThumbnailWidth sets the "thumbnail_width" field.
+func (u *MetaUpsert) SetThumbnailWidth(v int) *MetaUpsert {
+	u.Set(meta.FieldThumbnailWidth, v)
+	return u
+}
+
+// UpdateThumbnailWidth sets the "thumbnail_width" field to the value that was provided on create.
+func (u *MetaUpsert) UpdateThumbnailWidth() *MetaUpsert {
+	u.SetExcluded(meta.FieldThumbnailWidth)
+	return u
+}
+
+// AddThumbnailWidth adds v to the "thumbnail_width" field.
+func (u *MetaUpsert) AddThumbnailWidth(v int) *MetaUpsert {
+	u.Add(meta.FieldThumbnailWidth, v)
+	return u
+}
+
+// ClearThumbnailWidth clears the value of the "thumbnail_width" field.
+func (u *MetaUpsert) ClearThumbnailWidth() *MetaUpsert {
+	u.SetNull(meta.FieldThumbnailWidth)
+	return u
+}
+
+// SetThumbnailHeight sets the "thumbnail_height" field.
+func (u *MetaUpsert) SetThumbnailHeight(v int) *MetaUpsert {
+	u.Set(meta.FieldThumbnailHeight, v)
+	return u
+}
+
+// UpdateThumbnailHeight sets the "thumbnail_height" field to the value that was provided on create.
+func (u *MetaUpsert) UpdateThumbnailHeight() *MetaUpsert {
+	u.SetExcluded(meta.FieldThumbnailHeight)
+	return u
+}
+
+// AddThumbnailHeight adds v to the "thumbnail_height" field.
+func (u *MetaUpsert) AddThumbnailHeight(v int) *MetaUpsert {
+	u.Add(meta.FieldThumbnailHeight, v)
+	return u
+}
+
+// ClearThumbnailHeight clears the value of the "thumbnail_height" field.
+func (u *MetaUpsert) ClearThumbnailHeight() *MetaUpsert {
+	u.SetNull(meta.FieldThumbnailHeight)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -669,6 +899,146 @@ func (u *MetaUpsertOne) SetContainerType(v meta.ContainerType) *MetaUpsertOne {
 func (u *MetaUpsertOne) UpdateContainerType() *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateContainerType()
+	})
+}
+
+// SetThumbnailIndex sets the "thumbnail_index" field.
+func (u *MetaUpsertOne) SetThumbnailIndex(v int) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetThumbnailIndex(v)
+	})
+}
+
+// AddThumbnailIndex adds v to the "thumbnail_index" field.
+func (u *MetaUpsertOne) AddThumbnailIndex(v int) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.AddThumbnailIndex(v)
+	})
+}
+
+// UpdateThumbnailIndex sets the "thumbnail_index" field to the value that was provided on create.
+func (u *MetaUpsertOne) UpdateThumbnailIndex() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateThumbnailIndex()
+	})
+}
+
+// ClearThumbnailIndex clears the value of the "thumbnail_index" field.
+func (u *MetaUpsertOne) ClearThumbnailIndex() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnailIndex()
+	})
+}
+
+// SetThumbnailX sets the "thumbnail_x" field.
+func (u *MetaUpsertOne) SetThumbnailX(v int) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetThumbnailX(v)
+	})
+}
+
+// AddThumbnailX adds v to the "thumbnail_x" field.
+func (u *MetaUpsertOne) AddThumbnailX(v int) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.AddThumbnailX(v)
+	})
+}
+
+// UpdateThumbnailX sets the "thumbnail_x" field to the value that was provided on create.
+func (u *MetaUpsertOne) UpdateThumbnailX() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateThumbnailX()
+	})
+}
+
+// ClearThumbnailX clears the value of the "thumbnail_x" field.
+func (u *MetaUpsertOne) ClearThumbnailX() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnailX()
+	})
+}
+
+// SetThumbnmailY sets the "thumbnmail_y" field.
+func (u *MetaUpsertOne) SetThumbnmailY(v int) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetThumbnmailY(v)
+	})
+}
+
+// AddThumbnmailY adds v to the "thumbnmail_y" field.
+func (u *MetaUpsertOne) AddThumbnmailY(v int) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.AddThumbnmailY(v)
+	})
+}
+
+// UpdateThumbnmailY sets the "thumbnmail_y" field to the value that was provided on create.
+func (u *MetaUpsertOne) UpdateThumbnmailY() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateThumbnmailY()
+	})
+}
+
+// ClearThumbnmailY clears the value of the "thumbnmail_y" field.
+func (u *MetaUpsertOne) ClearThumbnmailY() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnmailY()
+	})
+}
+
+// SetThumbnailWidth sets the "thumbnail_width" field.
+func (u *MetaUpsertOne) SetThumbnailWidth(v int) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetThumbnailWidth(v)
+	})
+}
+
+// AddThumbnailWidth adds v to the "thumbnail_width" field.
+func (u *MetaUpsertOne) AddThumbnailWidth(v int) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.AddThumbnailWidth(v)
+	})
+}
+
+// UpdateThumbnailWidth sets the "thumbnail_width" field to the value that was provided on create.
+func (u *MetaUpsertOne) UpdateThumbnailWidth() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateThumbnailWidth()
+	})
+}
+
+// ClearThumbnailWidth clears the value of the "thumbnail_width" field.
+func (u *MetaUpsertOne) ClearThumbnailWidth() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnailWidth()
+	})
+}
+
+// SetThumbnailHeight sets the "thumbnail_height" field.
+func (u *MetaUpsertOne) SetThumbnailHeight(v int) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetThumbnailHeight(v)
+	})
+}
+
+// AddThumbnailHeight adds v to the "thumbnail_height" field.
+func (u *MetaUpsertOne) AddThumbnailHeight(v int) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.AddThumbnailHeight(v)
+	})
+}
+
+// UpdateThumbnailHeight sets the "thumbnail_height" field to the value that was provided on create.
+func (u *MetaUpsertOne) UpdateThumbnailHeight() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateThumbnailHeight()
+	})
+}
+
+// ClearThumbnailHeight clears the value of the "thumbnail_height" field.
+func (u *MetaUpsertOne) ClearThumbnailHeight() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnailHeight()
 	})
 }
 
@@ -992,6 +1362,146 @@ func (u *MetaUpsertBulk) SetContainerType(v meta.ContainerType) *MetaUpsertBulk 
 func (u *MetaUpsertBulk) UpdateContainerType() *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateContainerType()
+	})
+}
+
+// SetThumbnailIndex sets the "thumbnail_index" field.
+func (u *MetaUpsertBulk) SetThumbnailIndex(v int) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetThumbnailIndex(v)
+	})
+}
+
+// AddThumbnailIndex adds v to the "thumbnail_index" field.
+func (u *MetaUpsertBulk) AddThumbnailIndex(v int) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.AddThumbnailIndex(v)
+	})
+}
+
+// UpdateThumbnailIndex sets the "thumbnail_index" field to the value that was provided on create.
+func (u *MetaUpsertBulk) UpdateThumbnailIndex() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateThumbnailIndex()
+	})
+}
+
+// ClearThumbnailIndex clears the value of the "thumbnail_index" field.
+func (u *MetaUpsertBulk) ClearThumbnailIndex() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnailIndex()
+	})
+}
+
+// SetThumbnailX sets the "thumbnail_x" field.
+func (u *MetaUpsertBulk) SetThumbnailX(v int) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetThumbnailX(v)
+	})
+}
+
+// AddThumbnailX adds v to the "thumbnail_x" field.
+func (u *MetaUpsertBulk) AddThumbnailX(v int) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.AddThumbnailX(v)
+	})
+}
+
+// UpdateThumbnailX sets the "thumbnail_x" field to the value that was provided on create.
+func (u *MetaUpsertBulk) UpdateThumbnailX() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateThumbnailX()
+	})
+}
+
+// ClearThumbnailX clears the value of the "thumbnail_x" field.
+func (u *MetaUpsertBulk) ClearThumbnailX() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnailX()
+	})
+}
+
+// SetThumbnmailY sets the "thumbnmail_y" field.
+func (u *MetaUpsertBulk) SetThumbnmailY(v int) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetThumbnmailY(v)
+	})
+}
+
+// AddThumbnmailY adds v to the "thumbnmail_y" field.
+func (u *MetaUpsertBulk) AddThumbnmailY(v int) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.AddThumbnmailY(v)
+	})
+}
+
+// UpdateThumbnmailY sets the "thumbnmail_y" field to the value that was provided on create.
+func (u *MetaUpsertBulk) UpdateThumbnmailY() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateThumbnmailY()
+	})
+}
+
+// ClearThumbnmailY clears the value of the "thumbnmail_y" field.
+func (u *MetaUpsertBulk) ClearThumbnmailY() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnmailY()
+	})
+}
+
+// SetThumbnailWidth sets the "thumbnail_width" field.
+func (u *MetaUpsertBulk) SetThumbnailWidth(v int) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetThumbnailWidth(v)
+	})
+}
+
+// AddThumbnailWidth adds v to the "thumbnail_width" field.
+func (u *MetaUpsertBulk) AddThumbnailWidth(v int) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.AddThumbnailWidth(v)
+	})
+}
+
+// UpdateThumbnailWidth sets the "thumbnail_width" field to the value that was provided on create.
+func (u *MetaUpsertBulk) UpdateThumbnailWidth() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateThumbnailWidth()
+	})
+}
+
+// ClearThumbnailWidth clears the value of the "thumbnail_width" field.
+func (u *MetaUpsertBulk) ClearThumbnailWidth() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnailWidth()
+	})
+}
+
+// SetThumbnailHeight sets the "thumbnail_height" field.
+func (u *MetaUpsertBulk) SetThumbnailHeight(v int) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetThumbnailHeight(v)
+	})
+}
+
+// AddThumbnailHeight adds v to the "thumbnail_height" field.
+func (u *MetaUpsertBulk) AddThumbnailHeight(v int) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.AddThumbnailHeight(v)
+	})
+}
+
+// UpdateThumbnailHeight sets the "thumbnail_height" field to the value that was provided on create.
+func (u *MetaUpsertBulk) UpdateThumbnailHeight() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateThumbnailHeight()
+	})
+}
+
+// ClearThumbnailHeight clears the value of the "thumbnail_height" field.
+func (u *MetaUpsertBulk) ClearThumbnailHeight() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.ClearThumbnailHeight()
 	})
 }
 

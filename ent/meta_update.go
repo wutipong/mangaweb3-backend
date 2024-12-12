@@ -140,6 +140,141 @@ func (mu *MetaUpdate) SetNillableContainerType(mt *meta.ContainerType) *MetaUpda
 	return mu
 }
 
+// SetThumbnailIndex sets the "thumbnail_index" field.
+func (mu *MetaUpdate) SetThumbnailIndex(i int) *MetaUpdate {
+	mu.mutation.ResetThumbnailIndex()
+	mu.mutation.SetThumbnailIndex(i)
+	return mu
+}
+
+// SetNillableThumbnailIndex sets the "thumbnail_index" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableThumbnailIndex(i *int) *MetaUpdate {
+	if i != nil {
+		mu.SetThumbnailIndex(*i)
+	}
+	return mu
+}
+
+// AddThumbnailIndex adds i to the "thumbnail_index" field.
+func (mu *MetaUpdate) AddThumbnailIndex(i int) *MetaUpdate {
+	mu.mutation.AddThumbnailIndex(i)
+	return mu
+}
+
+// ClearThumbnailIndex clears the value of the "thumbnail_index" field.
+func (mu *MetaUpdate) ClearThumbnailIndex() *MetaUpdate {
+	mu.mutation.ClearThumbnailIndex()
+	return mu
+}
+
+// SetThumbnailX sets the "thumbnail_x" field.
+func (mu *MetaUpdate) SetThumbnailX(i int) *MetaUpdate {
+	mu.mutation.ResetThumbnailX()
+	mu.mutation.SetThumbnailX(i)
+	return mu
+}
+
+// SetNillableThumbnailX sets the "thumbnail_x" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableThumbnailX(i *int) *MetaUpdate {
+	if i != nil {
+		mu.SetThumbnailX(*i)
+	}
+	return mu
+}
+
+// AddThumbnailX adds i to the "thumbnail_x" field.
+func (mu *MetaUpdate) AddThumbnailX(i int) *MetaUpdate {
+	mu.mutation.AddThumbnailX(i)
+	return mu
+}
+
+// ClearThumbnailX clears the value of the "thumbnail_x" field.
+func (mu *MetaUpdate) ClearThumbnailX() *MetaUpdate {
+	mu.mutation.ClearThumbnailX()
+	return mu
+}
+
+// SetThumbnmailY sets the "thumbnmail_y" field.
+func (mu *MetaUpdate) SetThumbnmailY(i int) *MetaUpdate {
+	mu.mutation.ResetThumbnmailY()
+	mu.mutation.SetThumbnmailY(i)
+	return mu
+}
+
+// SetNillableThumbnmailY sets the "thumbnmail_y" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableThumbnmailY(i *int) *MetaUpdate {
+	if i != nil {
+		mu.SetThumbnmailY(*i)
+	}
+	return mu
+}
+
+// AddThumbnmailY adds i to the "thumbnmail_y" field.
+func (mu *MetaUpdate) AddThumbnmailY(i int) *MetaUpdate {
+	mu.mutation.AddThumbnmailY(i)
+	return mu
+}
+
+// ClearThumbnmailY clears the value of the "thumbnmail_y" field.
+func (mu *MetaUpdate) ClearThumbnmailY() *MetaUpdate {
+	mu.mutation.ClearThumbnmailY()
+	return mu
+}
+
+// SetThumbnailWidth sets the "thumbnail_width" field.
+func (mu *MetaUpdate) SetThumbnailWidth(i int) *MetaUpdate {
+	mu.mutation.ResetThumbnailWidth()
+	mu.mutation.SetThumbnailWidth(i)
+	return mu
+}
+
+// SetNillableThumbnailWidth sets the "thumbnail_width" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableThumbnailWidth(i *int) *MetaUpdate {
+	if i != nil {
+		mu.SetThumbnailWidth(*i)
+	}
+	return mu
+}
+
+// AddThumbnailWidth adds i to the "thumbnail_width" field.
+func (mu *MetaUpdate) AddThumbnailWidth(i int) *MetaUpdate {
+	mu.mutation.AddThumbnailWidth(i)
+	return mu
+}
+
+// ClearThumbnailWidth clears the value of the "thumbnail_width" field.
+func (mu *MetaUpdate) ClearThumbnailWidth() *MetaUpdate {
+	mu.mutation.ClearThumbnailWidth()
+	return mu
+}
+
+// SetThumbnailHeight sets the "thumbnail_height" field.
+func (mu *MetaUpdate) SetThumbnailHeight(i int) *MetaUpdate {
+	mu.mutation.ResetThumbnailHeight()
+	mu.mutation.SetThumbnailHeight(i)
+	return mu
+}
+
+// SetNillableThumbnailHeight sets the "thumbnail_height" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableThumbnailHeight(i *int) *MetaUpdate {
+	if i != nil {
+		mu.SetThumbnailHeight(*i)
+	}
+	return mu
+}
+
+// AddThumbnailHeight adds i to the "thumbnail_height" field.
+func (mu *MetaUpdate) AddThumbnailHeight(i int) *MetaUpdate {
+	mu.mutation.AddThumbnailHeight(i)
+	return mu
+}
+
+// ClearThumbnailHeight clears the value of the "thumbnail_height" field.
+func (mu *MetaUpdate) ClearThumbnailHeight() *MetaUpdate {
+	mu.mutation.ClearThumbnailHeight()
+	return mu
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (mu *MetaUpdate) AddTagIDs(ids ...int) *MetaUpdate {
 	mu.mutation.AddTagIDs(ids...)
@@ -338,6 +473,51 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := mu.mutation.ContainerType(); ok {
 		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)
+	}
+	if value, ok := mu.mutation.ThumbnailIndex(); ok {
+		_spec.SetField(meta.FieldThumbnailIndex, field.TypeInt, value)
+	}
+	if value, ok := mu.mutation.AddedThumbnailIndex(); ok {
+		_spec.AddField(meta.FieldThumbnailIndex, field.TypeInt, value)
+	}
+	if mu.mutation.ThumbnailIndexCleared() {
+		_spec.ClearField(meta.FieldThumbnailIndex, field.TypeInt)
+	}
+	if value, ok := mu.mutation.ThumbnailX(); ok {
+		_spec.SetField(meta.FieldThumbnailX, field.TypeInt, value)
+	}
+	if value, ok := mu.mutation.AddedThumbnailX(); ok {
+		_spec.AddField(meta.FieldThumbnailX, field.TypeInt, value)
+	}
+	if mu.mutation.ThumbnailXCleared() {
+		_spec.ClearField(meta.FieldThumbnailX, field.TypeInt)
+	}
+	if value, ok := mu.mutation.ThumbnmailY(); ok {
+		_spec.SetField(meta.FieldThumbnmailY, field.TypeInt, value)
+	}
+	if value, ok := mu.mutation.AddedThumbnmailY(); ok {
+		_spec.AddField(meta.FieldThumbnmailY, field.TypeInt, value)
+	}
+	if mu.mutation.ThumbnmailYCleared() {
+		_spec.ClearField(meta.FieldThumbnmailY, field.TypeInt)
+	}
+	if value, ok := mu.mutation.ThumbnailWidth(); ok {
+		_spec.SetField(meta.FieldThumbnailWidth, field.TypeInt, value)
+	}
+	if value, ok := mu.mutation.AddedThumbnailWidth(); ok {
+		_spec.AddField(meta.FieldThumbnailWidth, field.TypeInt, value)
+	}
+	if mu.mutation.ThumbnailWidthCleared() {
+		_spec.ClearField(meta.FieldThumbnailWidth, field.TypeInt)
+	}
+	if value, ok := mu.mutation.ThumbnailHeight(); ok {
+		_spec.SetField(meta.FieldThumbnailHeight, field.TypeInt, value)
+	}
+	if value, ok := mu.mutation.AddedThumbnailHeight(); ok {
+		_spec.AddField(meta.FieldThumbnailHeight, field.TypeInt, value)
+	}
+	if mu.mutation.ThumbnailHeightCleared() {
+		_spec.ClearField(meta.FieldThumbnailHeight, field.TypeInt)
 	}
 	if mu.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -602,6 +782,141 @@ func (muo *MetaUpdateOne) SetNillableContainerType(mt *meta.ContainerType) *Meta
 	return muo
 }
 
+// SetThumbnailIndex sets the "thumbnail_index" field.
+func (muo *MetaUpdateOne) SetThumbnailIndex(i int) *MetaUpdateOne {
+	muo.mutation.ResetThumbnailIndex()
+	muo.mutation.SetThumbnailIndex(i)
+	return muo
+}
+
+// SetNillableThumbnailIndex sets the "thumbnail_index" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableThumbnailIndex(i *int) *MetaUpdateOne {
+	if i != nil {
+		muo.SetThumbnailIndex(*i)
+	}
+	return muo
+}
+
+// AddThumbnailIndex adds i to the "thumbnail_index" field.
+func (muo *MetaUpdateOne) AddThumbnailIndex(i int) *MetaUpdateOne {
+	muo.mutation.AddThumbnailIndex(i)
+	return muo
+}
+
+// ClearThumbnailIndex clears the value of the "thumbnail_index" field.
+func (muo *MetaUpdateOne) ClearThumbnailIndex() *MetaUpdateOne {
+	muo.mutation.ClearThumbnailIndex()
+	return muo
+}
+
+// SetThumbnailX sets the "thumbnail_x" field.
+func (muo *MetaUpdateOne) SetThumbnailX(i int) *MetaUpdateOne {
+	muo.mutation.ResetThumbnailX()
+	muo.mutation.SetThumbnailX(i)
+	return muo
+}
+
+// SetNillableThumbnailX sets the "thumbnail_x" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableThumbnailX(i *int) *MetaUpdateOne {
+	if i != nil {
+		muo.SetThumbnailX(*i)
+	}
+	return muo
+}
+
+// AddThumbnailX adds i to the "thumbnail_x" field.
+func (muo *MetaUpdateOne) AddThumbnailX(i int) *MetaUpdateOne {
+	muo.mutation.AddThumbnailX(i)
+	return muo
+}
+
+// ClearThumbnailX clears the value of the "thumbnail_x" field.
+func (muo *MetaUpdateOne) ClearThumbnailX() *MetaUpdateOne {
+	muo.mutation.ClearThumbnailX()
+	return muo
+}
+
+// SetThumbnmailY sets the "thumbnmail_y" field.
+func (muo *MetaUpdateOne) SetThumbnmailY(i int) *MetaUpdateOne {
+	muo.mutation.ResetThumbnmailY()
+	muo.mutation.SetThumbnmailY(i)
+	return muo
+}
+
+// SetNillableThumbnmailY sets the "thumbnmail_y" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableThumbnmailY(i *int) *MetaUpdateOne {
+	if i != nil {
+		muo.SetThumbnmailY(*i)
+	}
+	return muo
+}
+
+// AddThumbnmailY adds i to the "thumbnmail_y" field.
+func (muo *MetaUpdateOne) AddThumbnmailY(i int) *MetaUpdateOne {
+	muo.mutation.AddThumbnmailY(i)
+	return muo
+}
+
+// ClearThumbnmailY clears the value of the "thumbnmail_y" field.
+func (muo *MetaUpdateOne) ClearThumbnmailY() *MetaUpdateOne {
+	muo.mutation.ClearThumbnmailY()
+	return muo
+}
+
+// SetThumbnailWidth sets the "thumbnail_width" field.
+func (muo *MetaUpdateOne) SetThumbnailWidth(i int) *MetaUpdateOne {
+	muo.mutation.ResetThumbnailWidth()
+	muo.mutation.SetThumbnailWidth(i)
+	return muo
+}
+
+// SetNillableThumbnailWidth sets the "thumbnail_width" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableThumbnailWidth(i *int) *MetaUpdateOne {
+	if i != nil {
+		muo.SetThumbnailWidth(*i)
+	}
+	return muo
+}
+
+// AddThumbnailWidth adds i to the "thumbnail_width" field.
+func (muo *MetaUpdateOne) AddThumbnailWidth(i int) *MetaUpdateOne {
+	muo.mutation.AddThumbnailWidth(i)
+	return muo
+}
+
+// ClearThumbnailWidth clears the value of the "thumbnail_width" field.
+func (muo *MetaUpdateOne) ClearThumbnailWidth() *MetaUpdateOne {
+	muo.mutation.ClearThumbnailWidth()
+	return muo
+}
+
+// SetThumbnailHeight sets the "thumbnail_height" field.
+func (muo *MetaUpdateOne) SetThumbnailHeight(i int) *MetaUpdateOne {
+	muo.mutation.ResetThumbnailHeight()
+	muo.mutation.SetThumbnailHeight(i)
+	return muo
+}
+
+// SetNillableThumbnailHeight sets the "thumbnail_height" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableThumbnailHeight(i *int) *MetaUpdateOne {
+	if i != nil {
+		muo.SetThumbnailHeight(*i)
+	}
+	return muo
+}
+
+// AddThumbnailHeight adds i to the "thumbnail_height" field.
+func (muo *MetaUpdateOne) AddThumbnailHeight(i int) *MetaUpdateOne {
+	muo.mutation.AddThumbnailHeight(i)
+	return muo
+}
+
+// ClearThumbnailHeight clears the value of the "thumbnail_height" field.
+func (muo *MetaUpdateOne) ClearThumbnailHeight() *MetaUpdateOne {
+	muo.mutation.ClearThumbnailHeight()
+	return muo
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (muo *MetaUpdateOne) AddTagIDs(ids ...int) *MetaUpdateOne {
 	muo.mutation.AddTagIDs(ids...)
@@ -830,6 +1145,51 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	}
 	if value, ok := muo.mutation.ContainerType(); ok {
 		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)
+	}
+	if value, ok := muo.mutation.ThumbnailIndex(); ok {
+		_spec.SetField(meta.FieldThumbnailIndex, field.TypeInt, value)
+	}
+	if value, ok := muo.mutation.AddedThumbnailIndex(); ok {
+		_spec.AddField(meta.FieldThumbnailIndex, field.TypeInt, value)
+	}
+	if muo.mutation.ThumbnailIndexCleared() {
+		_spec.ClearField(meta.FieldThumbnailIndex, field.TypeInt)
+	}
+	if value, ok := muo.mutation.ThumbnailX(); ok {
+		_spec.SetField(meta.FieldThumbnailX, field.TypeInt, value)
+	}
+	if value, ok := muo.mutation.AddedThumbnailX(); ok {
+		_spec.AddField(meta.FieldThumbnailX, field.TypeInt, value)
+	}
+	if muo.mutation.ThumbnailXCleared() {
+		_spec.ClearField(meta.FieldThumbnailX, field.TypeInt)
+	}
+	if value, ok := muo.mutation.ThumbnmailY(); ok {
+		_spec.SetField(meta.FieldThumbnmailY, field.TypeInt, value)
+	}
+	if value, ok := muo.mutation.AddedThumbnmailY(); ok {
+		_spec.AddField(meta.FieldThumbnmailY, field.TypeInt, value)
+	}
+	if muo.mutation.ThumbnmailYCleared() {
+		_spec.ClearField(meta.FieldThumbnmailY, field.TypeInt)
+	}
+	if value, ok := muo.mutation.ThumbnailWidth(); ok {
+		_spec.SetField(meta.FieldThumbnailWidth, field.TypeInt, value)
+	}
+	if value, ok := muo.mutation.AddedThumbnailWidth(); ok {
+		_spec.AddField(meta.FieldThumbnailWidth, field.TypeInt, value)
+	}
+	if muo.mutation.ThumbnailWidthCleared() {
+		_spec.ClearField(meta.FieldThumbnailWidth, field.TypeInt)
+	}
+	if value, ok := muo.mutation.ThumbnailHeight(); ok {
+		_spec.SetField(meta.FieldThumbnailHeight, field.TypeInt, value)
+	}
+	if value, ok := muo.mutation.AddedThumbnailHeight(); ok {
+		_spec.AddField(meta.FieldThumbnailHeight, field.TypeInt, value)
+	}
+	if muo.mutation.ThumbnailHeightCleared() {
+		_spec.ClearField(meta.FieldThumbnailHeight, field.TypeInt)
 	}
 	if muo.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
