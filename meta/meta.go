@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/disintegration/imaging"
-	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/configuration"
 	"github.com/wutipong/mangaweb3-backend/container"
 	"github.com/wutipong/mangaweb3-backend/ent"
@@ -193,7 +192,12 @@ func GetThumbnailBytes(m *ent.Meta) (thumbnail []byte, err error) {
 			return
 		}
 
-		log.Debug().AnErr("error", imaging.Save(img, thumbfile, imaging.JPEGQuality(75))).Msg("save image")
+		e = imaging.Save(img, thumbfile, imaging.JPEGQuality(75))
+		if e != nil {
+			err = e
+			return
+		}
+
 		imaging.Encode(&buffer, img, imaging.JPEG, imaging.JPEGQuality(75))
 		err = nil
 	} else {
