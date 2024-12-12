@@ -107,9 +107,9 @@ func GenerateThumbnail(m *ent.Meta, fileIndex int, details CropDetails) error {
 		})
 	}
 
-	const thumbnailSize = 360
-	if img.Bounds().Dx() > thumbnailSize {
-		resized := imaging.Resize(img, thumbnailSize, 0, imaging.MitchellNetravali)
+	const thumbnailHeight = 510
+	if img.Bounds().Dy() > thumbnailHeight {
+		resized := imaging.Resize(img, 0, thumbnailHeight, imaging.MitchellNetravali)
 		img = resized
 	}
 
