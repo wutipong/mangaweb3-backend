@@ -34,7 +34,13 @@ func GetThumbnailHandler(w http.ResponseWriter, r *http.Request, params httprout
 		return
 	}
 
+	thumbnail, err := meta.GetThumbnailBytes(m)
+	if err != nil {
+		handler.WriteResponse(w, err)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "image/jpeg")
-	w.Write(m.Thumbnail)
+	w.Write(thumbnail)
 }

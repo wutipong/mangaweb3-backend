@@ -48,7 +48,7 @@ var (
 		{Name: "container_type", Type: field.TypeEnum, Enums: []string{"zip", "directory"}, Default: "zip"},
 		{Name: "thumbnail_index", Type: field.TypeInt, Nullable: true, Default: 0},
 		{Name: "thumbnail_x", Type: field.TypeInt, Nullable: true, Default: 0},
-		{Name: "thumbnmail_y", Type: field.TypeInt, Nullable: true, Default: 0},
+		{Name: "thumbnail_y", Type: field.TypeInt, Nullable: true, Default: 0},
 		{Name: "thumbnail_width", Type: field.TypeInt, Nullable: true, Default: 0},
 		{Name: "thumbnail_height", Type: field.TypeInt, Nullable: true, Default: 0},
 	}

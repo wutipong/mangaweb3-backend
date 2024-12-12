@@ -38,8 +38,8 @@ type Meta struct {
 	ThumbnailIndex int `json:"thumbnail_index,omitempty"`
 	// ThumbnailX holds the value of the "thumbnail_x" field.
 	ThumbnailX int `json:"thumbnail_x,omitempty"`
-	// ThumbnmailY holds the value of the "thumbnmail_y" field.
-	ThumbnmailY int `json:"thumbnmail_y,omitempty"`
+	// ThumbnailY holds the value of the "thumbnail_y" field.
+	ThumbnailY int `json:"thumbnail_y,omitempty"`
 	// ThumbnailWidth holds the value of the "thumbnail_width" field.
 	ThumbnailWidth int `json:"thumbnail_width,omitempty"`
 	// ThumbnailHeight holds the value of the "thumbnail_height" field.
@@ -99,7 +99,7 @@ func (*Meta) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case meta.FieldFavorite, meta.FieldRead, meta.FieldActive:
 			values[i] = new(sql.NullBool)
-		case meta.FieldID, meta.FieldThumbnailIndex, meta.FieldThumbnailX, meta.FieldThumbnmailY, meta.FieldThumbnailWidth, meta.FieldThumbnailHeight:
+		case meta.FieldID, meta.FieldThumbnailIndex, meta.FieldThumbnailX, meta.FieldThumbnailY, meta.FieldThumbnailWidth, meta.FieldThumbnailHeight:
 			values[i] = new(sql.NullInt64)
 		case meta.FieldName, meta.FieldContainerType:
 			values[i] = new(sql.NullString)
@@ -188,11 +188,11 @@ func (m *Meta) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.ThumbnailX = int(value.Int64)
 			}
-		case meta.FieldThumbnmailY:
+		case meta.FieldThumbnailY:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field thumbnmail_y", values[i])
+				return fmt.Errorf("unexpected type %T for field thumbnail_y", values[i])
 			} else if value.Valid {
-				m.ThumbnmailY = int(value.Int64)
+				m.ThumbnailY = int(value.Int64)
 			}
 		case meta.FieldThumbnailWidth:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -286,8 +286,8 @@ func (m *Meta) String() string {
 	builder.WriteString("thumbnail_x=")
 	builder.WriteString(fmt.Sprintf("%v", m.ThumbnailX))
 	builder.WriteString(", ")
-	builder.WriteString("thumbnmail_y=")
-	builder.WriteString(fmt.Sprintf("%v", m.ThumbnmailY))
+	builder.WriteString("thumbnail_y=")
+	builder.WriteString(fmt.Sprintf("%v", m.ThumbnailY))
 	builder.WriteString(", ")
 	builder.WriteString("thumbnail_width=")
 	builder.WriteString(fmt.Sprintf("%v", m.ThumbnailWidth))

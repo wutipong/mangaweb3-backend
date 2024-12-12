@@ -56,10 +56,10 @@ func init() {
 	metaDescThumbnailX := metaFields[9].Descriptor()
 	// meta.DefaultThumbnailX holds the default value on creation for the thumbnail_x field.
 	meta.DefaultThumbnailX = metaDescThumbnailX.Default.(int)
-	// metaDescThumbnmailY is the schema descriptor for thumbnmail_y field.
-	metaDescThumbnmailY := metaFields[10].Descriptor()
-	// meta.DefaultThumbnmailY holds the default value on creation for the thumbnmail_y field.
-	meta.DefaultThumbnmailY = metaDescThumbnmailY.Default.(int)
+	// metaDescThumbnailY is the schema descriptor for thumbnail_y field.
+	metaDescThumbnailY := metaFields[10].Descriptor()
+	// meta.DefaultThumbnailY holds the default value on creation for the thumbnail_y field.
+	meta.DefaultThumbnailY = metaDescThumbnailY.Default.(int)
 	// metaDescThumbnailWidth is the schema descriptor for thumbnail_width field.
 	metaDescThumbnailWidth := metaFields[11].Descriptor()
 	// meta.DefaultThumbnailWidth holds the default value on creation for the thumbnail_width field.

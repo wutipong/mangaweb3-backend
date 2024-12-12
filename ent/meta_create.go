@@ -141,16 +141,16 @@ func (mc *MetaCreate) SetNillableThumbnailX(i *int) *MetaCreate {
 	return mc
 }
 
-// SetThumbnmailY sets the "thumbnmail_y" field.
-func (mc *MetaCreate) SetThumbnmailY(i int) *MetaCreate {
-	mc.mutation.SetThumbnmailY(i)
+// SetThumbnailY sets the "thumbnail_y" field.
+func (mc *MetaCreate) SetThumbnailY(i int) *MetaCreate {
+	mc.mutation.SetThumbnailY(i)
 	return mc
 }
 
-// SetNillableThumbnmailY sets the "thumbnmail_y" field if the given value is not nil.
-func (mc *MetaCreate) SetNillableThumbnmailY(i *int) *MetaCreate {
+// SetNillableThumbnailY sets the "thumbnail_y" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableThumbnailY(i *int) *MetaCreate {
 	if i != nil {
-		mc.SetThumbnmailY(*i)
+		mc.SetThumbnailY(*i)
 	}
 	return mc
 }
@@ -295,9 +295,9 @@ func (mc *MetaCreate) defaults() {
 		v := meta.DefaultThumbnailX
 		mc.mutation.SetThumbnailX(v)
 	}
-	if _, ok := mc.mutation.ThumbnmailY(); !ok {
-		v := meta.DefaultThumbnmailY
-		mc.mutation.SetThumbnmailY(v)
+	if _, ok := mc.mutation.ThumbnailY(); !ok {
+		v := meta.DefaultThumbnailY
+		mc.mutation.SetThumbnailY(v)
 	}
 	if _, ok := mc.mutation.ThumbnailWidth(); !ok {
 		v := meta.DefaultThumbnailWidth
@@ -409,9 +409,9 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 		_spec.SetField(meta.FieldThumbnailX, field.TypeInt, value)
 		_node.ThumbnailX = value
 	}
-	if value, ok := mc.mutation.ThumbnmailY(); ok {
-		_spec.SetField(meta.FieldThumbnmailY, field.TypeInt, value)
-		_node.ThumbnmailY = value
+	if value, ok := mc.mutation.ThumbnailY(); ok {
+		_spec.SetField(meta.FieldThumbnailY, field.TypeInt, value)
+		_node.ThumbnailY = value
 	}
 	if value, ok := mc.mutation.ThumbnailWidth(); ok {
 		_spec.SetField(meta.FieldThumbnailWidth, field.TypeInt, value)
@@ -671,27 +671,27 @@ func (u *MetaUpsert) ClearThumbnailX() *MetaUpsert {
 	return u
 }
 
-// SetThumbnmailY sets the "thumbnmail_y" field.
-func (u *MetaUpsert) SetThumbnmailY(v int) *MetaUpsert {
-	u.Set(meta.FieldThumbnmailY, v)
+// SetThumbnailY sets the "thumbnail_y" field.
+func (u *MetaUpsert) SetThumbnailY(v int) *MetaUpsert {
+	u.Set(meta.FieldThumbnailY, v)
 	return u
 }
 
-// UpdateThumbnmailY sets the "thumbnmail_y" field to the value that was provided on create.
-func (u *MetaUpsert) UpdateThumbnmailY() *MetaUpsert {
-	u.SetExcluded(meta.FieldThumbnmailY)
+// UpdateThumbnailY sets the "thumbnail_y" field to the value that was provided on create.
+func (u *MetaUpsert) UpdateThumbnailY() *MetaUpsert {
+	u.SetExcluded(meta.FieldThumbnailY)
 	return u
 }
 
-// AddThumbnmailY adds v to the "thumbnmail_y" field.
-func (u *MetaUpsert) AddThumbnmailY(v int) *MetaUpsert {
-	u.Add(meta.FieldThumbnmailY, v)
+// AddThumbnailY adds v to the "thumbnail_y" field.
+func (u *MetaUpsert) AddThumbnailY(v int) *MetaUpsert {
+	u.Add(meta.FieldThumbnailY, v)
 	return u
 }
 
-// ClearThumbnmailY clears the value of the "thumbnmail_y" field.
-func (u *MetaUpsert) ClearThumbnmailY() *MetaUpsert {
-	u.SetNull(meta.FieldThumbnmailY)
+// ClearThumbnailY clears the value of the "thumbnail_y" field.
+func (u *MetaUpsert) ClearThumbnailY() *MetaUpsert {
+	u.SetNull(meta.FieldThumbnailY)
 	return u
 }
 
@@ -958,31 +958,31 @@ func (u *MetaUpsertOne) ClearThumbnailX() *MetaUpsertOne {
 	})
 }
 
-// SetThumbnmailY sets the "thumbnmail_y" field.
-func (u *MetaUpsertOne) SetThumbnmailY(v int) *MetaUpsertOne {
+// SetThumbnailY sets the "thumbnail_y" field.
+func (u *MetaUpsertOne) SetThumbnailY(v int) *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
-		s.SetThumbnmailY(v)
+		s.SetThumbnailY(v)
 	})
 }
 
-// AddThumbnmailY adds v to the "thumbnmail_y" field.
-func (u *MetaUpsertOne) AddThumbnmailY(v int) *MetaUpsertOne {
+// AddThumbnailY adds v to the "thumbnail_y" field.
+func (u *MetaUpsertOne) AddThumbnailY(v int) *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
-		s.AddThumbnmailY(v)
+		s.AddThumbnailY(v)
 	})
 }
 
-// UpdateThumbnmailY sets the "thumbnmail_y" field to the value that was provided on create.
-func (u *MetaUpsertOne) UpdateThumbnmailY() *MetaUpsertOne {
+// UpdateThumbnailY sets the "thumbnail_y" field to the value that was provided on create.
+func (u *MetaUpsertOne) UpdateThumbnailY() *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
-		s.UpdateThumbnmailY()
+		s.UpdateThumbnailY()
 	})
 }
 
-// ClearThumbnmailY clears the value of the "thumbnmail_y" field.
-func (u *MetaUpsertOne) ClearThumbnmailY() *MetaUpsertOne {
+// ClearThumbnailY clears the value of the "thumbnail_y" field.
+func (u *MetaUpsertOne) ClearThumbnailY() *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
-		s.ClearThumbnmailY()
+		s.ClearThumbnailY()
 	})
 }
 
@@ -1421,31 +1421,31 @@ func (u *MetaUpsertBulk) ClearThumbnailX() *MetaUpsertBulk {
 	})
 }
 
-// SetThumbnmailY sets the "thumbnmail_y" field.
-func (u *MetaUpsertBulk) SetThumbnmailY(v int) *MetaUpsertBulk {
+// SetThumbnailY sets the "thumbnail_y" field.
+func (u *MetaUpsertBulk) SetThumbnailY(v int) *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
-		s.SetThumbnmailY(v)
+		s.SetThumbnailY(v)
 	})
 }
 
-// AddThumbnmailY adds v to the "thumbnmail_y" field.
-func (u *MetaUpsertBulk) AddThumbnmailY(v int) *MetaUpsertBulk {
+// AddThumbnailY adds v to the "thumbnail_y" field.
+func (u *MetaUpsertBulk) AddThumbnailY(v int) *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
-		s.AddThumbnmailY(v)
+		s.AddThumbnailY(v)
 	})
 }
 
-// UpdateThumbnmailY sets the "thumbnmail_y" field to the value that was provided on create.
-func (u *MetaUpsertBulk) UpdateThumbnmailY() *MetaUpsertBulk {
+// UpdateThumbnailY sets the "thumbnail_y" field to the value that was provided on create.
+func (u *MetaUpsertBulk) UpdateThumbnailY() *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
-		s.UpdateThumbnmailY()
+		s.UpdateThumbnailY()
 	})
 }
 
-// ClearThumbnmailY clears the value of the "thumbnmail_y" field.
-func (u *MetaUpsertBulk) ClearThumbnmailY() *MetaUpsertBulk {
+// ClearThumbnailY clears the value of the "thumbnail_y" field.
+func (u *MetaUpsertBulk) ClearThumbnailY() *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
-		s.ClearThumbnmailY()
+		s.ClearThumbnailY()
 	})
 }
 

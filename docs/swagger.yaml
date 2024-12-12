@@ -169,6 +169,21 @@ definitions:
       read:
         description: Read holds the value of the "read" field.
         type: boolean
+      thumbnail_height:
+        description: ThumbnailHeight holds the value of the "thumbnail_height" field.
+        type: integer
+      thumbnail_index:
+        description: ThumbnailIndex holds the value of the "thumbnail_index" field.
+        type: integer
+      thumbnail_width:
+        description: ThumbnailWidth holds the value of the "thumbnail_width" field.
+        type: integer
+      thumbnail_x:
+        description: ThumbnailX holds the value of the "thumbnail_x" field.
+        type: integer
+      thumbnmail_y:
+        description: ThumbnmailY holds the value of the "thumbnmail_y" field.
+        type: integer
     type: object
   ent.MetaEdges:
     properties:

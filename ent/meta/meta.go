@@ -35,8 +35,8 @@ const (
 	FieldThumbnailIndex = "thumbnail_index"
 	// FieldThumbnailX holds the string denoting the thumbnail_x field in the database.
 	FieldThumbnailX = "thumbnail_x"
-	// FieldThumbnmailY holds the string denoting the thumbnmail_y field in the database.
-	FieldThumbnmailY = "thumbnmail_y"
+	// FieldThumbnailY holds the string denoting the thumbnail_y field in the database.
+	FieldThumbnailY = "thumbnail_y"
 	// FieldThumbnailWidth holds the string denoting the thumbnail_width field in the database.
 	FieldThumbnailWidth = "thumbnail_width"
 	// FieldThumbnailHeight holds the string denoting the thumbnail_height field in the database.
@@ -81,7 +81,7 @@ var Columns = []string{
 	FieldContainerType,
 	FieldThumbnailIndex,
 	FieldThumbnailX,
-	FieldThumbnmailY,
+	FieldThumbnailY,
 	FieldThumbnailWidth,
 	FieldThumbnailHeight,
 }
@@ -122,8 +122,8 @@ var (
 	DefaultThumbnailIndex int
 	// DefaultThumbnailX holds the default value on creation for the "thumbnail_x" field.
 	DefaultThumbnailX int
-	// DefaultThumbnmailY holds the default value on creation for the "thumbnmail_y" field.
-	DefaultThumbnmailY int
+	// DefaultThumbnailY holds the default value on creation for the "thumbnail_y" field.
+	DefaultThumbnailY int
 	// DefaultThumbnailWidth holds the default value on creation for the "thumbnail_width" field.
 	DefaultThumbnailWidth int
 	// DefaultThumbnailHeight holds the default value on creation for the "thumbnail_height" field.
@@ -204,9 +204,9 @@ func ByThumbnailX(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldThumbnailX, opts...).ToFunc()
 }
 
-// ByThumbnmailY orders the results by the thumbnmail_y field.
-func ByThumbnmailY(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldThumbnmailY, opts...).ToFunc()
+// ByThumbnailY orders the results by the thumbnail_y field.
+func ByThumbnailY(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldThumbnailY, opts...).ToFunc()
 }
 
 // ByThumbnailWidth orders the results by the thumbnail_width field.

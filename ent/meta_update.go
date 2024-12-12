@@ -194,30 +194,30 @@ func (mu *MetaUpdate) ClearThumbnailX() *MetaUpdate {
 	return mu
 }
 
-// SetThumbnmailY sets the "thumbnmail_y" field.
-func (mu *MetaUpdate) SetThumbnmailY(i int) *MetaUpdate {
-	mu.mutation.ResetThumbnmailY()
-	mu.mutation.SetThumbnmailY(i)
+// SetThumbnailY sets the "thumbnail_y" field.
+func (mu *MetaUpdate) SetThumbnailY(i int) *MetaUpdate {
+	mu.mutation.ResetThumbnailY()
+	mu.mutation.SetThumbnailY(i)
 	return mu
 }
 
-// SetNillableThumbnmailY sets the "thumbnmail_y" field if the given value is not nil.
-func (mu *MetaUpdate) SetNillableThumbnmailY(i *int) *MetaUpdate {
+// SetNillableThumbnailY sets the "thumbnail_y" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableThumbnailY(i *int) *MetaUpdate {
 	if i != nil {
-		mu.SetThumbnmailY(*i)
+		mu.SetThumbnailY(*i)
 	}
 	return mu
 }
 
-// AddThumbnmailY adds i to the "thumbnmail_y" field.
-func (mu *MetaUpdate) AddThumbnmailY(i int) *MetaUpdate {
-	mu.mutation.AddThumbnmailY(i)
+// AddThumbnailY adds i to the "thumbnail_y" field.
+func (mu *MetaUpdate) AddThumbnailY(i int) *MetaUpdate {
+	mu.mutation.AddThumbnailY(i)
 	return mu
 }
 
-// ClearThumbnmailY clears the value of the "thumbnmail_y" field.
-func (mu *MetaUpdate) ClearThumbnmailY() *MetaUpdate {
-	mu.mutation.ClearThumbnmailY()
+// ClearThumbnailY clears the value of the "thumbnail_y" field.
+func (mu *MetaUpdate) ClearThumbnailY() *MetaUpdate {
+	mu.mutation.ClearThumbnailY()
 	return mu
 }
 
@@ -492,14 +492,14 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if mu.mutation.ThumbnailXCleared() {
 		_spec.ClearField(meta.FieldThumbnailX, field.TypeInt)
 	}
-	if value, ok := mu.mutation.ThumbnmailY(); ok {
-		_spec.SetField(meta.FieldThumbnmailY, field.TypeInt, value)
+	if value, ok := mu.mutation.ThumbnailY(); ok {
+		_spec.SetField(meta.FieldThumbnailY, field.TypeInt, value)
 	}
-	if value, ok := mu.mutation.AddedThumbnmailY(); ok {
-		_spec.AddField(meta.FieldThumbnmailY, field.TypeInt, value)
+	if value, ok := mu.mutation.AddedThumbnailY(); ok {
+		_spec.AddField(meta.FieldThumbnailY, field.TypeInt, value)
 	}
-	if mu.mutation.ThumbnmailYCleared() {
-		_spec.ClearField(meta.FieldThumbnmailY, field.TypeInt)
+	if mu.mutation.ThumbnailYCleared() {
+		_spec.ClearField(meta.FieldThumbnailY, field.TypeInt)
 	}
 	if value, ok := mu.mutation.ThumbnailWidth(); ok {
 		_spec.SetField(meta.FieldThumbnailWidth, field.TypeInt, value)
@@ -836,30 +836,30 @@ func (muo *MetaUpdateOne) ClearThumbnailX() *MetaUpdateOne {
 	return muo
 }
 
-// SetThumbnmailY sets the "thumbnmail_y" field.
-func (muo *MetaUpdateOne) SetThumbnmailY(i int) *MetaUpdateOne {
-	muo.mutation.ResetThumbnmailY()
-	muo.mutation.SetThumbnmailY(i)
+// SetThumbnailY sets the "thumbnail_y" field.
+func (muo *MetaUpdateOne) SetThumbnailY(i int) *MetaUpdateOne {
+	muo.mutation.ResetThumbnailY()
+	muo.mutation.SetThumbnailY(i)
 	return muo
 }
 
-// SetNillableThumbnmailY sets the "thumbnmail_y" field if the given value is not nil.
-func (muo *MetaUpdateOne) SetNillableThumbnmailY(i *int) *MetaUpdateOne {
+// SetNillableThumbnailY sets the "thumbnail_y" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableThumbnailY(i *int) *MetaUpdateOne {
 	if i != nil {
-		muo.SetThumbnmailY(*i)
+		muo.SetThumbnailY(*i)
 	}
 	return muo
 }
 
-// AddThumbnmailY adds i to the "thumbnmail_y" field.
-func (muo *MetaUpdateOne) AddThumbnmailY(i int) *MetaUpdateOne {
-	muo.mutation.AddThumbnmailY(i)
+// AddThumbnailY adds i to the "thumbnail_y" field.
+func (muo *MetaUpdateOne) AddThumbnailY(i int) *MetaUpdateOne {
+	muo.mutation.AddThumbnailY(i)
 	return muo
 }
 
-// ClearThumbnmailY clears the value of the "thumbnmail_y" field.
-func (muo *MetaUpdateOne) ClearThumbnmailY() *MetaUpdateOne {
-	muo.mutation.ClearThumbnmailY()
+// ClearThumbnailY clears the value of the "thumbnail_y" field.
+func (muo *MetaUpdateOne) ClearThumbnailY() *MetaUpdateOne {
+	muo.mutation.ClearThumbnailY()
 	return muo
 }
 
@@ -1164,14 +1164,14 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	if muo.mutation.ThumbnailXCleared() {
 		_spec.ClearField(meta.FieldThumbnailX, field.TypeInt)
 	}
-	if value, ok := muo.mutation.ThumbnmailY(); ok {
-		_spec.SetField(meta.FieldThumbnmailY, field.TypeInt, value)
+	if value, ok := muo.mutation.ThumbnailY(); ok {
+		_spec.SetField(meta.FieldThumbnailY, field.TypeInt, value)
 	}
-	if value, ok := muo.mutation.AddedThumbnmailY(); ok {
-		_spec.AddField(meta.FieldThumbnmailY, field.TypeInt, value)
+	if value, ok := muo.mutation.AddedThumbnailY(); ok {
+		_spec.AddField(meta.FieldThumbnailY, field.TypeInt, value)
 	}
-	if muo.mutation.ThumbnmailYCleared() {
-		_spec.ClearField(meta.FieldThumbnmailY, field.TypeInt)
+	if muo.mutation.ThumbnailYCleared() {
+		_spec.ClearField(meta.FieldThumbnailY, field.TypeInt)
 	}
 	if value, ok := muo.mutation.ThumbnailWidth(); ok {
 		_spec.SetField(meta.FieldThumbnailWidth, field.TypeInt, value)
