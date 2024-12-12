@@ -25,7 +25,6 @@ import (
 )
 
 const (
-	CACHE_LOCATION             = "cache"
 	META_THUMB_LOCATION        = "meta"
 	THUMBNAIL_FILENAME_PATTERN = "%d.jpg"
 
@@ -126,7 +125,8 @@ func CreateThumbnail(m *ent.Meta) (thumbnail image.Image, err error) {
 }
 
 func CreateThumbnailPath(id int) string {
-	return filepath.Join(CACHE_LOCATION, META_THUMB_LOCATION, fmt.Sprintf(THUMBNAIL_FILENAME_PATTERN, id))
+	c := configuration.Get()
+	return filepath.Join(c.CachePath, META_THUMB_LOCATION, fmt.Sprintf(THUMBNAIL_FILENAME_PATTERN, id))
 }
 
 func GetThumbnailBytes(m *ent.Meta) (thumbnail []byte, err error) {
