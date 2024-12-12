@@ -496,7 +496,6 @@ type MetaMutation struct {
 	favorite            *bool
 	file_indices        *[]int
 	appendfile_indices  []int
-	thumbnail           *[]byte
 	read                *bool
 	active              *bool
 	container_type      *meta.ContainerType
@@ -780,55 +779,6 @@ func (m *MetaMutation) AppendedFileIndices() ([]int, bool) {
 func (m *MetaMutation) ResetFileIndices() {
 	m.file_indices = nil
 	m.appendfile_indices = nil
-}
-
-// SetThumbnail sets the "thumbnail" field.
-func (m *MetaMutation) SetThumbnail(b []byte) {
-	m.thumbnail = &b
-}
-
-// Thumbnail returns the value of the "thumbnail" field in the mutation.
-func (m *MetaMutation) Thumbnail() (r []byte, exists bool) {
-	v := m.thumbnail
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldThumbnail returns the old "thumbnail" field's value of the Meta entity.
-// If the Meta object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MetaMutation) OldThumbnail(ctx context.Context) (v []byte, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldThumbnail is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldThumbnail requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldThumbnail: %w", err)
-	}
-	return oldValue.Thumbnail, nil
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (m *MetaMutation) ClearThumbnail() {
-	m.thumbnail = nil
-	m.clearedFields[meta.FieldThumbnail] = struct{}{}
-}
-
-// ThumbnailCleared returns if the "thumbnail" field was cleared in this mutation.
-func (m *MetaMutation) ThumbnailCleared() bool {
-	_, ok := m.clearedFields[meta.FieldThumbnail]
-	return ok
-}
-
-// ResetThumbnail resets all changes to the "thumbnail" field.
-func (m *MetaMutation) ResetThumbnail() {
-	m.thumbnail = nil
-	delete(m.clearedFields, meta.FieldThumbnail)
 }
 
 // SetRead sets the "read" field.
@@ -1485,7 +1435,7 @@ func (m *MetaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MetaMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 12)
 	if m.name != nil {
 		fields = append(fields, meta.FieldName)
 	}
@@ -1497,9 +1447,6 @@ func (m *MetaMutation) Fields() []string {
 	}
 	if m.file_indices != nil {
 		fields = append(fields, meta.FieldFileIndices)
-	}
-	if m.thumbnail != nil {
-		fields = append(fields, meta.FieldThumbnail)
 	}
 	if m.read != nil {
 		fields = append(fields, meta.FieldRead)
@@ -1541,8 +1488,6 @@ func (m *MetaMutation) Field(name string) (ent.Value, bool) {
 		return m.Favorite()
 	case meta.FieldFileIndices:
 		return m.FileIndices()
-	case meta.FieldThumbnail:
-		return m.Thumbnail()
 	case meta.FieldRead:
 		return m.Read()
 	case meta.FieldActive:
@@ -1576,8 +1521,6 @@ func (m *MetaMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldFavorite(ctx)
 	case meta.FieldFileIndices:
 		return m.OldFileIndices(ctx)
-	case meta.FieldThumbnail:
-		return m.OldThumbnail(ctx)
 	case meta.FieldRead:
 		return m.OldRead(ctx)
 	case meta.FieldActive:
@@ -1630,13 +1573,6 @@ func (m *MetaMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetFileIndices(v)
-		return nil
-	case meta.FieldThumbnail:
-		v, ok := value.([]byte)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetThumbnail(v)
 		return nil
 	case meta.FieldRead:
 		v, ok := value.(bool)
@@ -1787,9 +1723,6 @@ func (m *MetaMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *MetaMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(meta.FieldThumbnail) {
-		fields = append(fields, meta.FieldThumbnail)
-	}
 	if m.FieldCleared(meta.FieldThumbnailIndex) {
 		fields = append(fields, meta.FieldThumbnailIndex)
 	}
@@ -1819,9 +1752,6 @@ func (m *MetaMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *MetaMutation) ClearField(name string) error {
 	switch name {
-	case meta.FieldThumbnail:
-		m.ClearThumbnail()
-		return nil
 	case meta.FieldThumbnailIndex:
 		m.ClearThumbnailIndex()
 		return nil
@@ -1856,9 +1786,6 @@ func (m *MetaMutation) ResetField(name string) error {
 		return nil
 	case meta.FieldFileIndices:
 		m.ResetFileIndices()
-		return nil
-	case meta.FieldThumbnail:
-		m.ResetThumbnail()
 		return nil
 	case meta.FieldRead:
 		m.ResetRead()
@@ -2033,7 +1960,6 @@ type TagMutation struct {
 	name          *string
 	favorite      *bool
 	hidden        *bool
-	thumbnail     *[]byte
 	clearedFields map[string]struct{}
 	meta          map[int]struct{}
 	removedmeta   map[int]struct{}
@@ -2252,55 +2178,6 @@ func (m *TagMutation) ResetHidden() {
 	m.hidden = nil
 }
 
-// SetThumbnail sets the "thumbnail" field.
-func (m *TagMutation) SetThumbnail(b []byte) {
-	m.thumbnail = &b
-}
-
-// Thumbnail returns the value of the "thumbnail" field in the mutation.
-func (m *TagMutation) Thumbnail() (r []byte, exists bool) {
-	v := m.thumbnail
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldThumbnail returns the old "thumbnail" field's value of the Tag entity.
-// If the Tag object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TagMutation) OldThumbnail(ctx context.Context) (v []byte, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldThumbnail is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldThumbnail requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldThumbnail: %w", err)
-	}
-	return oldValue.Thumbnail, nil
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (m *TagMutation) ClearThumbnail() {
-	m.thumbnail = nil
-	m.clearedFields[tag.FieldThumbnail] = struct{}{}
-}
-
-// ThumbnailCleared returns if the "thumbnail" field was cleared in this mutation.
-func (m *TagMutation) ThumbnailCleared() bool {
-	_, ok := m.clearedFields[tag.FieldThumbnail]
-	return ok
-}
-
-// ResetThumbnail resets all changes to the "thumbnail" field.
-func (m *TagMutation) ResetThumbnail() {
-	m.thumbnail = nil
-	delete(m.clearedFields, tag.FieldThumbnail)
-}
-
 // AddMetumIDs adds the "meta" edge to the Meta entity by ids.
 func (m *TagMutation) AddMetumIDs(ids ...int) {
 	if m.meta == nil {
@@ -2443,7 +2320,7 @@ func (m *TagMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TagMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 3)
 	if m.name != nil {
 		fields = append(fields, tag.FieldName)
 	}
@@ -2452,9 +2329,6 @@ func (m *TagMutation) Fields() []string {
 	}
 	if m.hidden != nil {
 		fields = append(fields, tag.FieldHidden)
-	}
-	if m.thumbnail != nil {
-		fields = append(fields, tag.FieldThumbnail)
 	}
 	return fields
 }
@@ -2470,8 +2344,6 @@ func (m *TagMutation) Field(name string) (ent.Value, bool) {
 		return m.Favorite()
 	case tag.FieldHidden:
 		return m.Hidden()
-	case tag.FieldThumbnail:
-		return m.Thumbnail()
 	}
 	return nil, false
 }
@@ -2487,8 +2359,6 @@ func (m *TagMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldFavorite(ctx)
 	case tag.FieldHidden:
 		return m.OldHidden(ctx)
-	case tag.FieldThumbnail:
-		return m.OldThumbnail(ctx)
 	}
 	return nil, fmt.Errorf("unknown Tag field %s", name)
 }
@@ -2519,13 +2389,6 @@ func (m *TagMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetHidden(v)
 		return nil
-	case tag.FieldThumbnail:
-		v, ok := value.([]byte)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetThumbnail(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Tag field %s", name)
 }
@@ -2555,11 +2418,7 @@ func (m *TagMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *TagMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(tag.FieldThumbnail) {
-		fields = append(fields, tag.FieldThumbnail)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2572,11 +2431,6 @@ func (m *TagMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *TagMutation) ClearField(name string) error {
-	switch name {
-	case tag.FieldThumbnail:
-		m.ClearThumbnail()
-		return nil
-	}
 	return fmt.Errorf("unknown Tag nullable field %s", name)
 }
 
@@ -2592,9 +2446,6 @@ func (m *TagMutation) ResetField(name string) error {
 		return nil
 	case tag.FieldHidden:
 		m.ResetHidden()
-		return nil
-	case tag.FieldThumbnail:
-		m.ResetThumbnail()
 		return nil
 	}
 	return fmt.Errorf("unknown Tag field %s", name)

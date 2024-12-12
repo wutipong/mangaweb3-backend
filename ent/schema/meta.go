@@ -20,7 +20,6 @@ func (Meta) Fields() []ent.Field {
 		field.Time("create_time").Default(time.Now),
 		field.Bool("favorite").Default(false),
 		field.Ints("file_indices").Default([]int{}),
-		field.Bytes("thumbnail").Optional().Sensitive(),
 		field.Bool("read").Default(false),
 		field.Bool("active").Default(true),
 		field.Enum("container_type").Values("zip", "directory").Default("zip"),

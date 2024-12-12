@@ -190,24 +190,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/tag/recreate_thumbnails": {
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/browse.recreateThumbnailsResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/tag/set_favorite": {
             "post": {
                 "consumes": [
@@ -770,8 +752,8 @@ const docTemplate = `{
                     "description": "ThumbnailX holds the value of the \"thumbnail_x\" field.",
                     "type": "integer"
                 },
-                "thumbnmail_y": {
-                    "description": "ThumbnmailY holds the value of the \"thumbnmail_y\" field.",
+                "thumbnail_y": {
+                    "description": "ThumbnailY holds the value of the \"thumbnail_y\" field.",
                     "type": "integer"
                 }
             }

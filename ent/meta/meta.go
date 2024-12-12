@@ -23,8 +23,6 @@ const (
 	FieldFavorite = "favorite"
 	// FieldFileIndices holds the string denoting the file_indices field in the database.
 	FieldFileIndices = "file_indices"
-	// FieldThumbnail holds the string denoting the thumbnail field in the database.
-	FieldThumbnail = "thumbnail"
 	// FieldRead holds the string denoting the read field in the database.
 	FieldRead = "read"
 	// FieldActive holds the string denoting the active field in the database.
@@ -75,7 +73,6 @@ var Columns = []string{
 	FieldCreateTime,
 	FieldFavorite,
 	FieldFileIndices,
-	FieldThumbnail,
 	FieldRead,
 	FieldActive,
 	FieldContainerType,

@@ -86,18 +86,6 @@ func (mu *MetaUpdate) AppendFileIndices(i []int) *MetaUpdate {
 	return mu
 }
 
-// SetThumbnail sets the "thumbnail" field.
-func (mu *MetaUpdate) SetThumbnail(b []byte) *MetaUpdate {
-	mu.mutation.SetThumbnail(b)
-	return mu
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (mu *MetaUpdate) ClearThumbnail() *MetaUpdate {
-	mu.mutation.ClearThumbnail()
-	return mu
-}
-
 // SetRead sets the "read" field.
 func (mu *MetaUpdate) SetRead(b bool) *MetaUpdate {
 	mu.mutation.SetRead(b)
@@ -459,12 +447,6 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, meta.FieldFileIndices, value)
 		})
 	}
-	if value, ok := mu.mutation.Thumbnail(); ok {
-		_spec.SetField(meta.FieldThumbnail, field.TypeBytes, value)
-	}
-	if mu.mutation.ThumbnailCleared() {
-		_spec.ClearField(meta.FieldThumbnail, field.TypeBytes)
-	}
 	if value, ok := mu.mutation.Read(); ok {
 		_spec.SetField(meta.FieldRead, field.TypeBool, value)
 	}
@@ -725,18 +707,6 @@ func (muo *MetaUpdateOne) SetFileIndices(i []int) *MetaUpdateOne {
 // AppendFileIndices appends i to the "file_indices" field.
 func (muo *MetaUpdateOne) AppendFileIndices(i []int) *MetaUpdateOne {
 	muo.mutation.AppendFileIndices(i)
-	return muo
-}
-
-// SetThumbnail sets the "thumbnail" field.
-func (muo *MetaUpdateOne) SetThumbnail(b []byte) *MetaUpdateOne {
-	muo.mutation.SetThumbnail(b)
-	return muo
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (muo *MetaUpdateOne) ClearThumbnail() *MetaUpdateOne {
-	muo.mutation.ClearThumbnail()
 	return muo
 }
 
@@ -1130,12 +1100,6 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, meta.FieldFileIndices, value)
 		})
-	}
-	if value, ok := muo.mutation.Thumbnail(); ok {
-		_spec.SetField(meta.FieldThumbnail, field.TypeBytes, value)
-	}
-	if muo.mutation.ThumbnailCleared() {
-		_spec.ClearField(meta.FieldThumbnail, field.TypeBytes)
 	}
 	if value, ok := muo.mutation.Read(); ok {
 		_spec.SetField(meta.FieldRead, field.TypeBool, value)

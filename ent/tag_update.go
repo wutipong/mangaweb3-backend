@@ -71,18 +71,6 @@ func (tu *TagUpdate) SetNillableHidden(b *bool) *TagUpdate {
 	return tu
 }
 
-// SetThumbnail sets the "thumbnail" field.
-func (tu *TagUpdate) SetThumbnail(b []byte) *TagUpdate {
-	tu.mutation.SetThumbnail(b)
-	return tu
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (tu *TagUpdate) ClearThumbnail() *TagUpdate {
-	tu.mutation.ClearThumbnail()
-	return tu
-}
-
 // AddMetumIDs adds the "meta" edge to the Meta entity by IDs.
 func (tu *TagUpdate) AddMetumIDs(ids ...int) *TagUpdate {
 	tu.mutation.AddMetumIDs(ids...)
@@ -217,12 +205,6 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := tu.mutation.Hidden(); ok {
 		_spec.SetField(tag.FieldHidden, field.TypeBool, value)
-	}
-	if value, ok := tu.mutation.Thumbnail(); ok {
-		_spec.SetField(tag.FieldThumbnail, field.TypeBytes, value)
-	}
-	if tu.mutation.ThumbnailCleared() {
-		_spec.ClearField(tag.FieldThumbnail, field.TypeBytes)
 	}
 	if tu.mutation.MetaCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -373,18 +355,6 @@ func (tuo *TagUpdateOne) SetNillableHidden(b *bool) *TagUpdateOne {
 	if b != nil {
 		tuo.SetHidden(*b)
 	}
-	return tuo
-}
-
-// SetThumbnail sets the "thumbnail" field.
-func (tuo *TagUpdateOne) SetThumbnail(b []byte) *TagUpdateOne {
-	tuo.mutation.SetThumbnail(b)
-	return tuo
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (tuo *TagUpdateOne) ClearThumbnail() *TagUpdateOne {
-	tuo.mutation.ClearThumbnail()
 	return tuo
 }
 
@@ -552,12 +522,6 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 	}
 	if value, ok := tuo.mutation.Hidden(); ok {
 		_spec.SetField(tag.FieldHidden, field.TypeBool, value)
-	}
-	if value, ok := tuo.mutation.Thumbnail(); ok {
-		_spec.SetField(tag.FieldThumbnail, field.TypeBytes, value)
-	}
-	if tuo.mutation.ThumbnailCleared() {
-		_spec.ClearField(tag.FieldThumbnail, field.TypeBytes)
 	}
 	if tuo.mutation.MetaCleared() {
 		edge := &sqlgraph.EdgeSpec{

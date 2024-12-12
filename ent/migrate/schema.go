@@ -42,7 +42,6 @@ var (
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "favorite", Type: field.TypeBool, Default: false},
 		{Name: "file_indices", Type: field.TypeJSON},
-		{Name: "thumbnail", Type: field.TypeBytes, Nullable: true},
 		{Name: "read", Type: field.TypeBool, Default: false},
 		{Name: "active", Type: field.TypeBool, Default: true},
 		{Name: "container_type", Type: field.TypeEnum, Enums: []string{"zip", "directory"}, Default: "zip"},
@@ -64,7 +63,6 @@ var (
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "favorite", Type: field.TypeBool, Default: false},
 		{Name: "hidden", Type: field.TypeBool, Default: false},
-		{Name: "thumbnail", Type: field.TypeBytes, Nullable: true},
 	}
 	// TagsTable holds the schema information for the "tags" table.
 	TagsTable = &schema.Table{

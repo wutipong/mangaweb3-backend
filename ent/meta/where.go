@@ -70,11 +70,6 @@ func Favorite(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldEQ(FieldFavorite, v))
 }
 
-// Thumbnail applies equality check predicate on the "thumbnail" field. It's identical to ThumbnailEQ.
-func Thumbnail(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldEQ(FieldThumbnail, v))
-}
-
 // Read applies equality check predicate on the "read" field. It's identical to ReadEQ.
 func Read(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldEQ(FieldRead, v))
@@ -223,56 +218,6 @@ func FavoriteEQ(v bool) predicate.Meta {
 // FavoriteNEQ applies the NEQ predicate on the "favorite" field.
 func FavoriteNEQ(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldNEQ(FieldFavorite, v))
-}
-
-// ThumbnailEQ applies the EQ predicate on the "thumbnail" field.
-func ThumbnailEQ(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldEQ(FieldThumbnail, v))
-}
-
-// ThumbnailNEQ applies the NEQ predicate on the "thumbnail" field.
-func ThumbnailNEQ(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldNEQ(FieldThumbnail, v))
-}
-
-// ThumbnailIn applies the In predicate on the "thumbnail" field.
-func ThumbnailIn(vs ...[]byte) predicate.Meta {
-	return predicate.Meta(sql.FieldIn(FieldThumbnail, vs...))
-}
-
-// ThumbnailNotIn applies the NotIn predicate on the "thumbnail" field.
-func ThumbnailNotIn(vs ...[]byte) predicate.Meta {
-	return predicate.Meta(sql.FieldNotIn(FieldThumbnail, vs...))
-}
-
-// ThumbnailGT applies the GT predicate on the "thumbnail" field.
-func ThumbnailGT(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldGT(FieldThumbnail, v))
-}
-
-// ThumbnailGTE applies the GTE predicate on the "thumbnail" field.
-func ThumbnailGTE(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldGTE(FieldThumbnail, v))
-}
-
-// ThumbnailLT applies the LT predicate on the "thumbnail" field.
-func ThumbnailLT(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldLT(FieldThumbnail, v))
-}
-
-// ThumbnailLTE applies the LTE predicate on the "thumbnail" field.
-func ThumbnailLTE(v []byte) predicate.Meta {
-	return predicate.Meta(sql.FieldLTE(FieldThumbnail, v))
-}
-
-// ThumbnailIsNil applies the IsNil predicate on the "thumbnail" field.
-func ThumbnailIsNil() predicate.Meta {
-	return predicate.Meta(sql.FieldIsNull(FieldThumbnail))
-}
-
-// ThumbnailNotNil applies the NotNil predicate on the "thumbnail" field.
-func ThumbnailNotNil() predicate.Meta {
-	return predicate.Meta(sql.FieldNotNull(FieldThumbnail))
 }
 
 // ReadEQ applies the EQ predicate on the "read" field.

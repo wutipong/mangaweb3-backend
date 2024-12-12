@@ -51,8 +51,6 @@ func NewItem(ctx context.Context, client *ent.Client, name string, ct meta.Conta
 		return
 	}
 
-	GenerateThumbnail(i, 0, CropDetails{})
-
 	return client.Meta.Create().
 		SetName(i.Name).
 		SetCreateTime(i.CreateTime).
@@ -60,7 +58,7 @@ func NewItem(ctx context.Context, client *ent.Client, name string, ct meta.Conta
 		SetFileIndices(i.FileIndices).
 		SetRead(false).
 		SetContainerType(ct).
-		SetThumbnail(i.Thumbnail).Save(ctx)
+		Save(ctx)
 }
 
 func Open(m *ent.Meta) (reader io.ReadCloser, err error) {
@@ -81,54 +79,6 @@ type CropDetails struct {
 	Y      int `json:"y"`
 	Width  int `json:"width"`
 	Height int `json:"height"`
-}
-
-func GenerateThumbnail(m *ent.Meta, fileIndex int, details CropDetails) error {
-	mutex := new(sync.Mutex)
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	c, err := container.CreateContainer(m)
-	if err != nil {
-		return err
-	}
-	stream, _, err := c.OpenItem(context.Background(), fileIndex)
-	if err != nil {
-		return err
-	}
-
-	defer stream.Close()
-
-	img, err := imaging.Decode(stream, imaging.AutoOrientation(true))
-	if err != nil {
-		return err
-	}
-
-	if details.Width > 0 && details.Height > 0 {
-		img = imaging.Crop(img, image.Rectangle{
-			Min: image.Point{
-				X: details.X,
-				Y: details.Y,
-			},
-			Max: image.Point{
-				X: details.X + details.Width,
-				Y: details.Y + details.Height,
-			},
-		})
-	}
-
-	const thumbnailHeight = 510
-	if img.Bounds().Dy() > thumbnailHeight {
-		resized := imaging.Resize(img, 0, thumbnailHeight, imaging.MitchellNetravali)
-		img = resized
-	}
-
-	buffer := bytes.Buffer{}
-	imaging.Encode(&buffer, img, imaging.JPEG, imaging.JPEGQuality(75))
-
-	m.Thumbnail = buffer.Bytes()
-
-	return nil
 }
 
 func CreateThumbnail(m *ent.Meta) (thumbnail image.Image, err error) {
@@ -256,7 +206,6 @@ func PopulateTags(ctx context.Context, client *ent.Client, m *ent.Meta) (out *en
 				SetName(tag.Name).
 				SetFavorite(tag.Favorite).
 				SetHidden(tag.Hidden).
-				SetThumbnail(m.Thumbnail).
 				Save(ctx)
 
 		} else {

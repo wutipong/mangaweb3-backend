@@ -26,8 +26,6 @@ type Meta struct {
 	Favorite bool `json:"favorite,omitempty"`
 	// FileIndices holds the value of the "file_indices" field.
 	FileIndices []int `json:"file_indices,omitempty"`
-	// Thumbnail holds the value of the "thumbnail" field.
-	Thumbnail []byte `json:"-"`
 	// Read holds the value of the "read" field.
 	Read bool `json:"read,omitempty"`
 	// Active holds the value of the "active" field.
@@ -95,7 +93,7 @@ func (*Meta) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case meta.FieldFileIndices, meta.FieldThumbnail:
+		case meta.FieldFileIndices:
 			values[i] = new([]byte)
 		case meta.FieldFavorite, meta.FieldRead, meta.FieldActive:
 			values[i] = new(sql.NullBool)
@@ -151,12 +149,6 @@ func (m *Meta) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &m.FileIndices); err != nil {
 					return fmt.Errorf("unmarshal field file_indices: %w", err)
 				}
-			}
-		case meta.FieldThumbnail:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field thumbnail", values[i])
-			} else if value != nil {
-				m.Thumbnail = *value
 			}
 		case meta.FieldRead:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -268,8 +260,6 @@ func (m *Meta) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("file_indices=")
 	builder.WriteString(fmt.Sprintf("%v", m.FileIndices))
-	builder.WriteString(", ")
-	builder.WriteString("thumbnail=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("read=")
 	builder.WriteString(fmt.Sprintf("%v", m.Read))

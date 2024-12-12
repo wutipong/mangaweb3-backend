@@ -65,12 +65,6 @@ func (mc *MetaCreate) SetFileIndices(i []int) *MetaCreate {
 	return mc
 }
 
-// SetThumbnail sets the "thumbnail" field.
-func (mc *MetaCreate) SetThumbnail(b []byte) *MetaCreate {
-	mc.mutation.SetThumbnail(b)
-	return mc
-}
-
 // SetRead sets the "read" field.
 func (mc *MetaCreate) SetRead(b bool) *MetaCreate {
 	mc.mutation.SetRead(b)
@@ -385,10 +379,6 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 		_spec.SetField(meta.FieldFileIndices, field.TypeJSON, value)
 		_node.FileIndices = value
 	}
-	if value, ok := mc.mutation.Thumbnail(); ok {
-		_spec.SetField(meta.FieldThumbnail, field.TypeBytes, value)
-		_node.Thumbnail = value
-	}
 	if value, ok := mc.mutation.Read(); ok {
 		_spec.SetField(meta.FieldRead, field.TypeBool, value)
 		_node.Read = value
@@ -566,24 +556,6 @@ func (u *MetaUpsert) SetFileIndices(v []int) *MetaUpsert {
 // UpdateFileIndices sets the "file_indices" field to the value that was provided on create.
 func (u *MetaUpsert) UpdateFileIndices() *MetaUpsert {
 	u.SetExcluded(meta.FieldFileIndices)
-	return u
-}
-
-// SetThumbnail sets the "thumbnail" field.
-func (u *MetaUpsert) SetThumbnail(v []byte) *MetaUpsert {
-	u.Set(meta.FieldThumbnail, v)
-	return u
-}
-
-// UpdateThumbnail sets the "thumbnail" field to the value that was provided on create.
-func (u *MetaUpsert) UpdateThumbnail() *MetaUpsert {
-	u.SetExcluded(meta.FieldThumbnail)
-	return u
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (u *MetaUpsert) ClearThumbnail() *MetaUpsert {
-	u.SetNull(meta.FieldThumbnail)
 	return u
 }
 
@@ -836,27 +808,6 @@ func (u *MetaUpsertOne) SetFileIndices(v []int) *MetaUpsertOne {
 func (u *MetaUpsertOne) UpdateFileIndices() *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateFileIndices()
-	})
-}
-
-// SetThumbnail sets the "thumbnail" field.
-func (u *MetaUpsertOne) SetThumbnail(v []byte) *MetaUpsertOne {
-	return u.Update(func(s *MetaUpsert) {
-		s.SetThumbnail(v)
-	})
-}
-
-// UpdateThumbnail sets the "thumbnail" field to the value that was provided on create.
-func (u *MetaUpsertOne) UpdateThumbnail() *MetaUpsertOne {
-	return u.Update(func(s *MetaUpsert) {
-		s.UpdateThumbnail()
-	})
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (u *MetaUpsertOne) ClearThumbnail() *MetaUpsertOne {
-	return u.Update(func(s *MetaUpsert) {
-		s.ClearThumbnail()
 	})
 }
 
@@ -1299,27 +1250,6 @@ func (u *MetaUpsertBulk) SetFileIndices(v []int) *MetaUpsertBulk {
 func (u *MetaUpsertBulk) UpdateFileIndices() *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateFileIndices()
-	})
-}
-
-// SetThumbnail sets the "thumbnail" field.
-func (u *MetaUpsertBulk) SetThumbnail(v []byte) *MetaUpsertBulk {
-	return u.Update(func(s *MetaUpsert) {
-		s.SetThumbnail(v)
-	})
-}
-
-// UpdateThumbnail sets the "thumbnail" field to the value that was provided on create.
-func (u *MetaUpsertBulk) UpdateThumbnail() *MetaUpsertBulk {
-	return u.Update(func(s *MetaUpsert) {
-		s.UpdateThumbnail()
-	})
-}
-
-// ClearThumbnail clears the value of the "thumbnail" field.
-func (u *MetaUpsertBulk) ClearThumbnail() *MetaUpsertBulk {
-	return u.Update(func(s *MetaUpsert) {
-		s.ClearThumbnail()
 	})
 }
 
