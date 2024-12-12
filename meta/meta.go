@@ -134,25 +134,28 @@ func GetThumbnailBytes(m *ent.Meta) (thumbnail []byte, err error) {
 	file, err := os.Open(thumbfile)
 	buffer := bytes.Buffer{}
 
-	if errors.Is(err, os.ErrNotExist) {
-		os.MkdirAll(filepath.Dir(thumbfile), fs.ModePerm)
-		img, e := CreateThumbnail(m)
-		if e != nil {
-			err = e
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			os.MkdirAll(filepath.Dir(thumbfile), fs.ModePerm)
+			img, e := CreateThumbnail(m)
+			if e != nil {
+				err = e
+				return
+			}
+
+			e = imaging.Save(img, thumbfile, imaging.JPEGQuality(75))
+			if e != nil {
+				err = e
+				return
+			}
+
+			imaging.Encode(&buffer, img, imaging.JPEG, imaging.JPEGQuality(75))
+			err = nil
+		} else {
 			return
 		}
-
-		e = imaging.Save(img, thumbfile, imaging.JPEGQuality(75))
-		if e != nil {
-			err = e
-			return
-		}
-
-		imaging.Encode(&buffer, img, imaging.JPEG, imaging.JPEGQuality(75))
-		err = nil
-	} else {
-		io.Copy(&buffer, file)
 	}
+	io.Copy(&buffer, file)
 
 	thumbnail = bytes.Clone(buffer.Bytes())
 
