@@ -48,24 +48,28 @@ func init() {
 	metaDescActive := metaFields[5].Descriptor()
 	// meta.DefaultActive holds the default value on creation for the active field.
 	meta.DefaultActive = metaDescActive.Default.(bool)
+	// metaDescHidden is the schema descriptor for hidden field.
+	metaDescHidden := metaFields[6].Descriptor()
+	// meta.DefaultHidden holds the default value on creation for the hidden field.
+	meta.DefaultHidden = metaDescHidden.Default.(bool)
 	// metaDescThumbnailIndex is the schema descriptor for thumbnail_index field.
-	metaDescThumbnailIndex := metaFields[7].Descriptor()
+	metaDescThumbnailIndex := metaFields[8].Descriptor()
 	// meta.DefaultThumbnailIndex holds the default value on creation for the thumbnail_index field.
 	meta.DefaultThumbnailIndex = metaDescThumbnailIndex.Default.(int)
 	// metaDescThumbnailX is the schema descriptor for thumbnail_x field.
-	metaDescThumbnailX := metaFields[8].Descriptor()
+	metaDescThumbnailX := metaFields[9].Descriptor()
 	// meta.DefaultThumbnailX holds the default value on creation for the thumbnail_x field.
 	meta.DefaultThumbnailX = metaDescThumbnailX.Default.(int)
 	// metaDescThumbnailY is the schema descriptor for thumbnail_y field.
-	metaDescThumbnailY := metaFields[9].Descriptor()
+	metaDescThumbnailY := metaFields[10].Descriptor()
 	// meta.DefaultThumbnailY holds the default value on creation for the thumbnail_y field.
 	meta.DefaultThumbnailY = metaDescThumbnailY.Default.(int)
 	// metaDescThumbnailWidth is the schema descriptor for thumbnail_width field.
-	metaDescThumbnailWidth := metaFields[10].Descriptor()
+	metaDescThumbnailWidth := metaFields[11].Descriptor()
 	// meta.DefaultThumbnailWidth holds the default value on creation for the thumbnail_width field.
 	meta.DefaultThumbnailWidth = metaDescThumbnailWidth.Default.(int)
 	// metaDescThumbnailHeight is the schema descriptor for thumbnail_height field.
-	metaDescThumbnailHeight := metaFields[11].Descriptor()
+	metaDescThumbnailHeight := metaFields[12].Descriptor()
 	// meta.DefaultThumbnailHeight holds the default value on creation for the thumbnail_height field.
 	meta.DefaultThumbnailHeight = metaDescThumbnailHeight.Default.(int)
 	tagFields := schema.Tag{}.Fields()
