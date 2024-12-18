@@ -114,6 +114,20 @@ func (mu *MetaUpdate) SetNillableActive(b *bool) *MetaUpdate {
 	return mu
 }
 
+// SetHidden sets the "hidden" field.
+func (mu *MetaUpdate) SetHidden(b bool) *MetaUpdate {
+	mu.mutation.SetHidden(b)
+	return mu
+}
+
+// SetNillableHidden sets the "hidden" field if the given value is not nil.
+func (mu *MetaUpdate) SetNillableHidden(b *bool) *MetaUpdate {
+	if b != nil {
+		mu.SetHidden(*b)
+	}
+	return mu
+}
+
 // SetContainerType sets the "container_type" field.
 func (mu *MetaUpdate) SetContainerType(mt meta.ContainerType) *MetaUpdate {
 	mu.mutation.SetContainerType(mt)
@@ -453,6 +467,9 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.Active(); ok {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
 	}
+	if value, ok := mu.mutation.Hidden(); ok {
+		_spec.SetField(meta.FieldHidden, field.TypeBool, value)
+	}
 	if value, ok := mu.mutation.ContainerType(); ok {
 		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)
 	}
@@ -734,6 +751,20 @@ func (muo *MetaUpdateOne) SetActive(b bool) *MetaUpdateOne {
 func (muo *MetaUpdateOne) SetNillableActive(b *bool) *MetaUpdateOne {
 	if b != nil {
 		muo.SetActive(*b)
+	}
+	return muo
+}
+
+// SetHidden sets the "hidden" field.
+func (muo *MetaUpdateOne) SetHidden(b bool) *MetaUpdateOne {
+	muo.mutation.SetHidden(b)
+	return muo
+}
+
+// SetNillableHidden sets the "hidden" field if the given value is not nil.
+func (muo *MetaUpdateOne) SetNillableHidden(b *bool) *MetaUpdateOne {
+	if b != nil {
+		muo.SetHidden(*b)
 	}
 	return muo
 }
@@ -1106,6 +1137,9 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 	}
 	if value, ok := muo.mutation.Active(); ok {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
+	}
+	if value, ok := muo.mutation.Hidden(); ok {
+		_spec.SetField(meta.FieldHidden, field.TypeBool, value)
 	}
 	if value, ok := muo.mutation.ContainerType(); ok {
 		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)

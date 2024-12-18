@@ -22,6 +22,7 @@ func (Meta) Fields() []ent.Field {
 		field.Ints("file_indices").Default([]int{}),
 		field.Bool("read").Default(false),
 		field.Bool("active").Default(true),
+		field.Bool("hidden").Default(false),
 		field.Enum("container_type").Values("zip", "directory").Default("zip"),
 		field.Int("thumbnail_index").Default(0).Optional(),
 		field.Int("thumbnail_x").Default(0).Optional(),

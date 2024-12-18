@@ -498,6 +498,7 @@ type MetaMutation struct {
 	appendfile_indices  []int
 	read                *bool
 	active              *bool
+	hidden              *bool
 	container_type      *meta.ContainerType
 	thumbnail_index     *int
 	addthumbnail_index  *int
@@ -851,6 +852,42 @@ func (m *MetaMutation) OldActive(ctx context.Context) (v bool, err error) {
 // ResetActive resets all changes to the "active" field.
 func (m *MetaMutation) ResetActive() {
 	m.active = nil
+}
+
+// SetHidden sets the "hidden" field.
+func (m *MetaMutation) SetHidden(b bool) {
+	m.hidden = &b
+}
+
+// Hidden returns the value of the "hidden" field in the mutation.
+func (m *MetaMutation) Hidden() (r bool, exists bool) {
+	v := m.hidden
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHidden returns the old "hidden" field's value of the Meta entity.
+// If the Meta object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MetaMutation) OldHidden(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHidden is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHidden requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHidden: %w", err)
+	}
+	return oldValue.Hidden, nil
+}
+
+// ResetHidden resets all changes to the "hidden" field.
+func (m *MetaMutation) ResetHidden() {
+	m.hidden = nil
 }
 
 // SetContainerType sets the "container_type" field.
@@ -1435,7 +1472,7 @@ func (m *MetaMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MetaMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.name != nil {
 		fields = append(fields, meta.FieldName)
 	}
@@ -1453,6 +1490,9 @@ func (m *MetaMutation) Fields() []string {
 	}
 	if m.active != nil {
 		fields = append(fields, meta.FieldActive)
+	}
+	if m.hidden != nil {
+		fields = append(fields, meta.FieldHidden)
 	}
 	if m.container_type != nil {
 		fields = append(fields, meta.FieldContainerType)
@@ -1492,6 +1532,8 @@ func (m *MetaMutation) Field(name string) (ent.Value, bool) {
 		return m.Read()
 	case meta.FieldActive:
 		return m.Active()
+	case meta.FieldHidden:
+		return m.Hidden()
 	case meta.FieldContainerType:
 		return m.ContainerType()
 	case meta.FieldThumbnailIndex:
@@ -1525,6 +1567,8 @@ func (m *MetaMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldRead(ctx)
 	case meta.FieldActive:
 		return m.OldActive(ctx)
+	case meta.FieldHidden:
+		return m.OldHidden(ctx)
 	case meta.FieldContainerType:
 		return m.OldContainerType(ctx)
 	case meta.FieldThumbnailIndex:
@@ -1587,6 +1631,13 @@ func (m *MetaMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetActive(v)
+		return nil
+	case meta.FieldHidden:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHidden(v)
 		return nil
 	case meta.FieldContainerType:
 		v, ok := value.(meta.ContainerType)
@@ -1792,6 +1843,9 @@ func (m *MetaMutation) ResetField(name string) error {
 		return nil
 	case meta.FieldActive:
 		m.ResetActive()
+		return nil
+	case meta.FieldHidden:
+		m.ResetHidden()
 		return nil
 	case meta.FieldContainerType:
 		m.ResetContainerType()

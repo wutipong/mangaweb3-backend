@@ -93,6 +93,20 @@ func (mc *MetaCreate) SetNillableActive(b *bool) *MetaCreate {
 	return mc
 }
 
+// SetHidden sets the "hidden" field.
+func (mc *MetaCreate) SetHidden(b bool) *MetaCreate {
+	mc.mutation.SetHidden(b)
+	return mc
+}
+
+// SetNillableHidden sets the "hidden" field if the given value is not nil.
+func (mc *MetaCreate) SetNillableHidden(b *bool) *MetaCreate {
+	if b != nil {
+		mc.SetHidden(*b)
+	}
+	return mc
+}
+
 // SetContainerType sets the "container_type" field.
 func (mc *MetaCreate) SetContainerType(mt meta.ContainerType) *MetaCreate {
 	mc.mutation.SetContainerType(mt)
@@ -277,6 +291,10 @@ func (mc *MetaCreate) defaults() {
 		v := meta.DefaultActive
 		mc.mutation.SetActive(v)
 	}
+	if _, ok := mc.mutation.Hidden(); !ok {
+		v := meta.DefaultHidden
+		mc.mutation.SetHidden(v)
+	}
 	if _, ok := mc.mutation.ContainerType(); !ok {
 		v := meta.DefaultContainerType
 		mc.mutation.SetContainerType(v)
@@ -327,6 +345,9 @@ func (mc *MetaCreate) check() error {
 	}
 	if _, ok := mc.mutation.Active(); !ok {
 		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "Meta.active"`)}
+	}
+	if _, ok := mc.mutation.Hidden(); !ok {
+		return &ValidationError{Name: "hidden", err: errors.New(`ent: missing required field "Meta.hidden"`)}
 	}
 	if _, ok := mc.mutation.ContainerType(); !ok {
 		return &ValidationError{Name: "container_type", err: errors.New(`ent: missing required field "Meta.container_type"`)}
@@ -386,6 +407,10 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.Active(); ok {
 		_spec.SetField(meta.FieldActive, field.TypeBool, value)
 		_node.Active = value
+	}
+	if value, ok := mc.mutation.Hidden(); ok {
+		_spec.SetField(meta.FieldHidden, field.TypeBool, value)
+		_node.Hidden = value
 	}
 	if value, ok := mc.mutation.ContainerType(); ok {
 		_spec.SetField(meta.FieldContainerType, field.TypeEnum, value)
@@ -580,6 +605,18 @@ func (u *MetaUpsert) SetActive(v bool) *MetaUpsert {
 // UpdateActive sets the "active" field to the value that was provided on create.
 func (u *MetaUpsert) UpdateActive() *MetaUpsert {
 	u.SetExcluded(meta.FieldActive)
+	return u
+}
+
+// SetHidden sets the "hidden" field.
+func (u *MetaUpsert) SetHidden(v bool) *MetaUpsert {
+	u.Set(meta.FieldHidden, v)
+	return u
+}
+
+// UpdateHidden sets the "hidden" field to the value that was provided on create.
+func (u *MetaUpsert) UpdateHidden() *MetaUpsert {
+	u.SetExcluded(meta.FieldHidden)
 	return u
 }
 
@@ -836,6 +873,20 @@ func (u *MetaUpsertOne) SetActive(v bool) *MetaUpsertOne {
 func (u *MetaUpsertOne) UpdateActive() *MetaUpsertOne {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateActive()
+	})
+}
+
+// SetHidden sets the "hidden" field.
+func (u *MetaUpsertOne) SetHidden(v bool) *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetHidden(v)
+	})
+}
+
+// UpdateHidden sets the "hidden" field to the value that was provided on create.
+func (u *MetaUpsertOne) UpdateHidden() *MetaUpsertOne {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateHidden()
 	})
 }
 
@@ -1278,6 +1329,20 @@ func (u *MetaUpsertBulk) SetActive(v bool) *MetaUpsertBulk {
 func (u *MetaUpsertBulk) UpdateActive() *MetaUpsertBulk {
 	return u.Update(func(s *MetaUpsert) {
 		s.UpdateActive()
+	})
+}
+
+// SetHidden sets the "hidden" field.
+func (u *MetaUpsertBulk) SetHidden(v bool) *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.SetHidden(v)
+	})
+}
+
+// UpdateHidden sets the "hidden" field to the value that was provided on create.
+func (u *MetaUpsertBulk) UpdateHidden() *MetaUpsertBulk {
+	return u.Update(func(s *MetaUpsert) {
+		s.UpdateHidden()
 	})
 }
 

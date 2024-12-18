@@ -27,6 +27,8 @@ const (
 	FieldRead = "read"
 	// FieldActive holds the string denoting the active field in the database.
 	FieldActive = "active"
+	// FieldHidden holds the string denoting the hidden field in the database.
+	FieldHidden = "hidden"
 	// FieldContainerType holds the string denoting the container_type field in the database.
 	FieldContainerType = "container_type"
 	// FieldThumbnailIndex holds the string denoting the thumbnail_index field in the database.
@@ -75,6 +77,7 @@ var Columns = []string{
 	FieldFileIndices,
 	FieldRead,
 	FieldActive,
+	FieldHidden,
 	FieldContainerType,
 	FieldThumbnailIndex,
 	FieldThumbnailX,
@@ -115,6 +118,8 @@ var (
 	DefaultRead bool
 	// DefaultActive holds the default value on creation for the "active" field.
 	DefaultActive bool
+	// DefaultHidden holds the default value on creation for the "hidden" field.
+	DefaultHidden bool
 	// DefaultThumbnailIndex holds the default value on creation for the "thumbnail_index" field.
 	DefaultThumbnailIndex int
 	// DefaultThumbnailX holds the default value on creation for the "thumbnail_x" field.
@@ -184,6 +189,11 @@ func ByRead(opts ...sql.OrderTermOption) OrderOption {
 // ByActive orders the results by the active field.
 func ByActive(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldActive, opts...).ToFunc()
+}
+
+// ByHidden orders the results by the hidden field.
+func ByHidden(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHidden, opts...).ToFunc()
 }
 
 // ByContainerType orders the results by the container_type field.

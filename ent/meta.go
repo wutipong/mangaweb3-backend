@@ -30,6 +30,8 @@ type Meta struct {
 	Read bool `json:"read,omitempty"`
 	// Active holds the value of the "active" field.
 	Active bool `json:"active,omitempty"`
+	// Hidden holds the value of the "hidden" field.
+	Hidden bool `json:"hidden,omitempty"`
 	// ContainerType holds the value of the "container_type" field.
 	ContainerType meta.ContainerType `json:"container_type,omitempty"`
 	// ThumbnailIndex holds the value of the "thumbnail_index" field.
@@ -95,7 +97,7 @@ func (*Meta) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case meta.FieldFileIndices:
 			values[i] = new([]byte)
-		case meta.FieldFavorite, meta.FieldRead, meta.FieldActive:
+		case meta.FieldFavorite, meta.FieldRead, meta.FieldActive, meta.FieldHidden:
 			values[i] = new(sql.NullBool)
 		case meta.FieldID, meta.FieldThumbnailIndex, meta.FieldThumbnailX, meta.FieldThumbnailY, meta.FieldThumbnailWidth, meta.FieldThumbnailHeight:
 			values[i] = new(sql.NullInt64)
@@ -161,6 +163,12 @@ func (m *Meta) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field active", values[i])
 			} else if value.Valid {
 				m.Active = value.Bool
+			}
+		case meta.FieldHidden:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field hidden", values[i])
+			} else if value.Valid {
+				m.Hidden = value.Bool
 			}
 		case meta.FieldContainerType:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -266,6 +274,9 @@ func (m *Meta) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("active=")
 	builder.WriteString(fmt.Sprintf("%v", m.Active))
+	builder.WriteString(", ")
+	builder.WriteString("hidden=")
+	builder.WriteString(fmt.Sprintf("%v", m.Hidden))
 	builder.WriteString(", ")
 	builder.WriteString("container_type=")
 	builder.WriteString(fmt.Sprintf("%v", m.ContainerType))

@@ -46,7 +46,7 @@ func CreateQuery(ctx context.Context, client *ent.Client, u *ent.User, q QueryPa
 		query = client.Meta.Query()
 	}
 
-	query = query.Where(meta.Active(true))
+	query = query.Where(meta.Active(true), meta.Hidden(false))
 
 	if q.SearchName != "" {
 		query = query.Where(meta.NameContainsFold(q.SearchName))

@@ -80,6 +80,11 @@ func Active(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldEQ(FieldActive, v))
 }
 
+// Hidden applies equality check predicate on the "hidden" field. It's identical to HiddenEQ.
+func Hidden(v bool) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldHidden, v))
+}
+
 // ThumbnailIndex applies equality check predicate on the "thumbnail_index" field. It's identical to ThumbnailIndexEQ.
 func ThumbnailIndex(v int) predicate.Meta {
 	return predicate.Meta(sql.FieldEQ(FieldThumbnailIndex, v))
@@ -238,6 +243,16 @@ func ActiveEQ(v bool) predicate.Meta {
 // ActiveNEQ applies the NEQ predicate on the "active" field.
 func ActiveNEQ(v bool) predicate.Meta {
 	return predicate.Meta(sql.FieldNEQ(FieldActive, v))
+}
+
+// HiddenEQ applies the EQ predicate on the "hidden" field.
+func HiddenEQ(v bool) predicate.Meta {
+	return predicate.Meta(sql.FieldEQ(FieldHidden, v))
+}
+
+// HiddenNEQ applies the NEQ predicate on the "hidden" field.
+func HiddenNEQ(v bool) predicate.Meta {
+	return predicate.Meta(sql.FieldNEQ(FieldHidden, v))
 }
 
 // ContainerTypeEQ applies the EQ predicate on the "container_type" field.
