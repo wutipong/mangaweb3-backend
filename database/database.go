@@ -66,9 +66,12 @@ func Close() {
 	if sqlite != nil {
 		sqlite.Close()
 	}
+
+	db.Close()
 }
 
 func CreateEntClient() *ent.Client {
+	// TODO: use connection pool for postgres, recreate connection for sqlite.
 	options := []ent.Option{
 		ent.Driver(db),
 	}
