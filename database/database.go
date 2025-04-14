@@ -18,7 +18,6 @@ import (
 
 var pool *pgxpool.Pool
 
-var db *dialect_sql.Driver
 var databaseType string
 var connectionStr string
 
@@ -42,31 +41,25 @@ func Open(ctx context.Context, dbType string, connStr string) error {
 
 }
 
-func openDB(ctx context.Context, dbType string) (db *dialect_sql.Driver, err error) {
+func openDB(dbType string) (db *dialect_sql.Driver, err error) {
 	switch dbType {
 	case dialect.Postgres:
-		return openPostgres(ctx)
+		return openPostgres()
 
 	case dialect.SQLite:
-		return openSqlite(ctx)
+		return openSqlite()
 	}
 
 	return nil, errors.ErrNotImplemented
 }
 
-func openPostgres(ctx context.Context) (db *dialect_sql.Driver, err error) {
-	if p, e := pgxpool.New(ctx, connectionStr); e == nil {
-		pool = p
-		db = dialect_sql.OpenDB(dialect.Postgres, stdlib.OpenDBFromPool(pool))
+func openPostgres() (db *dialect_sql.Driver, err error) {
+	db = dialect_sql.OpenDB(dialect.Postgres, stdlib.OpenDBFromPool(pool))
 
-		return
-	} else {
-		err = e
-		return
-	}
+	return
 }
 
-func openSqlite(ctx context.Context) (db *dialect_sql.Driver, err error) {
+func openSqlite() (db *dialect_sql.Driver, err error) {
 	if d, e := sql.Open("sqlite", connectionStr); e == nil {
 		db = dialect_sql.OpenDB(dialect.SQLite, d)
 		return
@@ -80,14 +73,10 @@ func Close() {
 	if pool != nil {
 		pool.Close()
 	}
-
-	db.Close()
 }
 
 func CreateEntClient() *ent.Client {
-	// TODO: use connection pool for postgres, recreate connection for sqlite.
-
-	db, err := openDB(context.Background(), databaseType)
+	db, err := openDB(databaseType)
 	if err != nil {
 		return nil
 	}
