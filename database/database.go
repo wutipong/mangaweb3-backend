@@ -17,44 +17,62 @@ import (
 )
 
 var pool *pgxpool.Pool
-var sqlite *sql.DB
 
 var db *dialect_sql.Driver
 var databaseType string
+var connectionStr string
 
 func Open(ctx context.Context, dbType string, connStr string) error {
 	databaseType = dbType
+	connectionStr = connStr
 
 	switch dbType {
 	case dialect.Postgres:
-		return openPostgres(ctx, connStr)
+		if p, e := pgxpool.New(ctx, connStr); e == nil {
+			pool = p
+		} else {
+			return e
+		}
 
 	case dialect.SQLite:
-		return openSqlite(ctx, connStr)
+		return nil
 	}
 
 	return errors.ErrNotImplemented
 
 }
 
-func openPostgres(ctx context.Context, connStr string) error {
-	if p, e := pgxpool.New(ctx, connStr); e == nil {
-		pool = p
-		db = dialect_sql.OpenDB(dialect.Postgres, stdlib.OpenDBFromPool(pool))
-	} else {
-		return e
+func openDB(ctx context.Context, dbType string) (db *dialect_sql.Driver, err error) {
+	switch dbType {
+	case dialect.Postgres:
+		return openPostgres(ctx)
+
+	case dialect.SQLite:
+		return openSqlite(ctx)
 	}
 
-	return nil
+	return nil, errors.ErrNotImplemented
 }
 
-func openSqlite(ctx context.Context, connStr string) error {
-	if d, e := sql.Open("sqlite", connStr); e == nil {
-		sqlite = d
-		db = dialect_sql.OpenDB(dialect.SQLite, d)
-		return e
+func openPostgres(ctx context.Context) (db *dialect_sql.Driver, err error) {
+	if p, e := pgxpool.New(ctx, connectionStr); e == nil {
+		pool = p
+		db = dialect_sql.OpenDB(dialect.Postgres, stdlib.OpenDBFromPool(pool))
+
+		return
 	} else {
-		return e
+		err = e
+		return
+	}
+}
+
+func openSqlite(ctx context.Context) (db *dialect_sql.Driver, err error) {
+	if d, e := sql.Open("sqlite", connectionStr); e == nil {
+		db = dialect_sql.OpenDB(dialect.SQLite, d)
+		return
+	} else {
+		e = err
+		return
 	}
 }
 
@@ -63,15 +81,17 @@ func Close() {
 		pool.Close()
 	}
 
-	if sqlite != nil {
-		sqlite.Close()
-	}
-
 	db.Close()
 }
 
 func CreateEntClient() *ent.Client {
 	// TODO: use connection pool for postgres, recreate connection for sqlite.
+
+	db, err := openDB(context.Background(), databaseType)
+	if err != nil {
+		return nil
+	}
+
 	options := []ent.Option{
 		ent.Driver(db),
 	}
