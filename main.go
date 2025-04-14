@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"entgo.io/ent/dialect"
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
@@ -60,6 +61,11 @@ func main() {
 		connectionStr = value
 	}
 
+	dbType := dialect.Postgres
+	if value, valid := os.LookupEnv("MANGAWEB_DB_TYPE"); valid {
+		dbType = value
+	}
+
 	debugMode := false
 	if value, valid := os.LookupEnv("MANGAWEB_ENVIRONMENT"); valid {
 		if strings.ToLower(strings.TrimSpace(value)) == "development" {
@@ -77,8 +83,10 @@ func main() {
 	log.Info().
 		Bool("debugMode", debugMode).
 		Str("version", versionString).
-		Str("data_path", dataPath).
-		Str("cache_path", cachePath).
+		Str("dataPath", dataPath).
+		Str("cachePath", cachePath).
+		Str("dbType", dbType).
+		Str("dbConnection", connectionStr).
 		Str("address", address).
 		Msg("Server started.")
 
@@ -89,8 +97,8 @@ func main() {
 		CachePath:     cachePath,
 	})
 
-	if err := database.Open(ctx, connectionStr); err != nil {
-		log.Error().AnErr("error", err).Msg("Connect to Postgres fails")
+	if err := database.Open(ctx, dbType, connectionStr); err != nil {
+		log.Error().AnErr("error", err).Msg("Connect to Database fails")
 		return
 	} else {
 		defer database.Close()
