@@ -29,6 +29,7 @@ func Open(ctx context.Context, dbType string, connStr string) error {
 	case dialect.Postgres:
 		if p, e := pgxpool.New(ctx, connStr); e == nil {
 			pool = p
+			return nil
 		} else {
 			return e
 		}
