@@ -724,6 +724,10 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
+                "hidden": {
+                    "description": "Hidden holds the value of the \"hidden\" field.",
+                    "type": "boolean"
+                },
                 "id": {
                     "description": "ID of the ent.",
                     "type": "integer"

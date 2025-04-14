@@ -11,3 +11,4 @@ mangaweb
 mangaweb.exe
 node_modules
 static
+db.sqlite3

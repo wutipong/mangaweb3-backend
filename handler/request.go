@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func ParseInput(r io.Reader, value interface{}) error {
+func ParseInput(r io.Reader, value any) error {
 	reqBody, err := io.ReadAll(r)
 	if err != nil {
 		return err
