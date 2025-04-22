@@ -4,4 +4,5 @@ import "github.com/julienschmidt/httprouter"
 
 func Register(router *httprouter.Router) {
 	router.GET(PathUpdateLibrary, UpdateLibraryHandler)
+	router.GET(PathPurgeCache, PurgeCacheHandler)
 }

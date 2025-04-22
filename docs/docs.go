@@ -140,6 +140,24 @@ const docTemplate = `{
                 }
             }
         },
+        "/maintenance/purge_cache": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/maintenance.PurgeCacheResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/maintenance/update_library": {
             "get": {
                 "responses": {
@@ -898,6 +916,14 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "unknown error."
+                }
+            }
+        },
+        "maintenance.PurgeCacheResponse": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "type": "boolean"
                 }
             }
         },
