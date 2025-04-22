@@ -286,6 +286,11 @@ definitions:
         example: unknown error.
         type: string
     type: object
+  maintenance.PurgeCacheResponse:
+    properties:
+      result:
+        type: boolean
+    type: object
   maintenance.UpdateLibraryResponse:
     properties:
       result:
@@ -554,6 +559,17 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/browse.historyResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+  /maintenance/purge_cache:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/maintenance.PurgeCacheResponse'
         "500":
           description: Internal Server Error
           schema:
