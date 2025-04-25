@@ -56,12 +56,12 @@ func main() {
 		cachePath = value
 	}
 
-	connectionStr := "postgres://postgres:password@localhost:5432/manga"
+	connectionStr := "file:db.sqlite3?_pragma=foreign_keys(1)"
 	if value, valid := os.LookupEnv("MANGAWEB_DB"); valid {
 		connectionStr = value
 	}
 
-	dbType := dialect.Postgres
+	dbType := dialect.SQLite
 	if value, valid := os.LookupEnv("MANGAWEB_DB_TYPE"); valid {
 		dbType = value
 	}
