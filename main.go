@@ -67,15 +67,19 @@ func main() {
 	}
 
 	debugMode := false
+	environment := "development"
 	if value, valid := os.LookupEnv("MANGAWEB_ENVIRONMENT"); valid {
-		if strings.ToLower(strings.TrimSpace(value)) == "development" {
-			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).
-				Level(zerolog.DebugLevel)
-
-			log.Info().Msg("development environment")
-			debugMode = true
-		}
+		environment = value
 	}
+
+	if strings.ToLower(strings.TrimSpace(environment)) == "development" {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).
+			Level(zerolog.DebugLevel)
+
+		log.Info().Msg("development environment")
+		debugMode = true
+	}
+
 	if useEnvFile {
 		log.Info().Msg("Use .env file.")
 	}
