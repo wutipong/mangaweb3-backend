@@ -58,21 +58,19 @@ func ScanLibrary(ctx context.Context, client *ent.Client) error {
 				continue
 			}
 
-			item, err = meta.PopulateTags(ctx, client, item)
+			item, tags, err := meta.PopulateTags(ctx, client, item)
 			if err != nil {
 				log.Error().
 					AnErr("error", err).
 					Msg("Failed to write meta data.")
 			}
-			tags, err := item.QueryTags().All(ctx)
-			var tagsArray []string
-			if err == nil {
-				tagsArray = make([]string, len(tags))
 
-				for i, tag := range item.Edges.Tags {
-					tagsArray[i] = tag.Name
-				}
+			tagsArray := make([]string, len(tags))
+
+			for i, tag := range tags {
+				tagsArray[i] = tag.Name
 			}
+
 			log.Info().Str("name", item.Name).Strs("tags", tagsArray).Msg("Created metadata.")
 		}
 	}

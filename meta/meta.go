@@ -186,7 +186,7 @@ func GenerateImageIndices(m *ent.Meta) error {
 	return c.PopulateImageIndices(context.Background())
 }
 
-func PopulateTags(ctx context.Context, client *ent.Client, m *ent.Meta) (out *ent.Meta, err error) {
+func PopulateTags(ctx context.Context, client *ent.Client, m *ent.Meta) (out *ent.Meta, tags []*ent.Tag, err error) {
 	tagStrs := tag_util.ParseTag(m.Name)
 	currentTags, _ := m.QueryTags().All(ctx)
 
@@ -222,6 +222,7 @@ func PopulateTags(ctx context.Context, client *ent.Client, m *ent.Meta) (out *en
 		Save(ctx)
 
 	out = m
+	tags = append(currentTags, newTags...)
 
 	return
 }

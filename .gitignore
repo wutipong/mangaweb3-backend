@@ -4,6 +4,7 @@ __debug_bin*
 .idea
 .vscode
 cache
-*-private
+*-private/
+*-private.*
 db.sqlite3
 mangaweb3-backend
