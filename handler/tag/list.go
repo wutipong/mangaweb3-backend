@@ -13,11 +13,13 @@ import (
 )
 
 type listRequest struct {
-	User         string `json:"user"`
-	FavoriteOnly bool   `json:"favorite_only"`
-	Search       string `json:"search"`
-	Page         int    `json:"page"`
-	ItemPerPage  int    `json:"item_per_page"  default:"30"`
+	User         string        `json:"user"`
+	FavoriteOnly bool          `json:"favorite_only"`
+	Search       string        `json:"search"`
+	Page         int           `json:"page"`
+	ItemPerPage  int           `json:"item_per_page"  default:"30"`
+	Sort         tag.SortField `json:"sort"`
+	Order        tag.SortOrder `json:"order"`
 }
 
 type Tag struct {
@@ -51,6 +53,8 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 		Search:       "",
 		Page:         0,
 		ItemPerPage:  DefaultItemPerPage,
+		Sort:         tag.SortFieldName,
+		Order:        tag.SortOrderAscending,
 	}
 
 	if err := handler.ParseInput(r.Body, &req); err != nil {
@@ -75,6 +79,8 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 			Search:       req.Search,
 			Page:         req.Page,
 			ItemPerPage:  req.ItemPerPage,
+			Sort:         req.Sort,
+			Order:        req.Order,
 		})
 
 	if err != nil {
@@ -88,6 +94,8 @@ func ListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Param
 			Search:       req.Search,
 			Page:         0,
 			ItemPerPage:  0,
+			Sort:         req.Sort,
+			Order:        req.Order,
 		})
 
 	if err != nil {
