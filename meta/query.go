@@ -62,16 +62,9 @@ func CreateQuery(ctx context.Context, client *ent.Client, u *ent.User, q QueryPa
 			meta.HasUserWith(user.ID(u.ID)),
 		)
 	} else if q.Filter == FilterFavoriteTag {
-		tags, err := u.QueryFavoriteTags().All(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		tagIDs := make([]int, len(tags))
-		for i, tag := range tags {
-			tagIDs[i] = tag.ID
-		}
-		query = query.Where(meta.HasTagsWith(tag.IDIn(tagIDs...)))
+		query = query.Where(
+			meta.HasTagsWith(tag.HasUserWith(user.ID(u.ID))),
+		)
 	}
 
 	field := ""
