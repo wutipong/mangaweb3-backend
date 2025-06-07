@@ -1,6 +1,7 @@
 package browse
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -27,7 +28,13 @@ func RescanLibraryHandler(w http.ResponseWriter, r *http.Request, params httprou
 	client := database.CreateEntClient()
 	defer client.Close()
 
-	go maintenance.ScanLibrary(r.Context(), client)
+	go func() {
+		if err := maintenance.ScanLibrary(r.Context(), client); err != nil {
+			log.Error().Err(err).Msg("Error occurred while scanning library")
+		}
+	}()
+	bgCtx := context.Background()
+	go maintenance.ScanLibrary(bgCtx, client)
 
 	response := rescanLibraryResponse{
 		Result: true,

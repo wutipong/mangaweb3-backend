@@ -62,7 +62,8 @@ func ScanLibrary(ctx context.Context, client *ent.Client) error {
 			if err != nil {
 				log.Error().
 					AnErr("error", err).
-					Msg("Failed to write meta data.")
+					Msg("Failed to populate tags.")
+				continue
 			}
 
 			tagsArray := make([]string, len(tags))

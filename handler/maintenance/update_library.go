@@ -1,6 +1,7 @@
 package maintenance
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -23,7 +24,7 @@ const (
 func UpdateLibraryHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Info().Msg("Update library")
 
-	go maintenance.UpdateLibrary(r.Context())
+	go maintenance.UpdateLibrary(context.Background())
 
 	response := UpdateLibraryResponse{
 		Result: true,
