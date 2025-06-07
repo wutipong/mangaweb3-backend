@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"flag"
 	"net/http"
 	"os"
-	"strings"
+	"strconv"
 
 	"entgo.io/ent/dialect"
 	"github.com/joho/godotenv"
@@ -36,9 +37,44 @@ var versionString string = "development"
 func main() {
 	ctx := context.Background()
 
+	flag.Usage = func() {
+		os.Stderr.WriteString("Usage: mangaweb3-backend [options]\n\n")
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	envFlag := flag.String("environment", "",
+		"Choose the environment the server run as.\n"+
+			"The {{environment}}.env will be loaded and override the environment variables set on the system.")
+
+	helpFlag := flag.Bool("help", false, "Show this help message.")
+	flag.Parse()
+
+	if *helpFlag {
+		flag.Usage()
+		return
+	}
+
+	envFile := *envFlag + ".env"
+
 	useEnvFile := false
-	if err := godotenv.Overload(); err == nil {
+	if err := godotenv.Overload(envFile); err == nil {
 		useEnvFile = true
+	}
+
+	debugMode := false
+	if value, valid := os.LookupEnv("MANGAWEB_DEBUG"); valid {
+		debugMode, _ = strconv.ParseBool(value)
+		if debugMode {
+			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).
+				Level(zerolog.DebugLevel)
+		}
+	}
+
+	log.Info().Str("environment", *envFlag).Msg("")
+
+	if !useEnvFile {
+		log.Info().Str("file", envFile).Msg("Environment file not found.")
 	}
 
 	address := ":8972"
@@ -66,29 +102,12 @@ func main() {
 		dbType = value
 	}
 
-	debugMode := false
-	if value, valid := os.LookupEnv("MANGAWEB_ENVIRONMENT"); valid {
-		if strings.ToLower(strings.TrimSpace(value)) == "development" {
-			log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).
-				Level(zerolog.DebugLevel)
-
-			log.Info().Msg("development environment")
-			debugMode = true
-		}
-	}
-	if useEnvFile {
-		log.Info().Msg("Use .env file.")
-	}
-
 	log.Info().
 		Bool("debugMode", debugMode).
 		Str("version", versionString).
 		Str("dataPath", dataPath).
 		Str("cachePath", cachePath).
-		Str("dbType", dbType).
-		Str("dbConnection", connectionStr).
-		Str("address", address).
-		Msg("Server started.")
+		Msg("Server initializes.")
 
 	configuration.Init(configuration.Config{
 		DebugMode:     debugMode,
@@ -97,6 +116,7 @@ func main() {
 		CachePath:     cachePath,
 	})
 
+	log.Info().Str("dbType", dbType).Str("dbConnection", connectionStr).Msg("Database open.")
 	if err := database.Open(ctx, dbType, connectionStr); err != nil {
 		log.Error().AnErr("error", err).Msg("Connect to Database fails")
 		return
@@ -105,14 +125,14 @@ func main() {
 	}
 
 	if err := database.CreateSchema(ctx); err != nil {
-		log.Error().AnErr("error", err).Msg("failed creating schema resources.")
+		log.Error().AnErr("error", err).Msg("Database creating schema fails.")
 		return
 	}
 
 	go maintenance.UpdateLibrary()
 
 	router := httprouter.New()
-	RegisterHandler(router)
+	RegisterHandler(router, debugMode)
 
 	log.Info().Msg("Server starts.")
 
@@ -122,16 +142,18 @@ func main() {
 		return
 	}
 
-	log.Info().Msg("shutting down the server")
+	log.Info().Msg("Server shutdown.")
 }
 
-func RegisterHandler(router *httprouter.Router) {
+func RegisterHandler(router *httprouter.Router, debugMode bool) {
 	browse.Register(router)
 	tag.Register(router)
 	view.Register(router)
 	maintenanceHandler.Register(router)
 
-	router.GET("/doc/:any", swaggerHandler)
+	if debugMode {
+		router.GET("/doc/:any", swaggerHandler)
+	}
 }
 
 func swaggerHandler(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
