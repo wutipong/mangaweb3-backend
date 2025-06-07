@@ -77,16 +77,28 @@ func Close() {
 }
 
 func CreateEntClient() *ent.Client {
+
 	db, err := openDB(databaseType)
 	if err != nil {
 		return nil
 	}
+	config := configuration.Get()
 
-	options := []ent.Option{
-		ent.Driver(db),
+	var drv dialect.Driver
+	if config.DebugMode {
+		drv = dialect.DebugWithContext(db, func(ctx context.Context, i ...any) {
+			for _, v := range i {
+				log.Debug().Interface("params", v).Msg("Ent Debug")
+			}
+		})
+	} else {
+		drv = db
 	}
 
-	config := configuration.Get()
+	options := []ent.Option{
+		ent.Driver(drv),
+	}
+
 	if config.DebugMode {
 		options = append(options,
 			ent.Debug(),

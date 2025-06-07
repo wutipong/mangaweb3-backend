@@ -19,14 +19,14 @@ const (
 )
 
 type browseRequest struct {
-	User         string         `json:"user"`
-	Tag          string         `json:"tag"`
-	FavoriteOnly bool           `json:"favorite_only"`
-	Page         int            `json:"page"`
-	ItemPerPage  int            `json:"item_per_page" default:"30"`
-	Search       string         `json:"search"`
-	Sort         meta.SortField `json:"sort"`
-	Order        meta.SortOrder `json:"order"`
+	User        string         `json:"user"`
+	Tag         string         `json:"tag"`
+	Filter      meta.Filter    `json:"filter"`
+	Page        int            `json:"page"`
+	ItemPerPage int            `json:"item_per_page" default:"30"`
+	Search      string         `json:"search"`
+	Sort        meta.SortField `json:"sort"`
+	Order       meta.SortOrder `json:"order"`
 }
 
 type browseResponse struct {
@@ -53,13 +53,13 @@ type browseItem struct {
 
 func createDefaultBrowseRequest() browseRequest {
 	return browseRequest{
-		Tag:          "",
-		FavoriteOnly: false,
-		Page:         0,
-		Search:       "",
-		Sort:         meta.SortFieldCreateTime,
-		Order:        meta.SortOrderDescending,
-		ItemPerPage:  30,
+		Tag:         "",
+		Filter:      "",
+		Page:        0,
+		Search:      "",
+		Sort:        meta.SortFieldCreateTime,
+		Order:       meta.SortOrderDescending,
+		ItemPerPage: 30,
 	}
 }
 
@@ -89,13 +89,13 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		client,
 		u,
 		meta.QueryParams{
-			SearchName:   req.Search,
-			FavoriteOnly: req.FavoriteOnly,
-			SearchTag:    req.Tag,
-			SortBy:       req.Sort,
-			SortOrder:    req.Order,
-			Page:         req.Page,
-			ItemPerPage:  req.ItemPerPage,
+			SearchName:  req.Search,
+			Filter:      req.Filter,
+			SearchTag:   req.Tag,
+			SortBy:      req.Sort,
+			SortOrder:   req.Order,
+			Page:        req.Page,
+			ItemPerPage: req.ItemPerPage,
 		})
 	if err != nil {
 		handler.WriteResponse(w, err)
@@ -130,13 +130,13 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		client,
 		u,
 		meta.QueryParams{
-			SearchName:   req.Search,
-			FavoriteOnly: req.FavoriteOnly,
-			SearchTag:    req.Tag,
-			SortBy:       req.Sort,
-			SortOrder:    req.Order,
-			Page:         0,
-			ItemPerPage:  0,
+			SearchName:  req.Search,
+			Filter:      req.Filter,
+			SearchTag:   req.Tag,
+			SortBy:      req.Sort,
+			SortOrder:   req.Order,
+			Page:        0,
+			ItemPerPage: 0,
 		})
 	if err != nil {
 		handler.WriteResponse(w, err)
