@@ -534,8 +534,8 @@ const docTemplate = `{
         "browse.browseRequest": {
             "type": "object",
             "properties": {
-                "favorite_only": {
-                    "type": "boolean"
+                "filter": {
+                    "type": "string"
                 },
                 "item_per_page": {
                     "type": "integer",

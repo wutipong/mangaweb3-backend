@@ -22,8 +22,8 @@ definitions:
     type: object
   browse.browseRequest:
     properties:
-      favorite_only:
-        type: boolean
+      filter:
+        type: string
       item_per_page:
         default: 30
         type: integer
