@@ -70,11 +70,11 @@ func (s *QueryTestSuite) TestReadPageFavoriteOnly() {
 
 	var u *ent.User
 	tags, err := ReadPage(context.Background(), client, u, QueryParams{
-		FavoriteOnly: true,
-		SortBy:       SortFieldName,
-		SortOrder:    SortOrderAscending,
-		Page:         0,
-		ItemPerPage:  30,
+		Filter:      FilterFavoriteItem,
+		SortBy:      SortFieldName,
+		SortOrder:   SortOrderAscending,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 
@@ -100,11 +100,11 @@ func (s *QueryTestSuite) TestReadPageSortByCreateTimeDesc() {
 
 	var u *ent.User
 	tags, err := ReadPage(context.Background(), client, u, QueryParams{
-		FavoriteOnly: false,
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderDescending,
-		Page:         0,
-		ItemPerPage:  30,
+		Filter:      FilterNone,
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderDescending,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 
@@ -130,11 +130,11 @@ func (s *QueryTestSuite) TestReadPageSortByCreateTimeAsc() {
 
 	var u *ent.User
 	tags, err := ReadPage(context.Background(), client, u, QueryParams{
-		FavoriteOnly: false,
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderAscending,
-		Page:         0,
-		ItemPerPage:  30,
+		Filter:      FilterNone,
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderAscending,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 
@@ -160,11 +160,11 @@ func (s *QueryTestSuite) TestReadPageFavoriteOnlySortByCreateTimeDesc() {
 
 	var u *ent.User
 	tags, err := ReadPage(context.Background(), client, u, QueryParams{
-		FavoriteOnly: true,
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderDescending,
-		Page:         0,
-		ItemPerPage:  30,
+		Filter:      FilterFavoriteItem,
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderDescending,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 
@@ -191,11 +191,11 @@ func (s *QueryTestSuite) TestReadPageFavoriteOnlySortByCreateTimeAsc() {
 	var u *ent.User
 
 	tags, err := ReadPage(context.Background(), client, u, QueryParams{
-		FavoriteOnly: true,
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderAscending,
-		Page:         0,
-		ItemPerPage:  30,
+		Filter:      FilterFavoriteItem,
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderAscending,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 
@@ -221,12 +221,12 @@ func (s *QueryTestSuite) TestReadPageSearchNameFavoriteOnlySortByCreateTimeDesc(
 
 	var u *ent.User
 	tags, err := ReadPage(context.Background(), client, u, QueryParams{
-		SearchName:   "here",
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderDescending,
-		FavoriteOnly: true,
-		Page:         0,
-		ItemPerPage:  30,
+		SearchName:  "here",
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderDescending,
+		Filter:      FilterFavoriteItem,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 
@@ -252,12 +252,12 @@ func (s *QueryTestSuite) TestReadPageSearchNameFavoriteOnlySortByCreateTimeAsc()
 
 	var u *ent.User
 	tags, err := ReadPage(context.Background(), client, u, QueryParams{
-		SearchName:   "here",
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderAscending,
-		FavoriteOnly: true,
-		Page:         0,
-		ItemPerPage:  30,
+		SearchName:  "here",
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderAscending,
+		Filter:      FilterFavoriteItem,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 
@@ -286,12 +286,12 @@ func (s *QueryTestSuite) TestReadPageSearchTagFavoriteOnlySortByCreateTimeAsc() 
 
 	var u *ent.User
 	tags, err := ReadPage(context.Background(), client, u, QueryParams{
-		SearchTag:    "some artist",
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderAscending,
-		FavoriteOnly: true,
-		Page:         0,
-		ItemPerPage:  30,
+		SearchTag:   "some artist",
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderAscending,
+		Filter:      FilterFavoriteItem,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 
@@ -320,13 +320,13 @@ func (s *QueryTestSuite) TestReadPageSearchNameTagFavoriteOnlySortByCreateTimeAs
 	client.Meta.Create().SetName("[artist]manga 4.zip").SetCreateTime(time.UnixMilli(6000)).SetFavorite(true).AddTags(tag2).Save(context.Background())
 
 	tags, err := ReadPage(context.Background(), client, u, QueryParams{
-		SearchName:   "here",
-		SearchTag:    "some artist",
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderAscending,
-		FavoriteOnly: true,
-		Page:         0,
-		ItemPerPage:  30,
+		SearchName:  "here",
+		SearchTag:   "some artist",
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderAscending,
+		Filter:      FilterFavoriteItem,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 
@@ -378,11 +378,11 @@ func (s *QueryTestSuite) TestCountFavoriteOnly() {
 
 	var u *ent.User
 	c, err := Count(context.Background(), client, u, QueryParams{
-		FavoriteOnly: true,
-		SortBy:       SortFieldName,
-		SortOrder:    SortOrderAscending,
-		Page:         0,
-		ItemPerPage:  30,
+		Filter:      FilterFavoriteItem,
+		SortBy:      SortFieldName,
+		SortOrder:   SortOrderAscending,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, c)
@@ -404,11 +404,11 @@ func (s *QueryTestSuite) TestCountSortByCreateTimeDesc() {
 
 	var u *ent.User
 	c, err := Count(context.Background(), client, u, QueryParams{
-		FavoriteOnly: false,
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderDescending,
-		Page:         0,
-		ItemPerPage:  30,
+		Filter:      FilterNone,
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderDescending,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, c)
@@ -430,11 +430,11 @@ func (s *QueryTestSuite) TestCountSortByCreateTimeAsc() {
 
 	var u *ent.User
 	c, err := Count(context.Background(), client, u, QueryParams{
-		FavoriteOnly: false,
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderAscending,
-		Page:         0,
-		ItemPerPage:  30,
+		Filter:      FilterNone,
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderAscending,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, c)
@@ -456,11 +456,11 @@ func (s *QueryTestSuite) TestCountFavoriteOnlySortByCreateTimeDesc() {
 
 	var u *ent.User
 	c, err := Count(context.Background(), client, u, QueryParams{
-		FavoriteOnly: true,
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderDescending,
-		Page:         0,
-		ItemPerPage:  30,
+		Filter:      FilterFavoriteItem,
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderDescending,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, c)
@@ -482,11 +482,11 @@ func (s *QueryTestSuite) TestCountFavoriteOnlySortByCreateTimeAsc() {
 
 	var u *ent.User
 	c, err := Count(context.Background(), client, u, QueryParams{
-		FavoriteOnly: true,
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderAscending,
-		Page:         0,
-		ItemPerPage:  30,
+		Filter:      FilterFavoriteItem,
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderAscending,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, c)
@@ -508,12 +508,12 @@ func (s *QueryTestSuite) TestCountSearchNameFavoriteOnlySortByCreateTimeDesc() {
 
 	var u *ent.User
 	c, err := Count(context.Background(), client, u, QueryParams{
-		SearchName:   "here",
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderDescending,
-		FavoriteOnly: true,
-		Page:         0,
-		ItemPerPage:  30,
+		SearchName:  "here",
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderDescending,
+		Filter:      FilterFavoriteItem,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, c)
@@ -535,12 +535,12 @@ func (s *QueryTestSuite) TestCountSearchNameFavoriteOnlySortByCreateTimeAsc() {
 
 	var u *ent.User
 	c, err := Count(context.Background(), client, u, QueryParams{
-		SearchName:   "here",
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderAscending,
-		FavoriteOnly: true,
-		Page:         0,
-		ItemPerPage:  30,
+		SearchName:  "here",
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderAscending,
+		Filter:      FilterFavoriteItem,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 
@@ -566,12 +566,12 @@ func (s *QueryTestSuite) TestCountSearchTagFavoriteOnlySortByCreateTimeAsc() {
 
 	var u *ent.User
 	c, err := Count(context.Background(), client, u, QueryParams{
-		SearchTag:    "some artist",
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderAscending,
-		FavoriteOnly: true,
-		Page:         0,
-		ItemPerPage:  30,
+		SearchTag:   "some artist",
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderAscending,
+		Filter:      FilterFavoriteItem,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, c)
@@ -596,13 +596,13 @@ func (s *QueryTestSuite) TestCountSearchNameTagFavoriteOnlySortByCreateTimeAsc()
 
 	var u *ent.User
 	c, err := Count(context.Background(), client, u, QueryParams{
-		SearchName:   "here",
-		SearchTag:    "some artist",
-		SortBy:       SortFieldCreateTime,
-		SortOrder:    SortOrderAscending,
-		FavoriteOnly: true,
-		Page:         0,
-		ItemPerPage:  30,
+		SearchName:  "here",
+		SearchTag:   "some artist",
+		SortBy:      SortFieldCreateTime,
+		SortOrder:   SortOrderAscending,
+		Filter:      FilterFavoriteItem,
+		Page:        0,
+		ItemPerPage: 30,
 	})
 	s.Assert().Nil(err)
 	s.Assert().Equal(2, c)

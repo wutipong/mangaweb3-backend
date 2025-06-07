@@ -13,6 +13,7 @@ import (
 
 type SortField string
 type SortOrder string
+type Filter string
 
 const (
 	SortFieldName       = SortField("name")
@@ -21,16 +22,20 @@ const (
 
 	SortOrderAscending  = SortOrder("ascending")
 	SortOrderDescending = SortOrder("descending")
+
+	FilterNone         = ""
+	FilterFavoriteItem = "favorite"
+	FilterFavoriteTag  = "tag"
 )
 
 type QueryParams struct {
-	SearchName   string
-	SearchTag    string
-	SortBy       SortField
-	SortOrder    SortOrder
-	FavoriteOnly bool
-	Page         int
-	ItemPerPage  int
+	SearchName  string
+	SearchTag   string
+	SortBy      SortField
+	SortOrder   SortOrder
+	Filter      Filter
+	Page        int
+	ItemPerPage int
 }
 
 func CreateQuery(ctx context.Context, client *ent.Client, u *ent.User, q QueryParams) (query *ent.MetaQuery, err error) {
@@ -52,10 +57,21 @@ func CreateQuery(ctx context.Context, client *ent.Client, u *ent.User, q QueryPa
 		query = query.Where(meta.NameContainsFold(q.SearchName))
 	}
 
-	if q.FavoriteOnly {
+	if q.Filter == FilterFavoriteItem {
 		query = query.Where(
 			meta.HasUserWith(user.ID(u.ID)),
 		)
+	} else if q.Filter == FilterFavoriteTag {
+		tags, err := u.QueryFavoriteTags().All(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		tagIDs := make([]int, len(tags))
+		for i, tag := range tags {
+			tagIDs[i] = tag.ID
+		}
+		query = query.Where(meta.HasTagsWith(tag.IDIn(tagIDs...)))
 	}
 
 	field := ""
