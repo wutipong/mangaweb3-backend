@@ -50,7 +50,7 @@ func FixMeta(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
-	if m, err = meta.PopulateTags(r.Context(), client, m); err != nil {
+	if m, _, err = meta.PopulateTags(r.Context(), client, m); err != nil {
 		handler.WriteResponse(w, err)
 		return
 	}

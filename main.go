@@ -129,7 +129,7 @@ func main() {
 		return
 	}
 
-	go maintenance.UpdateLibrary()
+	go maintenance.UpdateLibrary(context.Background())
 
 	router := httprouter.New()
 	RegisterHandler(router, debugMode)
