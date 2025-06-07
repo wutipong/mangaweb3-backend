@@ -2,13 +2,8 @@ __debug_bin*
 .DS_Store
 .env
 .idea
-.parcel-cache
 .vscode
-act.secret
 cache
-data-private
-mangaweb
-mangaweb.exe
-node_modules
-static
+*-private
 db.sqlite3
+mangaweb3-backend
