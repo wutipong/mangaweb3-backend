@@ -9,6 +9,18 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
 
+type SortField string
+type SortOrder string
+type Filter string
+
+const (
+	SortFieldName      = SortField("name")
+	SortFieldPageCount = SortField("itemCount")
+
+	SortOrderAscending  = SortOrder("ascending")
+	SortOrderDescending = SortOrder("descending")
+)
+
 func IsTagExist(ctx context.Context, client *ent.Client, name string) bool {
 	count, err := client.Tag.Query().Where(tag.Name(name)).Count(ctx)
 	if err != nil {
@@ -31,10 +43,12 @@ type QueryParams struct {
 	Search       string
 	Page         int
 	ItemPerPage  int
+	Sort         SortField
+	Order        SortOrder
 }
 
 func CreateQuery(client *ent.Client, u *ent.User, q QueryParams) *ent.TagQuery {
-	query := client.Tag.Query().Order(tag.ByName())
+	query := client.Tag.Query()
 	if q.ItemPerPage > 0 {
 		query = query.Limit(q.ItemPerPage).
 			Offset(q.Page * q.ItemPerPage)
@@ -45,6 +59,21 @@ func CreateQuery(client *ent.Client, u *ent.User, q QueryParams) *ent.TagQuery {
 	}
 	if q.Search != "" {
 		query = query.Where(tag.NameContainsFold(q.Search))
+	}
+
+	switch q.Sort {
+	case SortFieldName:
+		if q.Order == SortOrderAscending {
+			query = query.Order(tag.ByName(sql.OrderAsc()))
+		} else {
+			query = query.Order(tag.ByName(sql.OrderDesc()))
+		}
+	case SortFieldPageCount:
+		if q.Order == SortOrderAscending {
+			query = query.Order(tag.ByMetaCount(sql.OrderAsc()))
+		} else {
+			query = query.Order(tag.ByMetaCount(sql.OrderDesc()))
+		}
 	}
 
 	return query
