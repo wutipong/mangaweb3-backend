@@ -221,19 +221,19 @@ func (mc *MetaCreate) AddHistories(h ...*History) *MetaCreate {
 	return mc.AddHistoryIDs(ids...)
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (mc *MetaCreate) AddUserIDs(ids ...int) *MetaCreate {
-	mc.mutation.AddUserIDs(ids...)
+// AddFavoriteOfUserIDs adds the "favorite_of_user" edge to the User entity by IDs.
+func (mc *MetaCreate) AddFavoriteOfUserIDs(ids ...int) *MetaCreate {
+	mc.mutation.AddFavoriteOfUserIDs(ids...)
 	return mc
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (mc *MetaCreate) AddUser(u ...*User) *MetaCreate {
+// AddFavoriteOfUser adds the "favorite_of_user" edges to the User entity.
+func (mc *MetaCreate) AddFavoriteOfUser(u ...*User) *MetaCreate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return mc.AddUserIDs(ids...)
+	return mc.AddFavoriteOfUserIDs(ids...)
 }
 
 // Mutation returns the MetaMutation object of the builder.
@@ -468,12 +468,12 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := mc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := mc.mutation.FavoriteOfUserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   meta.UserTable,
-			Columns: meta.UserPrimaryKey,
+			Table:   meta.FavoriteOfUserTable,
+			Columns: meta.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),

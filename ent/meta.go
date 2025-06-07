@@ -56,8 +56,8 @@ type MetaEdges struct {
 	Tags []*Tag `json:"tags,omitempty"`
 	// Histories holds the value of the histories edge.
 	Histories []*History `json:"histories,omitempty"`
-	// User holds the value of the user edge.
-	User []*User `json:"user,omitempty"`
+	// FavoriteOfUser holds the value of the favorite_of_user edge.
+	FavoriteOfUser []*User `json:"favorite_of_user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -81,13 +81,13 @@ func (e MetaEdges) HistoriesOrErr() ([]*History, error) {
 	return nil, &NotLoadedError{edge: "histories"}
 }
 
-// UserOrErr returns the User value or an error if the edge
+// FavoriteOfUserOrErr returns the FavoriteOfUser value or an error if the edge
 // was not loaded in eager-loading.
-func (e MetaEdges) UserOrErr() ([]*User, error) {
+func (e MetaEdges) FavoriteOfUserOrErr() ([]*User, error) {
 	if e.loadedTypes[2] {
-		return e.User, nil
+		return e.FavoriteOfUser, nil
 	}
-	return nil, &NotLoadedError{edge: "user"}
+	return nil, &NotLoadedError{edge: "favorite_of_user"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -229,9 +229,9 @@ func (m *Meta) QueryHistories() *HistoryQuery {
 	return NewMetaClient(m.config).QueryHistories(m)
 }
 
-// QueryUser queries the "user" edge of the Meta entity.
-func (m *Meta) QueryUser() *UserQuery {
-	return NewMetaClient(m.config).QueryUser(m)
+// QueryFavoriteOfUser queries the "favorite_of_user" edge of the Meta entity.
+func (m *Meta) QueryFavoriteOfUser() *UserQuery {
+	return NewMetaClient(m.config).QueryFavoriteOfUser(m)
 }
 
 // Update returns a builder for updating this Meta.

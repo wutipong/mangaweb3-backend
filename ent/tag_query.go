@@ -21,12 +21,12 @@ import (
 // TagQuery is the builder for querying Tag entities.
 type TagQuery struct {
 	config
-	ctx        *QueryContext
-	order      []tag.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Tag
-	withMeta   *MetaQuery
-	withUser   *UserQuery
+	ctx                *QueryContext
+	order              []tag.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Tag
+	withMeta           *MetaQuery
+	withFavoriteOfUser *UserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -85,8 +85,8 @@ func (tq *TagQuery) QueryMeta() *MetaQuery {
 	return query
 }
 
-// QueryUser chains the current query on the "user" edge.
-func (tq *TagQuery) QueryUser() *UserQuery {
+// QueryFavoriteOfUser chains the current query on the "favorite_of_user" edge.
+func (tq *TagQuery) QueryFavoriteOfUser() *UserQuery {
 	query := (&UserClient{config: tq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tq.prepareQuery(ctx); err != nil {
@@ -99,7 +99,7 @@ func (tq *TagQuery) QueryUser() *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tag.Table, tag.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, tag.UserTable, tag.UserPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, tag.FavoriteOfUserTable, tag.FavoriteOfUserPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -294,13 +294,13 @@ func (tq *TagQuery) Clone() *TagQuery {
 		return nil
 	}
 	return &TagQuery{
-		config:     tq.config,
-		ctx:        tq.ctx.Clone(),
-		order:      append([]tag.OrderOption{}, tq.order...),
-		inters:     append([]Interceptor{}, tq.inters...),
-		predicates: append([]predicate.Tag{}, tq.predicates...),
-		withMeta:   tq.withMeta.Clone(),
-		withUser:   tq.withUser.Clone(),
+		config:             tq.config,
+		ctx:                tq.ctx.Clone(),
+		order:              append([]tag.OrderOption{}, tq.order...),
+		inters:             append([]Interceptor{}, tq.inters...),
+		predicates:         append([]predicate.Tag{}, tq.predicates...),
+		withMeta:           tq.withMeta.Clone(),
+		withFavoriteOfUser: tq.withFavoriteOfUser.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
@@ -318,14 +318,14 @@ func (tq *TagQuery) WithMeta(opts ...func(*MetaQuery)) *TagQuery {
 	return tq
 }
 
-// WithUser tells the query-builder to eager-load the nodes that are connected to
-// the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TagQuery) WithUser(opts ...func(*UserQuery)) *TagQuery {
+// WithFavoriteOfUser tells the query-builder to eager-load the nodes that are connected to
+// the "favorite_of_user" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TagQuery) WithFavoriteOfUser(opts ...func(*UserQuery)) *TagQuery {
 	query := (&UserClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	tq.withUser = query
+	tq.withFavoriteOfUser = query
 	return tq
 }
 
@@ -409,7 +409,7 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 		_spec       = tq.querySpec()
 		loadedTypes = [2]bool{
 			tq.withMeta != nil,
-			tq.withUser != nil,
+			tq.withFavoriteOfUser != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -437,10 +437,10 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 			return nil, err
 		}
 	}
-	if query := tq.withUser; query != nil {
-		if err := tq.loadUser(ctx, query, nodes,
-			func(n *Tag) { n.Edges.User = []*User{} },
-			func(n *Tag, e *User) { n.Edges.User = append(n.Edges.User, e) }); err != nil {
+	if query := tq.withFavoriteOfUser; query != nil {
+		if err := tq.loadFavoriteOfUser(ctx, query, nodes,
+			func(n *Tag) { n.Edges.FavoriteOfUser = []*User{} },
+			func(n *Tag, e *User) { n.Edges.FavoriteOfUser = append(n.Edges.FavoriteOfUser, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -508,7 +508,7 @@ func (tq *TagQuery) loadMeta(ctx context.Context, query *MetaQuery, nodes []*Tag
 	}
 	return nil
 }
-func (tq *TagQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *User)) error {
+func (tq *TagQuery) loadFavoriteOfUser(ctx context.Context, query *UserQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *User)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Tag)
 	nids := make(map[int]map[*Tag]struct{})
@@ -520,11 +520,11 @@ func (tq *TagQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Tag
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(tag.UserTable)
-		s.Join(joinT).On(s.C(user.FieldID), joinT.C(tag.UserPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(tag.UserPrimaryKey[1]), edgeIDs...))
+		joinT := sql.Table(tag.FavoriteOfUserTable)
+		s.Join(joinT).On(s.C(user.FieldID), joinT.C(tag.FavoriteOfUserPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(tag.FavoriteOfUserPrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(tag.UserPrimaryKey[1]))
+		s.Select(joinT.C(tag.FavoriteOfUserPrimaryKey[1]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -561,7 +561,7 @@ func (tq *TagQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Tag
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "user" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "favorite_of_user" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)

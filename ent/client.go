@@ -532,15 +532,15 @@ func (c *MetaClient) QueryHistories(m *Meta) *HistoryQuery {
 	return query
 }
 
-// QueryUser queries the user edge of a Meta.
-func (c *MetaClient) QueryUser(m *Meta) *UserQuery {
+// QueryFavoriteOfUser queries the favorite_of_user edge of a Meta.
+func (c *MetaClient) QueryFavoriteOfUser(m *Meta) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(meta.Table, meta.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, meta.UserTable, meta.UserPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, meta.FavoriteOfUserTable, meta.FavoriteOfUserPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
 		return fromV, nil
@@ -697,15 +697,15 @@ func (c *TagClient) QueryMeta(t *Tag) *MetaQuery {
 	return query
 }
 
-// QueryUser queries the user edge of a Tag.
-func (c *TagClient) QueryUser(t *Tag) *UserQuery {
+// QueryFavoriteOfUser queries the favorite_of_user edge of a Tag.
+func (c *TagClient) QueryFavoriteOfUser(t *Tag) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := t.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tag.Table, tag.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, tag.UserTable, tag.UserPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, tag.FavoriteOfUserTable, tag.FavoriteOfUserPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
