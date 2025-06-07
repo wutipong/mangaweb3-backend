@@ -27,7 +27,7 @@ func RescanLibraryHandler(w http.ResponseWriter, r *http.Request, params httprou
 	client := database.CreateEntClient()
 	defer client.Close()
 
-	go maintenance.ScanLibrary(client)
+	go maintenance.ScanLibrary(r.Context(), client)
 
 	response := rescanLibraryResponse{
 		Result: true,

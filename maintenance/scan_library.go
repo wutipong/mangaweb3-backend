@@ -8,8 +8,8 @@ import (
 	"github.com/wutipong/mangaweb3-backend/meta"
 )
 
-func ScanLibrary(client *ent.Client) error {
-	allMeta, err := meta.ReadAll(context.Background(), client)
+func ScanLibrary(ctx context.Context, client *ent.Client) error {
+	allMeta, err := meta.ReadAll(ctx, client)
 	if err != nil {
 		return err
 	}
@@ -39,16 +39,16 @@ func ScanLibrary(client *ent.Client) error {
 			Str("type", file.Type.String()).
 			Msg("Creating metadata.")
 
-		if item, err := meta.Read(context.Background(), client, file.Name); err == nil {
+		if item, err := meta.Read(ctx, client, file.Name); err == nil {
 			item.Active = true
-			if err := meta.Write(context.Background(), client, item); err != nil {
+			if err := meta.Write(ctx, client, item); err != nil {
 				log.Error().
 					Str("name", item.Name).
 					AnErr("error", err).
 					Msg("Failed to re-activate meta")
 			}
 		} else {
-			item, err := meta.NewItem(context.Background(), client, file.Name, file.Type)
+			item, err := meta.NewItem(ctx, client, file.Name, file.Type)
 			if err != nil {
 				log.
 					Error().
@@ -58,12 +58,22 @@ func ScanLibrary(client *ent.Client) error {
 				continue
 			}
 
-			_, err = meta.PopulateTags(context.Background(), client, item)
+			item, err = meta.PopulateTags(ctx, client, item)
 			if err != nil {
 				log.Error().
 					AnErr("error", err).
 					Msg("Failed to write meta data.")
 			}
+			tags, err := item.QueryTags().All(ctx)
+			var tagsArray []string
+			if err == nil {
+				tagsArray = make([]string, len(tags))
+
+				for i, tag := range item.Edges.Tags {
+					tagsArray[i] = tag.Name
+				}
+			}
+			log.Info().Str("name", item.Name).Strs("tags", tagsArray).Msg("Created metadata.")
 		}
 	}
 
@@ -82,7 +92,7 @@ func ScanLibrary(client *ent.Client) error {
 		log.Info().Str("file", m.Name).Msg("Inactivate metadata.")
 		m.Active = false
 
-		if err := meta.Write(context.Background(), client, m); err != nil {
+		if err := meta.Write(ctx, client, m); err != nil {
 			log.Error().
 				Str("name", m.Name).
 				AnErr("error", err).

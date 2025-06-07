@@ -23,7 +23,7 @@ const (
 func UpdateLibraryHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	log.Info().Msg("Update library")
 
-	go maintenance.UpdateLibrary()
+	go maintenance.UpdateLibrary(r.Context())
 
 	response := UpdateLibraryResponse{
 		Result: true,
