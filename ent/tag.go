@@ -32,8 +32,8 @@ type Tag struct {
 type TagEdges struct {
 	// Meta holds the value of the meta edge.
 	Meta []*Meta `json:"meta,omitempty"`
-	// User holds the value of the user edge.
-	User []*User `json:"user,omitempty"`
+	// FavoriteOfUser holds the value of the favorite_of_user edge.
+	FavoriteOfUser []*User `json:"favorite_of_user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -48,13 +48,13 @@ func (e TagEdges) MetaOrErr() ([]*Meta, error) {
 	return nil, &NotLoadedError{edge: "meta"}
 }
 
-// UserOrErr returns the User value or an error if the edge
+// FavoriteOfUserOrErr returns the FavoriteOfUser value or an error if the edge
 // was not loaded in eager-loading.
-func (e TagEdges) UserOrErr() ([]*User, error) {
+func (e TagEdges) FavoriteOfUserOrErr() ([]*User, error) {
 	if e.loadedTypes[1] {
-		return e.User, nil
+		return e.FavoriteOfUser, nil
 	}
-	return nil, &NotLoadedError{edge: "user"}
+	return nil, &NotLoadedError{edge: "favorite_of_user"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -125,9 +125,9 @@ func (t *Tag) QueryMeta() *MetaQuery {
 	return NewTagClient(t.config).QueryMeta(t)
 }
 
-// QueryUser queries the "user" edge of the Tag entity.
-func (t *Tag) QueryUser() *UserQuery {
-	return NewTagClient(t.config).QueryUser(t)
+// QueryFavoriteOfUser queries the "favorite_of_user" edge of the Tag entity.
+func (t *Tag) QueryFavoriteOfUser() *UserQuery {
+	return NewTagClient(t.config).QueryFavoriteOfUser(t)
 }
 
 // Update returns a builder for updating this Tag.

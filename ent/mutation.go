@@ -488,41 +488,41 @@ func (m *HistoryMutation) ResetEdge(name string) error {
 // MetaMutation represents an operation that mutates the Meta nodes in the graph.
 type MetaMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *int
-	name                *string
-	create_time         *time.Time
-	favorite            *bool
-	file_indices        *[]int
-	appendfile_indices  []int
-	read                *bool
-	active              *bool
-	hidden              *bool
-	container_type      *meta.ContainerType
-	thumbnail_index     *int
-	addthumbnail_index  *int
-	thumbnail_x         *int
-	addthumbnail_x      *int
-	thumbnail_y         *int
-	addthumbnail_y      *int
-	thumbnail_width     *int
-	addthumbnail_width  *int
-	thumbnail_height    *int
-	addthumbnail_height *int
-	clearedFields       map[string]struct{}
-	tags                map[int]struct{}
-	removedtags         map[int]struct{}
-	clearedtags         bool
-	histories           map[int]struct{}
-	removedhistories    map[int]struct{}
-	clearedhistories    bool
-	user                map[int]struct{}
-	removeduser         map[int]struct{}
-	cleareduser         bool
-	done                bool
-	oldValue            func(context.Context) (*Meta, error)
-	predicates          []predicate.Meta
+	op                      Op
+	typ                     string
+	id                      *int
+	name                    *string
+	create_time             *time.Time
+	favorite                *bool
+	file_indices            *[]int
+	appendfile_indices      []int
+	read                    *bool
+	active                  *bool
+	hidden                  *bool
+	container_type          *meta.ContainerType
+	thumbnail_index         *int
+	addthumbnail_index      *int
+	thumbnail_x             *int
+	addthumbnail_x          *int
+	thumbnail_y             *int
+	addthumbnail_y          *int
+	thumbnail_width         *int
+	addthumbnail_width      *int
+	thumbnail_height        *int
+	addthumbnail_height     *int
+	clearedFields           map[string]struct{}
+	tags                    map[int]struct{}
+	removedtags             map[int]struct{}
+	clearedtags             bool
+	histories               map[int]struct{}
+	removedhistories        map[int]struct{}
+	clearedhistories        bool
+	favorite_of_user        map[int]struct{}
+	removedfavorite_of_user map[int]struct{}
+	clearedfavorite_of_user bool
+	done                    bool
+	oldValue                func(context.Context) (*Meta, error)
+	predicates              []predicate.Meta
 }
 
 var _ ent.Mutation = (*MetaMutation)(nil)
@@ -1384,58 +1384,58 @@ func (m *MetaMutation) ResetHistories() {
 	m.removedhistories = nil
 }
 
-// AddUserIDs adds the "user" edge to the User entity by ids.
-func (m *MetaMutation) AddUserIDs(ids ...int) {
-	if m.user == nil {
-		m.user = make(map[int]struct{})
+// AddFavoriteOfUserIDs adds the "favorite_of_user" edge to the User entity by ids.
+func (m *MetaMutation) AddFavoriteOfUserIDs(ids ...int) {
+	if m.favorite_of_user == nil {
+		m.favorite_of_user = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.user[ids[i]] = struct{}{}
+		m.favorite_of_user[ids[i]] = struct{}{}
 	}
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (m *MetaMutation) ClearUser() {
-	m.cleareduser = true
+// ClearFavoriteOfUser clears the "favorite_of_user" edge to the User entity.
+func (m *MetaMutation) ClearFavoriteOfUser() {
+	m.clearedfavorite_of_user = true
 }
 
-// UserCleared reports if the "user" edge to the User entity was cleared.
-func (m *MetaMutation) UserCleared() bool {
-	return m.cleareduser
+// FavoriteOfUserCleared reports if the "favorite_of_user" edge to the User entity was cleared.
+func (m *MetaMutation) FavoriteOfUserCleared() bool {
+	return m.clearedfavorite_of_user
 }
 
-// RemoveUserIDs removes the "user" edge to the User entity by IDs.
-func (m *MetaMutation) RemoveUserIDs(ids ...int) {
-	if m.removeduser == nil {
-		m.removeduser = make(map[int]struct{})
+// RemoveFavoriteOfUserIDs removes the "favorite_of_user" edge to the User entity by IDs.
+func (m *MetaMutation) RemoveFavoriteOfUserIDs(ids ...int) {
+	if m.removedfavorite_of_user == nil {
+		m.removedfavorite_of_user = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.user, ids[i])
-		m.removeduser[ids[i]] = struct{}{}
+		delete(m.favorite_of_user, ids[i])
+		m.removedfavorite_of_user[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedUser returns the removed IDs of the "user" edge to the User entity.
-func (m *MetaMutation) RemovedUserIDs() (ids []int) {
-	for id := range m.removeduser {
+// RemovedFavoriteOfUser returns the removed IDs of the "favorite_of_user" edge to the User entity.
+func (m *MetaMutation) RemovedFavoriteOfUserIDs() (ids []int) {
+	for id := range m.removedfavorite_of_user {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// UserIDs returns the "user" edge IDs in the mutation.
-func (m *MetaMutation) UserIDs() (ids []int) {
-	for id := range m.user {
+// FavoriteOfUserIDs returns the "favorite_of_user" edge IDs in the mutation.
+func (m *MetaMutation) FavoriteOfUserIDs() (ids []int) {
+	for id := range m.favorite_of_user {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetUser resets all changes to the "user" edge.
-func (m *MetaMutation) ResetUser() {
-	m.user = nil
-	m.cleareduser = false
-	m.removeduser = nil
+// ResetFavoriteOfUser resets all changes to the "favorite_of_user" edge.
+func (m *MetaMutation) ResetFavoriteOfUser() {
+	m.favorite_of_user = nil
+	m.clearedfavorite_of_user = false
+	m.removedfavorite_of_user = nil
 }
 
 // Where appends a list predicates to the MetaMutation builder.
@@ -1878,8 +1878,8 @@ func (m *MetaMutation) AddedEdges() []string {
 	if m.histories != nil {
 		edges = append(edges, meta.EdgeHistories)
 	}
-	if m.user != nil {
-		edges = append(edges, meta.EdgeUser)
+	if m.favorite_of_user != nil {
+		edges = append(edges, meta.EdgeFavoriteOfUser)
 	}
 	return edges
 }
@@ -1900,9 +1900,9 @@ func (m *MetaMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case meta.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.user))
-		for id := range m.user {
+	case meta.EdgeFavoriteOfUser:
+		ids := make([]ent.Value, 0, len(m.favorite_of_user))
+		for id := range m.favorite_of_user {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1919,8 +1919,8 @@ func (m *MetaMutation) RemovedEdges() []string {
 	if m.removedhistories != nil {
 		edges = append(edges, meta.EdgeHistories)
 	}
-	if m.removeduser != nil {
-		edges = append(edges, meta.EdgeUser)
+	if m.removedfavorite_of_user != nil {
+		edges = append(edges, meta.EdgeFavoriteOfUser)
 	}
 	return edges
 }
@@ -1941,9 +1941,9 @@ func (m *MetaMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case meta.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.removeduser))
-		for id := range m.removeduser {
+	case meta.EdgeFavoriteOfUser:
+		ids := make([]ent.Value, 0, len(m.removedfavorite_of_user))
+		for id := range m.removedfavorite_of_user {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1960,8 +1960,8 @@ func (m *MetaMutation) ClearedEdges() []string {
 	if m.clearedhistories {
 		edges = append(edges, meta.EdgeHistories)
 	}
-	if m.cleareduser {
-		edges = append(edges, meta.EdgeUser)
+	if m.clearedfavorite_of_user {
+		edges = append(edges, meta.EdgeFavoriteOfUser)
 	}
 	return edges
 }
@@ -1974,8 +1974,8 @@ func (m *MetaMutation) EdgeCleared(name string) bool {
 		return m.clearedtags
 	case meta.EdgeHistories:
 		return m.clearedhistories
-	case meta.EdgeUser:
-		return m.cleareduser
+	case meta.EdgeFavoriteOfUser:
+		return m.clearedfavorite_of_user
 	}
 	return false
 }
@@ -1998,8 +1998,8 @@ func (m *MetaMutation) ResetEdge(name string) error {
 	case meta.EdgeHistories:
 		m.ResetHistories()
 		return nil
-	case meta.EdgeUser:
-		m.ResetUser()
+	case meta.EdgeFavoriteOfUser:
+		m.ResetFavoriteOfUser()
 		return nil
 	}
 	return fmt.Errorf("unknown Meta edge %s", name)
@@ -2008,22 +2008,22 @@ func (m *MetaMutation) ResetEdge(name string) error {
 // TagMutation represents an operation that mutates the Tag nodes in the graph.
 type TagMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	name          *string
-	favorite      *bool
-	hidden        *bool
-	clearedFields map[string]struct{}
-	meta          map[int]struct{}
-	removedmeta   map[int]struct{}
-	clearedmeta   bool
-	user          map[int]struct{}
-	removeduser   map[int]struct{}
-	cleareduser   bool
-	done          bool
-	oldValue      func(context.Context) (*Tag, error)
-	predicates    []predicate.Tag
+	op                      Op
+	typ                     string
+	id                      *int
+	name                    *string
+	favorite                *bool
+	hidden                  *bool
+	clearedFields           map[string]struct{}
+	meta                    map[int]struct{}
+	removedmeta             map[int]struct{}
+	clearedmeta             bool
+	favorite_of_user        map[int]struct{}
+	removedfavorite_of_user map[int]struct{}
+	clearedfavorite_of_user bool
+	done                    bool
+	oldValue                func(context.Context) (*Tag, error)
+	predicates              []predicate.Tag
 }
 
 var _ ent.Mutation = (*TagMutation)(nil)
@@ -2286,58 +2286,58 @@ func (m *TagMutation) ResetMeta() {
 	m.removedmeta = nil
 }
 
-// AddUserIDs adds the "user" edge to the User entity by ids.
-func (m *TagMutation) AddUserIDs(ids ...int) {
-	if m.user == nil {
-		m.user = make(map[int]struct{})
+// AddFavoriteOfUserIDs adds the "favorite_of_user" edge to the User entity by ids.
+func (m *TagMutation) AddFavoriteOfUserIDs(ids ...int) {
+	if m.favorite_of_user == nil {
+		m.favorite_of_user = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.user[ids[i]] = struct{}{}
+		m.favorite_of_user[ids[i]] = struct{}{}
 	}
 }
 
-// ClearUser clears the "user" edge to the User entity.
-func (m *TagMutation) ClearUser() {
-	m.cleareduser = true
+// ClearFavoriteOfUser clears the "favorite_of_user" edge to the User entity.
+func (m *TagMutation) ClearFavoriteOfUser() {
+	m.clearedfavorite_of_user = true
 }
 
-// UserCleared reports if the "user" edge to the User entity was cleared.
-func (m *TagMutation) UserCleared() bool {
-	return m.cleareduser
+// FavoriteOfUserCleared reports if the "favorite_of_user" edge to the User entity was cleared.
+func (m *TagMutation) FavoriteOfUserCleared() bool {
+	return m.clearedfavorite_of_user
 }
 
-// RemoveUserIDs removes the "user" edge to the User entity by IDs.
-func (m *TagMutation) RemoveUserIDs(ids ...int) {
-	if m.removeduser == nil {
-		m.removeduser = make(map[int]struct{})
+// RemoveFavoriteOfUserIDs removes the "favorite_of_user" edge to the User entity by IDs.
+func (m *TagMutation) RemoveFavoriteOfUserIDs(ids ...int) {
+	if m.removedfavorite_of_user == nil {
+		m.removedfavorite_of_user = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.user, ids[i])
-		m.removeduser[ids[i]] = struct{}{}
+		delete(m.favorite_of_user, ids[i])
+		m.removedfavorite_of_user[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedUser returns the removed IDs of the "user" edge to the User entity.
-func (m *TagMutation) RemovedUserIDs() (ids []int) {
-	for id := range m.removeduser {
+// RemovedFavoriteOfUser returns the removed IDs of the "favorite_of_user" edge to the User entity.
+func (m *TagMutation) RemovedFavoriteOfUserIDs() (ids []int) {
+	for id := range m.removedfavorite_of_user {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// UserIDs returns the "user" edge IDs in the mutation.
-func (m *TagMutation) UserIDs() (ids []int) {
-	for id := range m.user {
+// FavoriteOfUserIDs returns the "favorite_of_user" edge IDs in the mutation.
+func (m *TagMutation) FavoriteOfUserIDs() (ids []int) {
+	for id := range m.favorite_of_user {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetUser resets all changes to the "user" edge.
-func (m *TagMutation) ResetUser() {
-	m.user = nil
-	m.cleareduser = false
-	m.removeduser = nil
+// ResetFavoriteOfUser resets all changes to the "favorite_of_user" edge.
+func (m *TagMutation) ResetFavoriteOfUser() {
+	m.favorite_of_user = nil
+	m.clearedfavorite_of_user = false
+	m.removedfavorite_of_user = nil
 }
 
 // Where appends a list predicates to the TagMutation builder.
@@ -2511,8 +2511,8 @@ func (m *TagMutation) AddedEdges() []string {
 	if m.meta != nil {
 		edges = append(edges, tag.EdgeMeta)
 	}
-	if m.user != nil {
-		edges = append(edges, tag.EdgeUser)
+	if m.favorite_of_user != nil {
+		edges = append(edges, tag.EdgeFavoriteOfUser)
 	}
 	return edges
 }
@@ -2527,9 +2527,9 @@ func (m *TagMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case tag.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.user))
-		for id := range m.user {
+	case tag.EdgeFavoriteOfUser:
+		ids := make([]ent.Value, 0, len(m.favorite_of_user))
+		for id := range m.favorite_of_user {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2543,8 +2543,8 @@ func (m *TagMutation) RemovedEdges() []string {
 	if m.removedmeta != nil {
 		edges = append(edges, tag.EdgeMeta)
 	}
-	if m.removeduser != nil {
-		edges = append(edges, tag.EdgeUser)
+	if m.removedfavorite_of_user != nil {
+		edges = append(edges, tag.EdgeFavoriteOfUser)
 	}
 	return edges
 }
@@ -2559,9 +2559,9 @@ func (m *TagMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case tag.EdgeUser:
-		ids := make([]ent.Value, 0, len(m.removeduser))
-		for id := range m.removeduser {
+	case tag.EdgeFavoriteOfUser:
+		ids := make([]ent.Value, 0, len(m.removedfavorite_of_user))
+		for id := range m.removedfavorite_of_user {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2575,8 +2575,8 @@ func (m *TagMutation) ClearedEdges() []string {
 	if m.clearedmeta {
 		edges = append(edges, tag.EdgeMeta)
 	}
-	if m.cleareduser {
-		edges = append(edges, tag.EdgeUser)
+	if m.clearedfavorite_of_user {
+		edges = append(edges, tag.EdgeFavoriteOfUser)
 	}
 	return edges
 }
@@ -2587,8 +2587,8 @@ func (m *TagMutation) EdgeCleared(name string) bool {
 	switch name {
 	case tag.EdgeMeta:
 		return m.clearedmeta
-	case tag.EdgeUser:
-		return m.cleareduser
+	case tag.EdgeFavoriteOfUser:
+		return m.clearedfavorite_of_user
 	}
 	return false
 }
@@ -2608,8 +2608,8 @@ func (m *TagMutation) ResetEdge(name string) error {
 	case tag.EdgeMeta:
 		m.ResetMeta()
 		return nil
-	case tag.EdgeUser:
-		m.ResetUser()
+	case tag.EdgeFavoriteOfUser:
+		m.ResetFavoriteOfUser()
 		return nil
 	}
 	return fmt.Errorf("unknown Tag edge %s", name)

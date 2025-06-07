@@ -59,11 +59,11 @@ func CreateQuery(ctx context.Context, client *ent.Client, u *ent.User, q QueryPa
 
 	if q.Filter == FilterFavoriteItem {
 		query = query.Where(
-			meta.HasUserWith(user.ID(u.ID)),
+			meta.HasFavoriteOfUserWith(user.ID(u.ID)),
 		)
 	} else if q.Filter == FilterFavoriteTag {
 		query = query.Where(
-			meta.HasTagsWith(tag.HasUserWith(user.ID(u.ID))),
+			meta.HasTagsWith(tag.HasFavoriteOfUserWith(user.ID(u.ID))),
 		)
 	}
 

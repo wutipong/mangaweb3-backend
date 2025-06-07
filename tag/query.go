@@ -41,7 +41,7 @@ func CreateQuery(client *ent.Client, u *ent.User, q QueryParams) *ent.TagQuery {
 	}
 
 	if q.FavoriteOnly {
-		query = query.Where(tag.HasUserWith(user.ID(u.ID)))
+		query = query.Where(tag.HasFavoriteOfUserWith(user.ID(u.ID)))
 	}
 	if q.Search != "" {
 		query = query.Where(tag.NameContainsFold(q.Search))

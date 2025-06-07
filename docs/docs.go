@@ -838,18 +838,18 @@ const docTemplate = `{
         "ent.TagEdges": {
             "type": "object",
             "properties": {
+                "favorite_of_user": {
+                    "description": "FavoriteOfUser holds the value of the favorite_of_user edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.User"
+                    }
+                },
                 "meta": {
                     "description": "Meta holds the value of the meta edge.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ent.Meta"
-                    }
-                },
-                "user": {
-                    "description": "User holds the value of the user edge.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ent.User"
                     }
                 }
             }

@@ -72,19 +72,19 @@ func (tc *TagCreate) AddMeta(m ...*Meta) *TagCreate {
 	return tc.AddMetumIDs(ids...)
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (tc *TagCreate) AddUserIDs(ids ...int) *TagCreate {
-	tc.mutation.AddUserIDs(ids...)
+// AddFavoriteOfUserIDs adds the "favorite_of_user" edge to the User entity by IDs.
+func (tc *TagCreate) AddFavoriteOfUserIDs(ids ...int) *TagCreate {
+	tc.mutation.AddFavoriteOfUserIDs(ids...)
 	return tc
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (tc *TagCreate) AddUser(u ...*User) *TagCreate {
+// AddFavoriteOfUser adds the "favorite_of_user" edges to the User entity.
+func (tc *TagCreate) AddFavoriteOfUser(u ...*User) *TagCreate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return tc.AddUserIDs(ids...)
+	return tc.AddFavoriteOfUserIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
@@ -203,12 +203,12 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := tc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := tc.mutation.FavoriteOfUserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   tag.UserTable,
-			Columns: tag.UserPrimaryKey,
+			Table:   tag.FavoriteOfUserTable,
+			Columns: tag.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),

@@ -86,19 +86,19 @@ func (tu *TagUpdate) AddMeta(m ...*Meta) *TagUpdate {
 	return tu.AddMetumIDs(ids...)
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (tu *TagUpdate) AddUserIDs(ids ...int) *TagUpdate {
-	tu.mutation.AddUserIDs(ids...)
+// AddFavoriteOfUserIDs adds the "favorite_of_user" edge to the User entity by IDs.
+func (tu *TagUpdate) AddFavoriteOfUserIDs(ids ...int) *TagUpdate {
+	tu.mutation.AddFavoriteOfUserIDs(ids...)
 	return tu
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (tu *TagUpdate) AddUser(u ...*User) *TagUpdate {
+// AddFavoriteOfUser adds the "favorite_of_user" edges to the User entity.
+func (tu *TagUpdate) AddFavoriteOfUser(u ...*User) *TagUpdate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return tu.AddUserIDs(ids...)
+	return tu.AddFavoriteOfUserIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
@@ -127,25 +127,25 @@ func (tu *TagUpdate) RemoveMeta(m ...*Meta) *TagUpdate {
 	return tu.RemoveMetumIDs(ids...)
 }
 
-// ClearUser clears all "user" edges to the User entity.
-func (tu *TagUpdate) ClearUser() *TagUpdate {
-	tu.mutation.ClearUser()
+// ClearFavoriteOfUser clears all "favorite_of_user" edges to the User entity.
+func (tu *TagUpdate) ClearFavoriteOfUser() *TagUpdate {
+	tu.mutation.ClearFavoriteOfUser()
 	return tu
 }
 
-// RemoveUserIDs removes the "user" edge to User entities by IDs.
-func (tu *TagUpdate) RemoveUserIDs(ids ...int) *TagUpdate {
-	tu.mutation.RemoveUserIDs(ids...)
+// RemoveFavoriteOfUserIDs removes the "favorite_of_user" edge to User entities by IDs.
+func (tu *TagUpdate) RemoveFavoriteOfUserIDs(ids ...int) *TagUpdate {
+	tu.mutation.RemoveFavoriteOfUserIDs(ids...)
 	return tu
 }
 
-// RemoveUser removes "user" edges to User entities.
-func (tu *TagUpdate) RemoveUser(u ...*User) *TagUpdate {
+// RemoveFavoriteOfUser removes "favorite_of_user" edges to User entities.
+func (tu *TagUpdate) RemoveFavoriteOfUser(u ...*User) *TagUpdate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return tu.RemoveUserIDs(ids...)
+	return tu.RemoveFavoriteOfUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -251,12 +251,12 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.UserCleared() {
+	if tu.mutation.FavoriteOfUserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   tag.UserTable,
-			Columns: tag.UserPrimaryKey,
+			Table:   tag.FavoriteOfUserTable,
+			Columns: tag.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -264,12 +264,12 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedUserIDs(); len(nodes) > 0 && !tu.mutation.UserCleared() {
+	if nodes := tu.mutation.RemovedFavoriteOfUserIDs(); len(nodes) > 0 && !tu.mutation.FavoriteOfUserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   tag.UserTable,
-			Columns: tag.UserPrimaryKey,
+			Table:   tag.FavoriteOfUserTable,
+			Columns: tag.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -280,12 +280,12 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := tu.mutation.FavoriteOfUserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   tag.UserTable,
-			Columns: tag.UserPrimaryKey,
+			Table:   tag.FavoriteOfUserTable,
+			Columns: tag.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -373,19 +373,19 @@ func (tuo *TagUpdateOne) AddMeta(m ...*Meta) *TagUpdateOne {
 	return tuo.AddMetumIDs(ids...)
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (tuo *TagUpdateOne) AddUserIDs(ids ...int) *TagUpdateOne {
-	tuo.mutation.AddUserIDs(ids...)
+// AddFavoriteOfUserIDs adds the "favorite_of_user" edge to the User entity by IDs.
+func (tuo *TagUpdateOne) AddFavoriteOfUserIDs(ids ...int) *TagUpdateOne {
+	tuo.mutation.AddFavoriteOfUserIDs(ids...)
 	return tuo
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (tuo *TagUpdateOne) AddUser(u ...*User) *TagUpdateOne {
+// AddFavoriteOfUser adds the "favorite_of_user" edges to the User entity.
+func (tuo *TagUpdateOne) AddFavoriteOfUser(u ...*User) *TagUpdateOne {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return tuo.AddUserIDs(ids...)
+	return tuo.AddFavoriteOfUserIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
@@ -414,25 +414,25 @@ func (tuo *TagUpdateOne) RemoveMeta(m ...*Meta) *TagUpdateOne {
 	return tuo.RemoveMetumIDs(ids...)
 }
 
-// ClearUser clears all "user" edges to the User entity.
-func (tuo *TagUpdateOne) ClearUser() *TagUpdateOne {
-	tuo.mutation.ClearUser()
+// ClearFavoriteOfUser clears all "favorite_of_user" edges to the User entity.
+func (tuo *TagUpdateOne) ClearFavoriteOfUser() *TagUpdateOne {
+	tuo.mutation.ClearFavoriteOfUser()
 	return tuo
 }
 
-// RemoveUserIDs removes the "user" edge to User entities by IDs.
-func (tuo *TagUpdateOne) RemoveUserIDs(ids ...int) *TagUpdateOne {
-	tuo.mutation.RemoveUserIDs(ids...)
+// RemoveFavoriteOfUserIDs removes the "favorite_of_user" edge to User entities by IDs.
+func (tuo *TagUpdateOne) RemoveFavoriteOfUserIDs(ids ...int) *TagUpdateOne {
+	tuo.mutation.RemoveFavoriteOfUserIDs(ids...)
 	return tuo
 }
 
-// RemoveUser removes "user" edges to User entities.
-func (tuo *TagUpdateOne) RemoveUser(u ...*User) *TagUpdateOne {
+// RemoveFavoriteOfUser removes "favorite_of_user" edges to User entities.
+func (tuo *TagUpdateOne) RemoveFavoriteOfUser(u ...*User) *TagUpdateOne {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return tuo.RemoveUserIDs(ids...)
+	return tuo.RemoveFavoriteOfUserIDs(ids...)
 }
 
 // Where appends a list predicates to the TagUpdate builder.
@@ -568,12 +568,12 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tuo.mutation.UserCleared() {
+	if tuo.mutation.FavoriteOfUserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   tag.UserTable,
-			Columns: tag.UserPrimaryKey,
+			Table:   tag.FavoriteOfUserTable,
+			Columns: tag.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -581,12 +581,12 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedUserIDs(); len(nodes) > 0 && !tuo.mutation.UserCleared() {
+	if nodes := tuo.mutation.RemovedFavoriteOfUserIDs(); len(nodes) > 0 && !tuo.mutation.FavoriteOfUserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   tag.UserTable,
-			Columns: tag.UserPrimaryKey,
+			Table:   tag.FavoriteOfUserTable,
+			Columns: tag.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -597,12 +597,12 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := tuo.mutation.FavoriteOfUserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   tag.UserTable,
-			Columns: tag.UserPrimaryKey,
+			Table:   tag.FavoriteOfUserTable,
+			Columns: tag.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),

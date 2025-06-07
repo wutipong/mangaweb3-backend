@@ -307,19 +307,19 @@ func (mu *MetaUpdate) AddHistories(h ...*History) *MetaUpdate {
 	return mu.AddHistoryIDs(ids...)
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (mu *MetaUpdate) AddUserIDs(ids ...int) *MetaUpdate {
-	mu.mutation.AddUserIDs(ids...)
+// AddFavoriteOfUserIDs adds the "favorite_of_user" edge to the User entity by IDs.
+func (mu *MetaUpdate) AddFavoriteOfUserIDs(ids ...int) *MetaUpdate {
+	mu.mutation.AddFavoriteOfUserIDs(ids...)
 	return mu
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (mu *MetaUpdate) AddUser(u ...*User) *MetaUpdate {
+// AddFavoriteOfUser adds the "favorite_of_user" edges to the User entity.
+func (mu *MetaUpdate) AddFavoriteOfUser(u ...*User) *MetaUpdate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return mu.AddUserIDs(ids...)
+	return mu.AddFavoriteOfUserIDs(ids...)
 }
 
 // Mutation returns the MetaMutation object of the builder.
@@ -369,25 +369,25 @@ func (mu *MetaUpdate) RemoveHistories(h ...*History) *MetaUpdate {
 	return mu.RemoveHistoryIDs(ids...)
 }
 
-// ClearUser clears all "user" edges to the User entity.
-func (mu *MetaUpdate) ClearUser() *MetaUpdate {
-	mu.mutation.ClearUser()
+// ClearFavoriteOfUser clears all "favorite_of_user" edges to the User entity.
+func (mu *MetaUpdate) ClearFavoriteOfUser() *MetaUpdate {
+	mu.mutation.ClearFavoriteOfUser()
 	return mu
 }
 
-// RemoveUserIDs removes the "user" edge to User entities by IDs.
-func (mu *MetaUpdate) RemoveUserIDs(ids ...int) *MetaUpdate {
-	mu.mutation.RemoveUserIDs(ids...)
+// RemoveFavoriteOfUserIDs removes the "favorite_of_user" edge to User entities by IDs.
+func (mu *MetaUpdate) RemoveFavoriteOfUserIDs(ids ...int) *MetaUpdate {
+	mu.mutation.RemoveFavoriteOfUserIDs(ids...)
 	return mu
 }
 
-// RemoveUser removes "user" edges to User entities.
-func (mu *MetaUpdate) RemoveUser(u ...*User) *MetaUpdate {
+// RemoveFavoriteOfUser removes "favorite_of_user" edges to User entities.
+func (mu *MetaUpdate) RemoveFavoriteOfUser(u ...*User) *MetaUpdate {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return mu.RemoveUserIDs(ids...)
+	return mu.RemoveFavoriteOfUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -608,12 +608,12 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if mu.mutation.UserCleared() {
+	if mu.mutation.FavoriteOfUserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   meta.UserTable,
-			Columns: meta.UserPrimaryKey,
+			Table:   meta.FavoriteOfUserTable,
+			Columns: meta.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -621,12 +621,12 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.RemovedUserIDs(); len(nodes) > 0 && !mu.mutation.UserCleared() {
+	if nodes := mu.mutation.RemovedFavoriteOfUserIDs(); len(nodes) > 0 && !mu.mutation.FavoriteOfUserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   meta.UserTable,
-			Columns: meta.UserPrimaryKey,
+			Table:   meta.FavoriteOfUserTable,
+			Columns: meta.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -637,12 +637,12 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mu.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := mu.mutation.FavoriteOfUserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   meta.UserTable,
-			Columns: meta.UserPrimaryKey,
+			Table:   meta.FavoriteOfUserTable,
+			Columns: meta.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -948,19 +948,19 @@ func (muo *MetaUpdateOne) AddHistories(h ...*History) *MetaUpdateOne {
 	return muo.AddHistoryIDs(ids...)
 }
 
-// AddUserIDs adds the "user" edge to the User entity by IDs.
-func (muo *MetaUpdateOne) AddUserIDs(ids ...int) *MetaUpdateOne {
-	muo.mutation.AddUserIDs(ids...)
+// AddFavoriteOfUserIDs adds the "favorite_of_user" edge to the User entity by IDs.
+func (muo *MetaUpdateOne) AddFavoriteOfUserIDs(ids ...int) *MetaUpdateOne {
+	muo.mutation.AddFavoriteOfUserIDs(ids...)
 	return muo
 }
 
-// AddUser adds the "user" edges to the User entity.
-func (muo *MetaUpdateOne) AddUser(u ...*User) *MetaUpdateOne {
+// AddFavoriteOfUser adds the "favorite_of_user" edges to the User entity.
+func (muo *MetaUpdateOne) AddFavoriteOfUser(u ...*User) *MetaUpdateOne {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return muo.AddUserIDs(ids...)
+	return muo.AddFavoriteOfUserIDs(ids...)
 }
 
 // Mutation returns the MetaMutation object of the builder.
@@ -1010,25 +1010,25 @@ func (muo *MetaUpdateOne) RemoveHistories(h ...*History) *MetaUpdateOne {
 	return muo.RemoveHistoryIDs(ids...)
 }
 
-// ClearUser clears all "user" edges to the User entity.
-func (muo *MetaUpdateOne) ClearUser() *MetaUpdateOne {
-	muo.mutation.ClearUser()
+// ClearFavoriteOfUser clears all "favorite_of_user" edges to the User entity.
+func (muo *MetaUpdateOne) ClearFavoriteOfUser() *MetaUpdateOne {
+	muo.mutation.ClearFavoriteOfUser()
 	return muo
 }
 
-// RemoveUserIDs removes the "user" edge to User entities by IDs.
-func (muo *MetaUpdateOne) RemoveUserIDs(ids ...int) *MetaUpdateOne {
-	muo.mutation.RemoveUserIDs(ids...)
+// RemoveFavoriteOfUserIDs removes the "favorite_of_user" edge to User entities by IDs.
+func (muo *MetaUpdateOne) RemoveFavoriteOfUserIDs(ids ...int) *MetaUpdateOne {
+	muo.mutation.RemoveFavoriteOfUserIDs(ids...)
 	return muo
 }
 
-// RemoveUser removes "user" edges to User entities.
-func (muo *MetaUpdateOne) RemoveUser(u ...*User) *MetaUpdateOne {
+// RemoveFavoriteOfUser removes "favorite_of_user" edges to User entities.
+func (muo *MetaUpdateOne) RemoveFavoriteOfUser(u ...*User) *MetaUpdateOne {
 	ids := make([]int, len(u))
 	for i := range u {
 		ids[i] = u[i].ID
 	}
-	return muo.RemoveUserIDs(ids...)
+	return muo.RemoveFavoriteOfUserIDs(ids...)
 }
 
 // Where appends a list predicates to the MetaUpdate builder.
@@ -1279,12 +1279,12 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if muo.mutation.UserCleared() {
+	if muo.mutation.FavoriteOfUserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   meta.UserTable,
-			Columns: meta.UserPrimaryKey,
+			Table:   meta.FavoriteOfUserTable,
+			Columns: meta.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -1292,12 +1292,12 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.RemovedUserIDs(); len(nodes) > 0 && !muo.mutation.UserCleared() {
+	if nodes := muo.mutation.RemovedFavoriteOfUserIDs(); len(nodes) > 0 && !muo.mutation.FavoriteOfUserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   meta.UserTable,
-			Columns: meta.UserPrimaryKey,
+			Table:   meta.FavoriteOfUserTable,
+			Columns: meta.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
@@ -1308,12 +1308,12 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := muo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := muo.mutation.FavoriteOfUserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   meta.UserTable,
-			Columns: meta.UserPrimaryKey,
+			Table:   meta.FavoriteOfUserTable,
+			Columns: meta.FavoriteOfUserPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
