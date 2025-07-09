@@ -50,37 +50,49 @@ func (pu *ProgressUpdate) AddPage(i int) *ProgressUpdate {
 	return pu
 }
 
-// SetItemID sets the "item" edge to the Meta entity by ID.
-func (pu *ProgressUpdate) SetItemID(id int) *ProgressUpdate {
-	pu.mutation.SetItemID(id)
+// SetItemID sets the "item_id" field.
+func (pu *ProgressUpdate) SetItemID(i int) *ProgressUpdate {
+	pu.mutation.SetItemID(i)
 	return pu
 }
 
-// SetNillableItemID sets the "item" edge to the Meta entity by ID if the given value is not nil.
-func (pu *ProgressUpdate) SetNillableItemID(id *int) *ProgressUpdate {
-	if id != nil {
-		pu = pu.SetItemID(*id)
+// SetNillableItemID sets the "item_id" field if the given value is not nil.
+func (pu *ProgressUpdate) SetNillableItemID(i *int) *ProgressUpdate {
+	if i != nil {
+		pu.SetItemID(*i)
 	}
+	return pu
+}
+
+// ClearItemID clears the value of the "item_id" field.
+func (pu *ProgressUpdate) ClearItemID() *ProgressUpdate {
+	pu.mutation.ClearItemID()
+	return pu
+}
+
+// SetUserID sets the "user_id" field.
+func (pu *ProgressUpdate) SetUserID(i int) *ProgressUpdate {
+	pu.mutation.SetUserID(i)
+	return pu
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (pu *ProgressUpdate) SetNillableUserID(i *int) *ProgressUpdate {
+	if i != nil {
+		pu.SetUserID(*i)
+	}
+	return pu
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (pu *ProgressUpdate) ClearUserID() *ProgressUpdate {
+	pu.mutation.ClearUserID()
 	return pu
 }
 
 // SetItem sets the "item" edge to the Meta entity.
 func (pu *ProgressUpdate) SetItem(m *Meta) *ProgressUpdate {
 	return pu.SetItemID(m.ID)
-}
-
-// SetUserID sets the "user" edge to the User entity by ID.
-func (pu *ProgressUpdate) SetUserID(id int) *ProgressUpdate {
-	pu.mutation.SetUserID(id)
-	return pu
-}
-
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (pu *ProgressUpdate) SetNillableUserID(id *int) *ProgressUpdate {
-	if id != nil {
-		pu = pu.SetUserID(*id)
-	}
-	return pu
 }
 
 // SetUser sets the "user" edge to the User entity.
@@ -246,37 +258,49 @@ func (puo *ProgressUpdateOne) AddPage(i int) *ProgressUpdateOne {
 	return puo
 }
 
-// SetItemID sets the "item" edge to the Meta entity by ID.
-func (puo *ProgressUpdateOne) SetItemID(id int) *ProgressUpdateOne {
-	puo.mutation.SetItemID(id)
+// SetItemID sets the "item_id" field.
+func (puo *ProgressUpdateOne) SetItemID(i int) *ProgressUpdateOne {
+	puo.mutation.SetItemID(i)
 	return puo
 }
 
-// SetNillableItemID sets the "item" edge to the Meta entity by ID if the given value is not nil.
-func (puo *ProgressUpdateOne) SetNillableItemID(id *int) *ProgressUpdateOne {
-	if id != nil {
-		puo = puo.SetItemID(*id)
+// SetNillableItemID sets the "item_id" field if the given value is not nil.
+func (puo *ProgressUpdateOne) SetNillableItemID(i *int) *ProgressUpdateOne {
+	if i != nil {
+		puo.SetItemID(*i)
 	}
+	return puo
+}
+
+// ClearItemID clears the value of the "item_id" field.
+func (puo *ProgressUpdateOne) ClearItemID() *ProgressUpdateOne {
+	puo.mutation.ClearItemID()
+	return puo
+}
+
+// SetUserID sets the "user_id" field.
+func (puo *ProgressUpdateOne) SetUserID(i int) *ProgressUpdateOne {
+	puo.mutation.SetUserID(i)
+	return puo
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (puo *ProgressUpdateOne) SetNillableUserID(i *int) *ProgressUpdateOne {
+	if i != nil {
+		puo.SetUserID(*i)
+	}
+	return puo
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (puo *ProgressUpdateOne) ClearUserID() *ProgressUpdateOne {
+	puo.mutation.ClearUserID()
 	return puo
 }
 
 // SetItem sets the "item" edge to the Meta entity.
 func (puo *ProgressUpdateOne) SetItem(m *Meta) *ProgressUpdateOne {
 	return puo.SetItemID(m.ID)
-}
-
-// SetUserID sets the "user" edge to the User entity by ID.
-func (puo *ProgressUpdateOne) SetUserID(id int) *ProgressUpdateOne {
-	puo.mutation.SetUserID(id)
-	return puo
-}
-
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (puo *ProgressUpdateOne) SetNillableUserID(id *int) *ProgressUpdateOne {
-	if id != nil {
-		puo = puo.SetUserID(*id)
-	}
-	return puo
 }
 
 // SetUser sets the "user" edge to the User entity.

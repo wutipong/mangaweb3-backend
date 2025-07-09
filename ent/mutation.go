@@ -2262,27 +2262,113 @@ func (m *ProgressMutation) ResetPage() {
 	m.addpage = nil
 }
 
-// SetItemID sets the "item" edge to the Meta entity by id.
-func (m *ProgressMutation) SetItemID(id int) {
-	m.item = &id
+// SetItemID sets the "item_id" field.
+func (m *ProgressMutation) SetItemID(i int) {
+	m.item = &i
+}
+
+// ItemID returns the value of the "item_id" field in the mutation.
+func (m *ProgressMutation) ItemID() (r int, exists bool) {
+	v := m.item
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldItemID returns the old "item_id" field's value of the Progress entity.
+// If the Progress object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgressMutation) OldItemID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldItemID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldItemID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldItemID: %w", err)
+	}
+	return oldValue.ItemID, nil
+}
+
+// ClearItemID clears the value of the "item_id" field.
+func (m *ProgressMutation) ClearItemID() {
+	m.item = nil
+	m.clearedFields[progress.FieldItemID] = struct{}{}
+}
+
+// ItemIDCleared returns if the "item_id" field was cleared in this mutation.
+func (m *ProgressMutation) ItemIDCleared() bool {
+	_, ok := m.clearedFields[progress.FieldItemID]
+	return ok
+}
+
+// ResetItemID resets all changes to the "item_id" field.
+func (m *ProgressMutation) ResetItemID() {
+	m.item = nil
+	delete(m.clearedFields, progress.FieldItemID)
+}
+
+// SetUserID sets the "user_id" field.
+func (m *ProgressMutation) SetUserID(i int) {
+	m.user = &i
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *ProgressMutation) UserID() (r int, exists bool) {
+	v := m.user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the Progress entity.
+// If the Progress object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgressMutation) OldUserID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (m *ProgressMutation) ClearUserID() {
+	m.user = nil
+	m.clearedFields[progress.FieldUserID] = struct{}{}
+}
+
+// UserIDCleared returns if the "user_id" field was cleared in this mutation.
+func (m *ProgressMutation) UserIDCleared() bool {
+	_, ok := m.clearedFields[progress.FieldUserID]
+	return ok
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *ProgressMutation) ResetUserID() {
+	m.user = nil
+	delete(m.clearedFields, progress.FieldUserID)
 }
 
 // ClearItem clears the "item" edge to the Meta entity.
 func (m *ProgressMutation) ClearItem() {
 	m.cleareditem = true
+	m.clearedFields[progress.FieldItemID] = struct{}{}
 }
 
 // ItemCleared reports if the "item" edge to the Meta entity was cleared.
 func (m *ProgressMutation) ItemCleared() bool {
-	return m.cleareditem
-}
-
-// ItemID returns the "item" edge ID in the mutation.
-func (m *ProgressMutation) ItemID() (id int, exists bool) {
-	if m.item != nil {
-		return *m.item, true
-	}
-	return
+	return m.ItemIDCleared() || m.cleareditem
 }
 
 // ItemIDs returns the "item" edge IDs in the mutation.
@@ -2301,27 +2387,15 @@ func (m *ProgressMutation) ResetItem() {
 	m.cleareditem = false
 }
 
-// SetUserID sets the "user" edge to the User entity by id.
-func (m *ProgressMutation) SetUserID(id int) {
-	m.user = &id
-}
-
 // ClearUser clears the "user" edge to the User entity.
 func (m *ProgressMutation) ClearUser() {
 	m.cleareduser = true
+	m.clearedFields[progress.FieldUserID] = struct{}{}
 }
 
 // UserCleared reports if the "user" edge to the User entity was cleared.
 func (m *ProgressMutation) UserCleared() bool {
-	return m.cleareduser
-}
-
-// UserID returns the "user" edge ID in the mutation.
-func (m *ProgressMutation) UserID() (id int, exists bool) {
-	if m.user != nil {
-		return *m.user, true
-	}
-	return
+	return m.UserIDCleared() || m.cleareduser
 }
 
 // UserIDs returns the "user" edge IDs in the mutation.
@@ -2374,9 +2448,15 @@ func (m *ProgressMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProgressMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 3)
 	if m.page != nil {
 		fields = append(fields, progress.FieldPage)
+	}
+	if m.item != nil {
+		fields = append(fields, progress.FieldItemID)
+	}
+	if m.user != nil {
+		fields = append(fields, progress.FieldUserID)
 	}
 	return fields
 }
@@ -2388,6 +2468,10 @@ func (m *ProgressMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case progress.FieldPage:
 		return m.Page()
+	case progress.FieldItemID:
+		return m.ItemID()
+	case progress.FieldUserID:
+		return m.UserID()
 	}
 	return nil, false
 }
@@ -2399,6 +2483,10 @@ func (m *ProgressMutation) OldField(ctx context.Context, name string) (ent.Value
 	switch name {
 	case progress.FieldPage:
 		return m.OldPage(ctx)
+	case progress.FieldItemID:
+		return m.OldItemID(ctx)
+	case progress.FieldUserID:
+		return m.OldUserID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Progress field %s", name)
 }
@@ -2414,6 +2502,20 @@ func (m *ProgressMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPage(v)
+		return nil
+	case progress.FieldItemID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetItemID(v)
+		return nil
+	case progress.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Progress field %s", name)
@@ -2459,7 +2561,14 @@ func (m *ProgressMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ProgressMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(progress.FieldItemID) {
+		fields = append(fields, progress.FieldItemID)
+	}
+	if m.FieldCleared(progress.FieldUserID) {
+		fields = append(fields, progress.FieldUserID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2472,6 +2581,14 @@ func (m *ProgressMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ProgressMutation) ClearField(name string) error {
+	switch name {
+	case progress.FieldItemID:
+		m.ClearItemID()
+		return nil
+	case progress.FieldUserID:
+		m.ClearUserID()
+		return nil
+	}
 	return fmt.Errorf("unknown Progress nullable field %s", name)
 }
 
@@ -2481,6 +2598,12 @@ func (m *ProgressMutation) ResetField(name string) error {
 	switch name {
 	case progress.FieldPage:
 		m.ResetPage()
+		return nil
+	case progress.FieldItemID:
+		m.ResetItemID()
+		return nil
+	case progress.FieldUserID:
+		m.ResetUserID()
 		return nil
 	}
 	return fmt.Errorf("unknown Progress field %s", name)

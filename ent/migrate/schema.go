@@ -61,9 +61,9 @@ var (
 	// ProgressesColumns holds the columns for the "progresses" table.
 	ProgressesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "page", Type: field.TypeInt, Default: -1},
-		{Name: "meta_progress", Type: field.TypeInt, Nullable: true},
-		{Name: "user_progress", Type: field.TypeInt, Nullable: true},
+		{Name: "page", Type: field.TypeInt, Default: 0},
+		{Name: "item_id", Type: field.TypeInt, Nullable: true},
+		{Name: "user_id", Type: field.TypeInt, Nullable: true},
 	}
 	// ProgressesTable holds the schema information for the "progresses" table.
 	ProgressesTable = &schema.Table{

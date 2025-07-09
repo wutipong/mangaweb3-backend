@@ -37,16 +37,30 @@ func (pc *ProgressCreate) SetNillablePage(i *int) *ProgressCreate {
 	return pc
 }
 
-// SetItemID sets the "item" edge to the Meta entity by ID.
-func (pc *ProgressCreate) SetItemID(id int) *ProgressCreate {
-	pc.mutation.SetItemID(id)
+// SetItemID sets the "item_id" field.
+func (pc *ProgressCreate) SetItemID(i int) *ProgressCreate {
+	pc.mutation.SetItemID(i)
 	return pc
 }
 
-// SetNillableItemID sets the "item" edge to the Meta entity by ID if the given value is not nil.
-func (pc *ProgressCreate) SetNillableItemID(id *int) *ProgressCreate {
-	if id != nil {
-		pc = pc.SetItemID(*id)
+// SetNillableItemID sets the "item_id" field if the given value is not nil.
+func (pc *ProgressCreate) SetNillableItemID(i *int) *ProgressCreate {
+	if i != nil {
+		pc.SetItemID(*i)
+	}
+	return pc
+}
+
+// SetUserID sets the "user_id" field.
+func (pc *ProgressCreate) SetUserID(i int) *ProgressCreate {
+	pc.mutation.SetUserID(i)
+	return pc
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (pc *ProgressCreate) SetNillableUserID(i *int) *ProgressCreate {
+	if i != nil {
+		pc.SetUserID(*i)
 	}
 	return pc
 }
@@ -54,20 +68,6 @@ func (pc *ProgressCreate) SetNillableItemID(id *int) *ProgressCreate {
 // SetItem sets the "item" edge to the Meta entity.
 func (pc *ProgressCreate) SetItem(m *Meta) *ProgressCreate {
 	return pc.SetItemID(m.ID)
-}
-
-// SetUserID sets the "user" edge to the User entity by ID.
-func (pc *ProgressCreate) SetUserID(id int) *ProgressCreate {
-	pc.mutation.SetUserID(id)
-	return pc
-}
-
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (pc *ProgressCreate) SetNillableUserID(id *int) *ProgressCreate {
-	if id != nil {
-		pc = pc.SetUserID(*id)
-	}
-	return pc
 }
 
 // SetUser sets the "user" edge to the User entity.
@@ -166,7 +166,7 @@ func (pc *ProgressCreate) createSpec() (*Progress, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.meta_progress = &nodes[0]
+		_node.ItemID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.UserIDs(); len(nodes) > 0 {
@@ -183,7 +183,7 @@ func (pc *ProgressCreate) createSpec() (*Progress, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_progress = &nodes[0]
+		_node.UserID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -256,6 +256,42 @@ func (u *ProgressUpsert) AddPage(v int) *ProgressUpsert {
 	return u
 }
 
+// SetItemID sets the "item_id" field.
+func (u *ProgressUpsert) SetItemID(v int) *ProgressUpsert {
+	u.Set(progress.FieldItemID, v)
+	return u
+}
+
+// UpdateItemID sets the "item_id" field to the value that was provided on create.
+func (u *ProgressUpsert) UpdateItemID() *ProgressUpsert {
+	u.SetExcluded(progress.FieldItemID)
+	return u
+}
+
+// ClearItemID clears the value of the "item_id" field.
+func (u *ProgressUpsert) ClearItemID() *ProgressUpsert {
+	u.SetNull(progress.FieldItemID)
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *ProgressUpsert) SetUserID(v int) *ProgressUpsert {
+	u.Set(progress.FieldUserID, v)
+	return u
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *ProgressUpsert) UpdateUserID() *ProgressUpsert {
+	u.SetExcluded(progress.FieldUserID)
+	return u
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (u *ProgressUpsert) ClearUserID() *ProgressUpsert {
+	u.SetNull(progress.FieldUserID)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -314,6 +350,48 @@ func (u *ProgressUpsertOne) AddPage(v int) *ProgressUpsertOne {
 func (u *ProgressUpsertOne) UpdatePage() *ProgressUpsertOne {
 	return u.Update(func(s *ProgressUpsert) {
 		s.UpdatePage()
+	})
+}
+
+// SetItemID sets the "item_id" field.
+func (u *ProgressUpsertOne) SetItemID(v int) *ProgressUpsertOne {
+	return u.Update(func(s *ProgressUpsert) {
+		s.SetItemID(v)
+	})
+}
+
+// UpdateItemID sets the "item_id" field to the value that was provided on create.
+func (u *ProgressUpsertOne) UpdateItemID() *ProgressUpsertOne {
+	return u.Update(func(s *ProgressUpsert) {
+		s.UpdateItemID()
+	})
+}
+
+// ClearItemID clears the value of the "item_id" field.
+func (u *ProgressUpsertOne) ClearItemID() *ProgressUpsertOne {
+	return u.Update(func(s *ProgressUpsert) {
+		s.ClearItemID()
+	})
+}
+
+// SetUserID sets the "user_id" field.
+func (u *ProgressUpsertOne) SetUserID(v int) *ProgressUpsertOne {
+	return u.Update(func(s *ProgressUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *ProgressUpsertOne) UpdateUserID() *ProgressUpsertOne {
+	return u.Update(func(s *ProgressUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (u *ProgressUpsertOne) ClearUserID() *ProgressUpsertOne {
+	return u.Update(func(s *ProgressUpsert) {
+		s.ClearUserID()
 	})
 }
 
@@ -539,6 +617,48 @@ func (u *ProgressUpsertBulk) AddPage(v int) *ProgressUpsertBulk {
 func (u *ProgressUpsertBulk) UpdatePage() *ProgressUpsertBulk {
 	return u.Update(func(s *ProgressUpsert) {
 		s.UpdatePage()
+	})
+}
+
+// SetItemID sets the "item_id" field.
+func (u *ProgressUpsertBulk) SetItemID(v int) *ProgressUpsertBulk {
+	return u.Update(func(s *ProgressUpsert) {
+		s.SetItemID(v)
+	})
+}
+
+// UpdateItemID sets the "item_id" field to the value that was provided on create.
+func (u *ProgressUpsertBulk) UpdateItemID() *ProgressUpsertBulk {
+	return u.Update(func(s *ProgressUpsert) {
+		s.UpdateItemID()
+	})
+}
+
+// ClearItemID clears the value of the "item_id" field.
+func (u *ProgressUpsertBulk) ClearItemID() *ProgressUpsertBulk {
+	return u.Update(func(s *ProgressUpsert) {
+		s.ClearItemID()
+	})
+}
+
+// SetUserID sets the "user_id" field.
+func (u *ProgressUpsertBulk) SetUserID(v int) *ProgressUpsertBulk {
+	return u.Update(func(s *ProgressUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *ProgressUpsertBulk) UpdateUserID() *ProgressUpsertBulk {
+	return u.Update(func(s *ProgressUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (u *ProgressUpsertBulk) ClearUserID() *ProgressUpsertBulk {
+	return u.Update(func(s *ProgressUpsert) {
+		s.ClearUserID()
 	})
 }
 

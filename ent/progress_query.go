@@ -26,7 +26,6 @@ type ProgressQuery struct {
 	predicates []predicate.Progress
 	withItem   *MetaQuery
 	withUser   *UserQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -406,19 +405,12 @@ func (pq *ProgressQuery) prepareQuery(ctx context.Context) error {
 func (pq *ProgressQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Progress, error) {
 	var (
 		nodes       = []*Progress{}
-		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
 		loadedTypes = [2]bool{
 			pq.withItem != nil,
 			pq.withUser != nil,
 		}
 	)
-	if pq.withItem != nil || pq.withUser != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, progress.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Progress).scanValues(nil, columns)
 	}
@@ -456,10 +448,7 @@ func (pq *ProgressQuery) loadItem(ctx context.Context, query *MetaQuery, nodes [
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Progress)
 	for i := range nodes {
-		if nodes[i].meta_progress == nil {
-			continue
-		}
-		fk := *nodes[i].meta_progress
+		fk := nodes[i].ItemID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -476,7 +465,7 @@ func (pq *ProgressQuery) loadItem(ctx context.Context, query *MetaQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "meta_progress" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "item_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -488,10 +477,7 @@ func (pq *ProgressQuery) loadUser(ctx context.Context, query *UserQuery, nodes [
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Progress)
 	for i := range nodes {
-		if nodes[i].user_progress == nil {
-			continue
-		}
-		fk := *nodes[i].user_progress
+		fk := nodes[i].UserID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -508,7 +494,7 @@ func (pq *ProgressQuery) loadUser(ctx context.Context, query *UserQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_progress" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -541,6 +527,12 @@ func (pq *ProgressQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != progress.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if pq.withItem != nil {
+			_spec.Node.AddColumnOnce(progress.FieldItemID)
+		}
+		if pq.withUser != nil {
+			_spec.Node.AddColumnOnce(progress.FieldUserID)
 		}
 	}
 	if ps := pq.predicates; len(ps) > 0 {

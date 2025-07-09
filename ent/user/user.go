@@ -49,7 +49,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "progress" package.
 	ProgressInverseTable = "progresses"
 	// ProgressColumn is the table column denoting the progress relation/edge.
-	ProgressColumn = "user_progress"
+	ProgressColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.

@@ -386,6 +386,12 @@ const docTemplate = `{
                         "name": "i",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "user",
+                        "name": "user",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -797,12 +803,61 @@ const docTemplate = `{
                         "$ref": "#/definitions/ent.History"
                     }
                 },
+                "progress": {
+                    "description": "Progress holds the value of the progress edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Progress"
+                    }
+                },
                 "tags": {
                     "description": "Tags holds the value of the tags edge.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ent.Tag"
                     }
+                }
+            }
+        },
+        "ent.Progress": {
+            "type": "object",
+            "properties": {
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the ProgressQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.ProgressEdges"
+                        }
+                    ]
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "page": {
+                    "description": "Page holds the value of the \"page\" field.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.ProgressEdges": {
+            "type": "object",
+            "properties": {
+                "item": {
+                    "description": "Item holds the value of the item edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.Meta"
+                        }
+                    ]
+                },
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.User"
+                        }
+                    ]
                 }
             }
         },
@@ -901,6 +956,13 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ent.History"
+                    }
+                },
+                "progress": {
+                    "description": "Progress holds the value of the progress edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Progress"
                     }
                 }
             }
@@ -1214,6 +1276,9 @@ const docTemplate = `{
         "view.viewResponse": {
             "type": "object",
             "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
                 "favorite": {
                     "type": "boolean"
                 },

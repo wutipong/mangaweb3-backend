@@ -20,12 +20,14 @@ type Progress struct {
 	ID int `json:"id,omitempty"`
 	// Page holds the value of the "page" field.
 	Page int `json:"page,omitempty"`
+	// ItemID holds the value of the "item_id" field.
+	ItemID int `json:"item_id,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID int `json:"user_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProgressQuery when eager-loading is set.
-	Edges         ProgressEdges `json:"edges"`
-	meta_progress *int
-	user_progress *int
-	selectValues  sql.SelectValues
+	Edges        ProgressEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ProgressEdges holds the relations/edges for other nodes in the graph.
@@ -66,11 +68,7 @@ func (*Progress) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case progress.FieldID, progress.FieldPage:
-			values[i] = new(sql.NullInt64)
-		case progress.ForeignKeys[0]: // meta_progress
-			values[i] = new(sql.NullInt64)
-		case progress.ForeignKeys[1]: // user_progress
+		case progress.FieldID, progress.FieldPage, progress.FieldItemID, progress.FieldUserID:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -99,19 +97,17 @@ func (pr *Progress) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pr.Page = int(value.Int64)
 			}
-		case progress.ForeignKeys[0]:
+		case progress.FieldItemID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field meta_progress", value)
+				return fmt.Errorf("unexpected type %T for field item_id", values[i])
 			} else if value.Valid {
-				pr.meta_progress = new(int)
-				*pr.meta_progress = int(value.Int64)
+				pr.ItemID = int(value.Int64)
 			}
-		case progress.ForeignKeys[1]:
+		case progress.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_progress", value)
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				pr.user_progress = new(int)
-				*pr.user_progress = int(value.Int64)
+				pr.UserID = int(value.Int64)
 			}
 		default:
 			pr.selectValues.Set(columns[i], values[i])
@@ -161,6 +157,12 @@ func (pr *Progress) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", pr.ID))
 	builder.WriteString("page=")
 	builder.WriteString(fmt.Sprintf("%v", pr.Page))
+	builder.WriteString(", ")
+	builder.WriteString("item_id=")
+	builder.WriteString(fmt.Sprintf("%v", pr.ItemID))
+	builder.WriteString(", ")
+	builder.WriteString("user_id=")
+	builder.WriteString(fmt.Sprintf("%v", pr.UserID))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -14,6 +14,10 @@ const (
 	FieldID = "id"
 	// FieldPage holds the string denoting the page field in the database.
 	FieldPage = "page"
+	// FieldItemID holds the string denoting the item_id field in the database.
+	FieldItemID = "item_id"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
 	// EdgeItem holds the string denoting the item edge name in mutations.
 	EdgeItem = "item"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -26,38 +30,28 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "meta" package.
 	ItemInverseTable = "meta"
 	// ItemColumn is the table column denoting the item relation/edge.
-	ItemColumn = "meta_progress"
+	ItemColumn = "item_id"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "progresses"
 	// UserInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UserInverseTable = "users"
 	// UserColumn is the table column denoting the user relation/edge.
-	UserColumn = "user_progress"
+	UserColumn = "user_id"
 )
 
 // Columns holds all SQL columns for progress fields.
 var Columns = []string{
 	FieldID,
 	FieldPage,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "progresses"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"meta_progress",
-	"user_progress",
+	FieldItemID,
+	FieldUserID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -80,6 +74,16 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByPage orders the results by the page field.
 func ByPage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPage, opts...).ToFunc()
+}
+
+// ByItemID orders the results by the item_id field.
+func ByItemID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldItemID, opts...).ToFunc()
+}
+
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
 }
 
 // ByItemField orders the results by item field.

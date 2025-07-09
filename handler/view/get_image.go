@@ -15,9 +15,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/container"
 	"github.com/wutipong/mangaweb3-backend/database"
-	ent_meta "github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/progress"
-	ent_user "github.com/wutipong/mangaweb3-backend/ent/user"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/user"
@@ -88,14 +86,11 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 		return
 	}
 
-	userName := query.Get("name")
+	userName := query.Get("user")
 
 	u, err := user.GetUser(r.Context(), client, userName)
 	if err == nil {
-		progressRec, _ := client.Progress.Query().Where(
-			progress.HasItemWith(ent_meta.ID(m.ID)),
-			progress.HasUserWith(ent_user.ID(u.ID)),
-		).First(r.Context())
+		progressRec, _ := client.Progress.Query().Where(progress.UserID(u.ID), progress.ItemID(m.ID)).Only(r.Context())
 
 		if progressRec == nil {
 			_, err = client.Progress.Create().
