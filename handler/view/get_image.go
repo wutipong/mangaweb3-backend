@@ -15,8 +15,12 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/wutipong/mangaweb3-backend/container"
 	"github.com/wutipong/mangaweb3-backend/database"
+	ent_meta "github.com/wutipong/mangaweb3-backend/ent/meta"
+	"github.com/wutipong/mangaweb3-backend/ent/progress"
+	ent_user "github.com/wutipong/mangaweb3-backend/ent/user"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
+	"github.com/wutipong/mangaweb3-backend/user"
 
 	_ "golang.org/x/image/webp"
 )
@@ -29,6 +33,7 @@ const (
 // @Param width query int false "width"
 // @Param height query int false "height"
 // @Param i query int true "index"
+// @Param user query string false "user"
 // @Success      200  {body}  file
 // @Failure      500  {object}  errors.Error
 // @Router /view/get_image [get]
@@ -83,6 +88,34 @@ func GetImage(w http.ResponseWriter, r *http.Request, params httprouter.Params) 
 		return
 	}
 
+	userName := query.Get("name")
+
+	u, err := user.GetUser(r.Context(), client, userName)
+	if err == nil {
+		progressRec, _ := client.Progress.Query().Where(
+			progress.HasItemWith(ent_meta.ID(m.ID)),
+			progress.HasUserWith(ent_user.ID(u.ID)),
+		).First(r.Context())
+
+		if progressRec == nil {
+			_, err = client.Progress.Create().
+				SetPage(index).
+				SetItem(m).
+				SetUser(u).
+				Save(r.Context())
+		} else {
+			_, err = progressRec.Update().
+				SetPage(index).
+				SetItem(m).
+				SetUser(u).
+				Save(r.Context())
+		}
+
+		if err != nil {
+			handler.WriteResponse(w, err)
+			return
+		}
+	}
 	if width == 0 && height == 0 {
 		var contentType string
 		switch filepath.Ext(strings.ToLower(f)) {

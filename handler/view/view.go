@@ -9,6 +9,8 @@ import (
 	"github.com/wutipong/mangaweb3-backend/database"
 	"github.com/wutipong/mangaweb3-backend/ent"
 	ent_meta "github.com/wutipong/mangaweb3-backend/ent/meta"
+	"github.com/wutipong/mangaweb3-backend/ent/progress"
+	ent_user "github.com/wutipong/mangaweb3-backend/ent/user"
 	"github.com/wutipong/mangaweb3-backend/handler"
 	"github.com/wutipong/mangaweb3-backend/meta"
 	"github.com/wutipong/mangaweb3-backend/user"
@@ -20,12 +22,13 @@ type viewRequest struct {
 }
 
 type viewResponse struct {
-	Request   viewRequest `json:"request"`
-	Name      string      `json:"name"`
-	Version   string      `json:"version"`
-	Favorite  bool        `json:"favorite"`
-	PageCount int         `json:"page_count"`
-	Tags      []*ent.Tag  `json:"tags"`
+	Request     viewRequest `json:"request"`
+	Name        string      `json:"name"`
+	Version     string      `json:"version"`
+	Favorite    bool        `json:"favorite"`
+	PageCount   int         `json:"page_count"`
+	CurrentPage int         `json:"current_page"`
+	Tags        []*ent.Tag  `json:"tags"`
 }
 
 const (
@@ -77,14 +80,25 @@ func Handler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		return
 	}
 
+	progress, _ := client.Progress.Query().Where(
+		progress.HasItemWith(ent_meta.ID(m.ID)),
+		progress.HasUserWith(ent_user.ID(u.ID)),
+	).First(r.Context())
+
+	currentPage := -1
+	if progress != nil {
+		currentPage = progress.Page
+	}
+
 	c := configuration.Get()
 	data := viewResponse{
-		Request:   req,
-		Name:      item,
-		Version:   c.VersionString,
-		Favorite:  u.QueryFavoriteItems().Where(ent_meta.ID(m.ID)).ExistX(r.Context()),
-		Tags:      tags,
-		PageCount: len(m.FileIndices),
+		Request:     req,
+		Name:        item,
+		Version:     c.VersionString,
+		Favorite:    u.QueryFavoriteItems().Where(ent_meta.ID(m.ID)).ExistX(r.Context()),
+		Tags:        tags,
+		PageCount:   len(m.FileIndices),
+		CurrentPage: currentPage,
 	}
 
 	client.History.Create().
