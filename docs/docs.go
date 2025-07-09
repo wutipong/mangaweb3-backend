@@ -386,6 +386,12 @@ const docTemplate = `{
                         "name": "i",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "user",
+                        "name": "user",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -783,11 +789,25 @@ const docTemplate = `{
         "ent.MetaEdges": {
             "type": "object",
             "properties": {
+                "favorite_of_user": {
+                    "description": "FavoriteOfUser holds the value of the favorite_of_user edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.User"
+                    }
+                },
                 "histories": {
                     "description": "Histories holds the value of the histories edge.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ent.History"
+                    }
+                },
+                "progress": {
+                    "description": "Progress holds the value of the progress edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Progress"
                     }
                 },
                 "tags": {
@@ -796,13 +816,48 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/ent.Tag"
                     }
+                }
+            }
+        },
+        "ent.Progress": {
+            "type": "object",
+            "properties": {
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the ProgressQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.ProgressEdges"
+                        }
+                    ]
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "page": {
+                    "description": "Page holds the value of the \"page\" field.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.ProgressEdges": {
+            "type": "object",
+            "properties": {
+                "item": {
+                    "description": "Item holds the value of the item edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.Meta"
+                        }
+                    ]
                 },
                 "user": {
                     "description": "User holds the value of the user edge.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ent.User"
-                    }
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.User"
+                        }
+                    ]
                 }
             }
         },
@@ -902,6 +957,13 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/ent.History"
                     }
+                },
+                "progress": {
+                    "description": "Progress holds the value of the progress edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Progress"
+                    }
                 }
             }
         },
@@ -989,6 +1051,28 @@ const docTemplate = `{
                 "SortOrderDescending"
             ]
         },
+        "tag.SortField": {
+            "type": "string",
+            "enum": [
+                "name",
+                "itemCount"
+            ],
+            "x-enum-varnames": [
+                "SortFieldName",
+                "SortFieldPageCount"
+            ]
+        },
+        "tag.SortOrder": {
+            "type": "string",
+            "enum": [
+                "ascending",
+                "descending"
+            ],
+            "x-enum-varnames": [
+                "SortOrderAscending",
+                "SortOrderDescending"
+            ]
+        },
         "tag.Tag": {
             "type": "object",
             "properties": {
@@ -1013,11 +1097,17 @@ const docTemplate = `{
                     "type": "integer",
                     "default": 30
                 },
+                "order": {
+                    "$ref": "#/definitions/tag.SortOrder"
+                },
                 "page": {
                     "type": "integer"
                 },
                 "search": {
                     "type": "string"
+                },
+                "sort": {
+                    "$ref": "#/definitions/tag.SortField"
                 },
                 "user": {
                     "type": "string"
@@ -1186,6 +1276,9 @@ const docTemplate = `{
         "view.viewResponse": {
             "type": "object",
             "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
                 "favorite": {
                     "type": "boolean"
                 },

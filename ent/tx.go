@@ -16,6 +16,8 @@ type Tx struct {
 	History *HistoryClient
 	// Meta is the client for interacting with the Meta builders.
 	Meta *MetaClient
+	// Progress is the client for interacting with the Progress builders.
+	Progress *ProgressClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
 	// User is the client for interacting with the User builders.
@@ -153,6 +155,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.History = NewHistoryClient(tx.config)
 	tx.Meta = NewMetaClient(tx.config)
+	tx.Progress = NewProgressClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }

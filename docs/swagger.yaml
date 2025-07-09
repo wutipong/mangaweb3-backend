@@ -190,21 +190,52 @@ definitions:
     type: object
   ent.MetaEdges:
     properties:
+      favorite_of_user:
+        description: FavoriteOfUser holds the value of the favorite_of_user edge.
+        items:
+          $ref: '#/definitions/ent.User'
+        type: array
       histories:
         description: Histories holds the value of the histories edge.
         items:
           $ref: '#/definitions/ent.History'
+        type: array
+      progress:
+        description: Progress holds the value of the progress edge.
+        items:
+          $ref: '#/definitions/ent.Progress'
         type: array
       tags:
         description: Tags holds the value of the tags edge.
         items:
           $ref: '#/definitions/ent.Tag'
         type: array
+    type: object
+  ent.Progress:
+    properties:
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.ProgressEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the ProgressQuery when eager-loading is set.
+      id:
+        description: ID of the ent.
+        type: integer
+      page:
+        description: Page holds the value of the "page" field.
+        type: integer
+    type: object
+  ent.ProgressEdges:
+    properties:
+      item:
+        allOf:
+        - $ref: '#/definitions/ent.Meta'
+        description: Item holds the value of the item edge.
       user:
+        allOf:
+        - $ref: '#/definitions/ent.User'
         description: User holds the value of the user edge.
-        items:
-          $ref: '#/definitions/ent.User'
-        type: array
     type: object
   ent.Tag:
     properties:
@@ -275,6 +306,11 @@ definitions:
         items:
           $ref: '#/definitions/ent.History'
         type: array
+      progress:
+        description: Progress holds the value of the progress edge.
+        items:
+          $ref: '#/definitions/ent.Progress'
+        type: array
     type: object
   errors.Error:
     properties:
@@ -335,6 +371,22 @@ definitions:
     x-enum-varnames:
     - SortOrderAscending
     - SortOrderDescending
+  tag.SortField:
+    enum:
+    - name
+    - itemCount
+    type: string
+    x-enum-varnames:
+    - SortFieldName
+    - SortFieldPageCount
+  tag.SortOrder:
+    enum:
+    - ascending
+    - descending
+    type: string
+    x-enum-varnames:
+    - SortOrderAscending
+    - SortOrderDescending
   tag.Tag:
     properties:
       favorite:
@@ -351,10 +403,14 @@ definitions:
       item_per_page:
         default: 30
         type: integer
+      order:
+        $ref: '#/definitions/tag.SortOrder'
       page:
         type: integer
       search:
         type: string
+      sort:
+        $ref: '#/definitions/tag.SortField'
       user:
         type: string
     type: object
@@ -462,6 +518,8 @@ definitions:
     type: object
   view.viewResponse:
     properties:
+      current_page:
+        type: integer
       favorite:
         type: boolean
       name:
@@ -720,6 +778,10 @@ paths:
         name: i
         required: true
         type: integer
+      - description: user
+        in: query
+        name: user
+        type: string
       responses:
         "200":
           description: OK

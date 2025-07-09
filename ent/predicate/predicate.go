@@ -12,6 +12,9 @@ type History func(*sql.Selector)
 // Meta is the predicate function for meta builders.
 type Meta func(*sql.Selector)
 
+// Progress is the predicate function for progress builders.
+type Progress func(*sql.Selector)
+
 // Tag is the predicate function for tag builders.
 type Tag func(*sql.Selector)
 

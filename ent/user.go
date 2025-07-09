@@ -34,9 +34,11 @@ type UserEdges struct {
 	FavoriteTags []*Tag `json:"favorite_tags,omitempty"`
 	// Histories holds the value of the histories edge.
 	Histories []*History `json:"histories,omitempty"`
+	// Progress holds the value of the progress edge.
+	Progress []*Progress `json:"progress,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // FavoriteItemsOrErr returns the FavoriteItems value or an error if the edge
@@ -64,6 +66,15 @@ func (e UserEdges) HistoriesOrErr() ([]*History, error) {
 		return e.Histories, nil
 	}
 	return nil, &NotLoadedError{edge: "histories"}
+}
+
+// ProgressOrErr returns the Progress value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ProgressOrErr() ([]*Progress, error) {
+	if e.loadedTypes[3] {
+		return e.Progress, nil
+	}
+	return nil, &NotLoadedError{edge: "progress"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -136,6 +147,11 @@ func (u *User) QueryFavoriteTags() *TagQuery {
 // QueryHistories queries the "histories" edge of the User entity.
 func (u *User) QueryHistories() *HistoryQuery {
 	return NewUserClient(u.config).QueryHistories(u)
+}
+
+// QueryProgress queries the "progress" edge of the User entity.
+func (u *User) QueryProgress() *ProgressQuery {
+	return NewUserClient(u.config).QueryProgress(u)
 }
 
 // Update returns a builder for updating this User.

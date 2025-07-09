@@ -15,6 +15,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
+	"github.com/wutipong/mangaweb3-backend/ent/progress"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
@@ -29,6 +30,7 @@ type MetaQuery struct {
 	withTags           *TagQuery
 	withHistories      *HistoryQuery
 	withFavoriteOfUser *UserQuery
+	withProgress       *ProgressQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -124,6 +126,28 @@ func (mq *MetaQuery) QueryFavoriteOfUser() *UserQuery {
 			sqlgraph.From(meta.Table, meta.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, meta.FavoriteOfUserTable, meta.FavoriteOfUserPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryProgress chains the current query on the "progress" edge.
+func (mq *MetaQuery) QueryProgress() *ProgressQuery {
+	query := (&ProgressClient{config: mq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(meta.Table, meta.FieldID, selector),
+			sqlgraph.To(progress.Table, progress.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, meta.ProgressTable, meta.ProgressColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
 		return fromU, nil
@@ -326,6 +350,7 @@ func (mq *MetaQuery) Clone() *MetaQuery {
 		withTags:           mq.withTags.Clone(),
 		withHistories:      mq.withHistories.Clone(),
 		withFavoriteOfUser: mq.withFavoriteOfUser.Clone(),
+		withProgress:       mq.withProgress.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
@@ -362,6 +387,17 @@ func (mq *MetaQuery) WithFavoriteOfUser(opts ...func(*UserQuery)) *MetaQuery {
 		opt(query)
 	}
 	mq.withFavoriteOfUser = query
+	return mq
+}
+
+// WithProgress tells the query-builder to eager-load the nodes that are connected to
+// the "progress" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MetaQuery) WithProgress(opts ...func(*ProgressQuery)) *MetaQuery {
+	query := (&ProgressClient{config: mq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	mq.withProgress = query
 	return mq
 }
 
@@ -443,10 +479,11 @@ func (mq *MetaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Meta, e
 	var (
 		nodes       = []*Meta{}
 		_spec       = mq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			mq.withTags != nil,
 			mq.withHistories != nil,
 			mq.withFavoriteOfUser != nil,
+			mq.withProgress != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -485,6 +522,13 @@ func (mq *MetaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Meta, e
 		if err := mq.loadFavoriteOfUser(ctx, query, nodes,
 			func(n *Meta) { n.Edges.FavoriteOfUser = []*User{} },
 			func(n *Meta, e *User) { n.Edges.FavoriteOfUser = append(n.Edges.FavoriteOfUser, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := mq.withProgress; query != nil {
+		if err := mq.loadProgress(ctx, query, nodes,
+			func(n *Meta) { n.Edges.Progress = []*Progress{} },
+			func(n *Meta, e *Progress) { n.Edges.Progress = append(n.Edges.Progress, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -641,6 +685,36 @@ func (mq *MetaQuery) loadFavoriteOfUser(ctx context.Context, query *UserQuery, n
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (mq *MetaQuery) loadProgress(ctx context.Context, query *ProgressQuery, nodes []*Meta, init func(*Meta), assign func(*Meta, *Progress)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Meta)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(progress.FieldItemID)
+	}
+	query.Where(predicate.Progress(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(meta.ProgressColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ItemID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "item_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

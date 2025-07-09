@@ -17,6 +17,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
+	"github.com/wutipong/mangaweb3-backend/ent/progress"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
@@ -30,6 +31,8 @@ type Client struct {
 	History *HistoryClient
 	// Meta is the client for interacting with the Meta builders.
 	Meta *MetaClient
+	// Progress is the client for interacting with the Progress builders.
+	Progress *ProgressClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
 	// User is the client for interacting with the User builders.
@@ -47,6 +50,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.History = NewHistoryClient(c.config)
 	c.Meta = NewMetaClient(c.config)
+	c.Progress = NewProgressClient(c.config)
 	c.Tag = NewTagClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -139,12 +143,13 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		History: NewHistoryClient(cfg),
-		Meta:    NewMetaClient(cfg),
-		Tag:     NewTagClient(cfg),
-		User:    NewUserClient(cfg),
+		ctx:      ctx,
+		config:   cfg,
+		History:  NewHistoryClient(cfg),
+		Meta:     NewMetaClient(cfg),
+		Progress: NewProgressClient(cfg),
+		Tag:      NewTagClient(cfg),
+		User:     NewUserClient(cfg),
 	}, nil
 }
 
@@ -162,12 +167,13 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		History: NewHistoryClient(cfg),
-		Meta:    NewMetaClient(cfg),
-		Tag:     NewTagClient(cfg),
-		User:    NewUserClient(cfg),
+		ctx:      ctx,
+		config:   cfg,
+		History:  NewHistoryClient(cfg),
+		Meta:     NewMetaClient(cfg),
+		Progress: NewProgressClient(cfg),
+		Tag:      NewTagClient(cfg),
+		User:     NewUserClient(cfg),
 	}, nil
 }
 
@@ -198,6 +204,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.History.Use(hooks...)
 	c.Meta.Use(hooks...)
+	c.Progress.Use(hooks...)
 	c.Tag.Use(hooks...)
 	c.User.Use(hooks...)
 }
@@ -207,6 +214,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.History.Intercept(interceptors...)
 	c.Meta.Intercept(interceptors...)
+	c.Progress.Intercept(interceptors...)
 	c.Tag.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
@@ -218,6 +226,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.History.mutate(ctx, m)
 	case *MetaMutation:
 		return c.Meta.mutate(ctx, m)
+	case *ProgressMutation:
+		return c.Progress.mutate(ctx, m)
 	case *TagMutation:
 		return c.Tag.mutate(ctx, m)
 	case *UserMutation:
@@ -548,6 +558,22 @@ func (c *MetaClient) QueryFavoriteOfUser(m *Meta) *UserQuery {
 	return query
 }
 
+// QueryProgress queries the progress edge of a Meta.
+func (c *MetaClient) QueryProgress(m *Meta) *ProgressQuery {
+	query := (&ProgressClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(meta.Table, meta.FieldID, id),
+			sqlgraph.To(progress.Table, progress.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, meta.ProgressTable, meta.ProgressColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *MetaClient) Hooks() []Hook {
 	return c.hooks.Meta
@@ -570,6 +596,171 @@ func (c *MetaClient) mutate(ctx context.Context, m *MetaMutation) (Value, error)
 		return (&MetaDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Meta mutation op: %q", m.Op())
+	}
+}
+
+// ProgressClient is a client for the Progress schema.
+type ProgressClient struct {
+	config
+}
+
+// NewProgressClient returns a client for the Progress from the given config.
+func NewProgressClient(c config) *ProgressClient {
+	return &ProgressClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `progress.Hooks(f(g(h())))`.
+func (c *ProgressClient) Use(hooks ...Hook) {
+	c.hooks.Progress = append(c.hooks.Progress, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `progress.Intercept(f(g(h())))`.
+func (c *ProgressClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Progress = append(c.inters.Progress, interceptors...)
+}
+
+// Create returns a builder for creating a Progress entity.
+func (c *ProgressClient) Create() *ProgressCreate {
+	mutation := newProgressMutation(c.config, OpCreate)
+	return &ProgressCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Progress entities.
+func (c *ProgressClient) CreateBulk(builders ...*ProgressCreate) *ProgressCreateBulk {
+	return &ProgressCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProgressClient) MapCreateBulk(slice any, setFunc func(*ProgressCreate, int)) *ProgressCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProgressCreateBulk{err: fmt.Errorf("calling to ProgressClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProgressCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProgressCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Progress.
+func (c *ProgressClient) Update() *ProgressUpdate {
+	mutation := newProgressMutation(c.config, OpUpdate)
+	return &ProgressUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProgressClient) UpdateOne(pr *Progress) *ProgressUpdateOne {
+	mutation := newProgressMutation(c.config, OpUpdateOne, withProgress(pr))
+	return &ProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProgressClient) UpdateOneID(id int) *ProgressUpdateOne {
+	mutation := newProgressMutation(c.config, OpUpdateOne, withProgressID(id))
+	return &ProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Progress.
+func (c *ProgressClient) Delete() *ProgressDelete {
+	mutation := newProgressMutation(c.config, OpDelete)
+	return &ProgressDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProgressClient) DeleteOne(pr *Progress) *ProgressDeleteOne {
+	return c.DeleteOneID(pr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProgressClient) DeleteOneID(id int) *ProgressDeleteOne {
+	builder := c.Delete().Where(progress.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProgressDeleteOne{builder}
+}
+
+// Query returns a query builder for Progress.
+func (c *ProgressClient) Query() *ProgressQuery {
+	return &ProgressQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProgress},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Progress entity by its id.
+func (c *ProgressClient) Get(ctx context.Context, id int) (*Progress, error) {
+	return c.Query().Where(progress.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProgressClient) GetX(ctx context.Context, id int) *Progress {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryItem queries the item edge of a Progress.
+func (c *ProgressClient) QueryItem(pr *Progress) *MetaQuery {
+	query := (&MetaClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(progress.Table, progress.FieldID, id),
+			sqlgraph.To(meta.Table, meta.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, progress.ItemTable, progress.ItemColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a Progress.
+func (c *ProgressClient) QueryUser(pr *Progress) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(progress.Table, progress.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, progress.UserTable, progress.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ProgressClient) Hooks() []Hook {
+	return c.hooks.Progress
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProgressClient) Interceptors() []Interceptor {
+	return c.inters.Progress
+}
+
+func (c *ProgressClient) mutate(ctx context.Context, m *ProgressMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProgressCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProgressUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProgressUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProgressDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Progress mutation op: %q", m.Op())
 	}
 }
 
@@ -894,6 +1085,22 @@ func (c *UserClient) QueryHistories(u *User) *HistoryQuery {
 	return query
 }
 
+// QueryProgress queries the progress edge of a User.
+func (c *UserClient) QueryProgress(u *User) *ProgressQuery {
+	query := (&ProgressClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(progress.Table, progress.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ProgressTable, user.ProgressColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -922,9 +1129,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		History, Meta, Tag, User []ent.Hook
+		History, Meta, Progress, Tag, User []ent.Hook
 	}
 	inters struct {
-		History, Meta, Tag, User []ent.Interceptor
+		History, Meta, Progress, Tag, User []ent.Interceptor
 	}
 )
