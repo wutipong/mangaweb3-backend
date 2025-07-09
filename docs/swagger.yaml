@@ -190,6 +190,11 @@ definitions:
     type: object
   ent.MetaEdges:
     properties:
+      favorite_of_user:
+        description: FavoriteOfUser holds the value of the favorite_of_user edge.
+        items:
+          $ref: '#/definitions/ent.User'
+        type: array
       histories:
         description: Histories holds the value of the histories edge.
         items:
@@ -199,11 +204,6 @@ definitions:
         description: Tags holds the value of the tags edge.
         items:
           $ref: '#/definitions/ent.Tag'
-        type: array
-      user:
-        description: User holds the value of the user edge.
-        items:
-          $ref: '#/definitions/ent.User'
         type: array
     type: object
   ent.Tag:
@@ -335,6 +335,22 @@ definitions:
     x-enum-varnames:
     - SortOrderAscending
     - SortOrderDescending
+  tag.SortField:
+    enum:
+    - name
+    - itemCount
+    type: string
+    x-enum-varnames:
+    - SortFieldName
+    - SortFieldPageCount
+  tag.SortOrder:
+    enum:
+    - ascending
+    - descending
+    type: string
+    x-enum-varnames:
+    - SortOrderAscending
+    - SortOrderDescending
   tag.Tag:
     properties:
       favorite:
@@ -351,10 +367,14 @@ definitions:
       item_per_page:
         default: 30
         type: integer
+      order:
+        $ref: '#/definitions/tag.SortOrder'
       page:
         type: integer
       search:
         type: string
+      sort:
+        $ref: '#/definitions/tag.SortField'
       user:
         type: string
     type: object

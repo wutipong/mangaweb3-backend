@@ -13,6 +13,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
+	"github.com/wutipong/mangaweb3-backend/ent/progress"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
@@ -103,6 +104,21 @@ func (uu *UserUpdate) AddHistories(h ...*History) *UserUpdate {
 	return uu.AddHistoryIDs(ids...)
 }
 
+// AddProgresIDs adds the "progress" edge to the Progress entity by IDs.
+func (uu *UserUpdate) AddProgresIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddProgresIDs(ids...)
+	return uu
+}
+
+// AddProgress adds the "progress" edges to the Progress entity.
+func (uu *UserUpdate) AddProgress(p ...*Progress) *UserUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uu.AddProgresIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -169,6 +185,27 @@ func (uu *UserUpdate) RemoveHistories(h ...*History) *UserUpdate {
 		ids[i] = h[i].ID
 	}
 	return uu.RemoveHistoryIDs(ids...)
+}
+
+// ClearProgress clears all "progress" edges to the Progress entity.
+func (uu *UserUpdate) ClearProgress() *UserUpdate {
+	uu.mutation.ClearProgress()
+	return uu
+}
+
+// RemoveProgresIDs removes the "progress" edge to Progress entities by IDs.
+func (uu *UserUpdate) RemoveProgresIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveProgresIDs(ids...)
+	return uu
+}
+
+// RemoveProgress removes "progress" edges to Progress entities.
+func (uu *UserUpdate) RemoveProgress(p ...*Progress) *UserUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uu.RemoveProgresIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -361,6 +398,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.ProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProgressTable,
+			Columns: []string{user.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedProgressIDs(); len(nodes) > 0 && !uu.mutation.ProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProgressTable,
+			Columns: []string{user.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.ProgressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProgressTable,
+			Columns: []string{user.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -454,6 +536,21 @@ func (uuo *UserUpdateOne) AddHistories(h ...*History) *UserUpdateOne {
 	return uuo.AddHistoryIDs(ids...)
 }
 
+// AddProgresIDs adds the "progress" edge to the Progress entity by IDs.
+func (uuo *UserUpdateOne) AddProgresIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddProgresIDs(ids...)
+	return uuo
+}
+
+// AddProgress adds the "progress" edges to the Progress entity.
+func (uuo *UserUpdateOne) AddProgress(p ...*Progress) *UserUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uuo.AddProgresIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -520,6 +617,27 @@ func (uuo *UserUpdateOne) RemoveHistories(h ...*History) *UserUpdateOne {
 		ids[i] = h[i].ID
 	}
 	return uuo.RemoveHistoryIDs(ids...)
+}
+
+// ClearProgress clears all "progress" edges to the Progress entity.
+func (uuo *UserUpdateOne) ClearProgress() *UserUpdateOne {
+	uuo.mutation.ClearProgress()
+	return uuo
+}
+
+// RemoveProgresIDs removes the "progress" edge to Progress entities by IDs.
+func (uuo *UserUpdateOne) RemoveProgresIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveProgresIDs(ids...)
+	return uuo
+}
+
+// RemoveProgress removes "progress" edges to Progress entities.
+func (uuo *UserUpdateOne) RemoveProgress(p ...*Progress) *UserUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return uuo.RemoveProgresIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -735,6 +853,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(history.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.ProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProgressTable,
+			Columns: []string{user.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedProgressIDs(); len(nodes) > 0 && !uuo.mutation.ProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProgressTable,
+			Columns: []string{user.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.ProgressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ProgressTable,
+			Columns: []string{user.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

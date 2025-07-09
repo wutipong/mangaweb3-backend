@@ -7,6 +7,7 @@ import (
 
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
+	"github.com/wutipong/mangaweb3-backend/ent/progress"
 	"github.com/wutipong/mangaweb3-backend/ent/schema"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/ent/user"
@@ -72,6 +73,12 @@ func init() {
 	metaDescThumbnailHeight := metaFields[12].Descriptor()
 	// meta.DefaultThumbnailHeight holds the default value on creation for the thumbnail_height field.
 	meta.DefaultThumbnailHeight = metaDescThumbnailHeight.Default.(int)
+	progressFields := schema.Progress{}.Fields()
+	_ = progressFields
+	// progressDescPage is the schema descriptor for page field.
+	progressDescPage := progressFields[0].Descriptor()
+	// progress.DefaultPage holds the default value on creation for the page field.
+	progress.DefaultPage = progressDescPage.Default.(int)
 	tagFields := schema.Tag{}.Fields()
 	_ = tagFields
 	// tagDescName is the schema descriptor for name field.

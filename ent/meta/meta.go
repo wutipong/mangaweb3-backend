@@ -47,6 +47,8 @@ const (
 	EdgeHistories = "histories"
 	// EdgeFavoriteOfUser holds the string denoting the favorite_of_user edge name in mutations.
 	EdgeFavoriteOfUser = "favorite_of_user"
+	// EdgeProgress holds the string denoting the progress edge name in mutations.
+	EdgeProgress = "progress"
 	// Table holds the table name of the meta in the database.
 	Table = "meta"
 	// TagsTable is the table that holds the tags relation/edge. The primary key declared below.
@@ -66,6 +68,13 @@ const (
 	// FavoriteOfUserInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	FavoriteOfUserInverseTable = "users"
+	// ProgressTable is the table that holds the progress relation/edge.
+	ProgressTable = "progresses"
+	// ProgressInverseTable is the table name for the Progress entity.
+	// It exists in this package in order to avoid circular dependency with the "progress" package.
+	ProgressInverseTable = "progresses"
+	// ProgressColumn is the table column denoting the progress relation/edge.
+	ProgressColumn = "meta_progress"
 )
 
 // Columns holds all SQL columns for meta fields.
@@ -267,6 +276,20 @@ func ByFavoriteOfUser(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newFavoriteOfUserStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByProgressCount orders the results by progress count.
+func ByProgressCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProgressStep(), opts...)
+	}
+}
+
+// ByProgress orders the results by progress terms.
+func ByProgress(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProgressStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newTagsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -286,5 +309,12 @@ func newFavoriteOfUserStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(FavoriteOfUserInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, FavoriteOfUserTable, FavoriteOfUserPrimaryKey...),
+	)
+}
+func newProgressStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProgressInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ProgressTable, ProgressColumn),
 	)
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
+	"github.com/wutipong/mangaweb3-backend/ent/progress"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
@@ -322,6 +323,21 @@ func (mu *MetaUpdate) AddFavoriteOfUser(u ...*User) *MetaUpdate {
 	return mu.AddFavoriteOfUserIDs(ids...)
 }
 
+// AddProgresIDs adds the "progress" edge to the Progress entity by IDs.
+func (mu *MetaUpdate) AddProgresIDs(ids ...int) *MetaUpdate {
+	mu.mutation.AddProgresIDs(ids...)
+	return mu
+}
+
+// AddProgress adds the "progress" edges to the Progress entity.
+func (mu *MetaUpdate) AddProgress(p ...*Progress) *MetaUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return mu.AddProgresIDs(ids...)
+}
+
 // Mutation returns the MetaMutation object of the builder.
 func (mu *MetaUpdate) Mutation() *MetaMutation {
 	return mu.mutation
@@ -388,6 +404,27 @@ func (mu *MetaUpdate) RemoveFavoriteOfUser(u ...*User) *MetaUpdate {
 		ids[i] = u[i].ID
 	}
 	return mu.RemoveFavoriteOfUserIDs(ids...)
+}
+
+// ClearProgress clears all "progress" edges to the Progress entity.
+func (mu *MetaUpdate) ClearProgress() *MetaUpdate {
+	mu.mutation.ClearProgress()
+	return mu
+}
+
+// RemoveProgresIDs removes the "progress" edge to Progress entities by IDs.
+func (mu *MetaUpdate) RemoveProgresIDs(ids ...int) *MetaUpdate {
+	mu.mutation.RemoveProgresIDs(ids...)
+	return mu
+}
+
+// RemoveProgress removes "progress" edges to Progress entities.
+func (mu *MetaUpdate) RemoveProgress(p ...*Progress) *MetaUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return mu.RemoveProgresIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -646,6 +683,51 @@ func (mu *MetaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if mu.mutation.ProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.ProgressTable,
+			Columns: []string{meta.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.RemovedProgressIDs(); len(nodes) > 0 && !mu.mutation.ProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.ProgressTable,
+			Columns: []string{meta.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.ProgressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.ProgressTable,
+			Columns: []string{meta.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -963,6 +1045,21 @@ func (muo *MetaUpdateOne) AddFavoriteOfUser(u ...*User) *MetaUpdateOne {
 	return muo.AddFavoriteOfUserIDs(ids...)
 }
 
+// AddProgresIDs adds the "progress" edge to the Progress entity by IDs.
+func (muo *MetaUpdateOne) AddProgresIDs(ids ...int) *MetaUpdateOne {
+	muo.mutation.AddProgresIDs(ids...)
+	return muo
+}
+
+// AddProgress adds the "progress" edges to the Progress entity.
+func (muo *MetaUpdateOne) AddProgress(p ...*Progress) *MetaUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return muo.AddProgresIDs(ids...)
+}
+
 // Mutation returns the MetaMutation object of the builder.
 func (muo *MetaUpdateOne) Mutation() *MetaMutation {
 	return muo.mutation
@@ -1029,6 +1126,27 @@ func (muo *MetaUpdateOne) RemoveFavoriteOfUser(u ...*User) *MetaUpdateOne {
 		ids[i] = u[i].ID
 	}
 	return muo.RemoveFavoriteOfUserIDs(ids...)
+}
+
+// ClearProgress clears all "progress" edges to the Progress entity.
+func (muo *MetaUpdateOne) ClearProgress() *MetaUpdateOne {
+	muo.mutation.ClearProgress()
+	return muo
+}
+
+// RemoveProgresIDs removes the "progress" edge to Progress entities by IDs.
+func (muo *MetaUpdateOne) RemoveProgresIDs(ids ...int) *MetaUpdateOne {
+	muo.mutation.RemoveProgresIDs(ids...)
+	return muo
+}
+
+// RemoveProgress removes "progress" edges to Progress entities.
+func (muo *MetaUpdateOne) RemoveProgress(p ...*Progress) *MetaUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return muo.RemoveProgresIDs(ids...)
 }
 
 // Where appends a list predicates to the MetaUpdate builder.
@@ -1317,6 +1435,51 @@ func (muo *MetaUpdateOne) sqlSave(ctx context.Context) (_node *Meta, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if muo.mutation.ProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.ProgressTable,
+			Columns: []string{meta.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.RemovedProgressIDs(); len(nodes) > 0 && !muo.mutation.ProgressCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.ProgressTable,
+			Columns: []string{meta.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.ProgressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.ProgressTable,
+			Columns: []string{meta.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

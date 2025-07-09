@@ -15,6 +15,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
+	"github.com/wutipong/mangaweb3-backend/ent/progress"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
@@ -29,6 +30,7 @@ type UserQuery struct {
 	withFavoriteItems *MetaQuery
 	withFavoriteTags  *TagQuery
 	withHistories     *HistoryQuery
+	withProgress      *ProgressQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -124,6 +126,28 @@ func (uq *UserQuery) QueryHistories() *HistoryQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(history.Table, history.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.HistoriesTable, user.HistoriesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryProgress chains the current query on the "progress" edge.
+func (uq *UserQuery) QueryProgress() *ProgressQuery {
+	query := (&ProgressClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(progress.Table, progress.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ProgressTable, user.ProgressColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -326,6 +350,7 @@ func (uq *UserQuery) Clone() *UserQuery {
 		withFavoriteItems: uq.withFavoriteItems.Clone(),
 		withFavoriteTags:  uq.withFavoriteTags.Clone(),
 		withHistories:     uq.withHistories.Clone(),
+		withProgress:      uq.withProgress.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -362,6 +387,17 @@ func (uq *UserQuery) WithHistories(opts ...func(*HistoryQuery)) *UserQuery {
 		opt(query)
 	}
 	uq.withHistories = query
+	return uq
+}
+
+// WithProgress tells the query-builder to eager-load the nodes that are connected to
+// the "progress" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithProgress(opts ...func(*ProgressQuery)) *UserQuery {
+	query := (&ProgressClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withProgress = query
 	return uq
 }
 
@@ -443,10 +479,11 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			uq.withFavoriteItems != nil,
 			uq.withFavoriteTags != nil,
 			uq.withHistories != nil,
+			uq.withProgress != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -485,6 +522,13 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadHistories(ctx, query, nodes,
 			func(n *User) { n.Edges.Histories = []*History{} },
 			func(n *User, e *History) { n.Edges.Histories = append(n.Edges.Histories, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withProgress; query != nil {
+		if err := uq.loadProgress(ctx, query, nodes,
+			func(n *User) { n.Edges.Progress = []*Progress{} },
+			func(n *User, e *Progress) { n.Edges.Progress = append(n.Edges.Progress, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -639,6 +683,37 @@ func (uq *UserQuery) loadHistories(ctx context.Context, query *HistoryQuery, nod
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "user_histories" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadProgress(ctx context.Context, query *ProgressQuery, nodes []*User, init func(*User), assign func(*User, *Progress)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Progress(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.ProgressColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.user_progress
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_progress" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_progress" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

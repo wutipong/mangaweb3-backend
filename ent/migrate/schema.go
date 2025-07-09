@@ -58,6 +58,33 @@ var (
 		Columns:    MetaColumns,
 		PrimaryKey: []*schema.Column{MetaColumns[0]},
 	}
+	// ProgressesColumns holds the columns for the "progresses" table.
+	ProgressesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "page", Type: field.TypeInt, Default: -1},
+		{Name: "meta_progress", Type: field.TypeInt, Nullable: true},
+		{Name: "user_progress", Type: field.TypeInt, Nullable: true},
+	}
+	// ProgressesTable holds the schema information for the "progresses" table.
+	ProgressesTable = &schema.Table{
+		Name:       "progresses",
+		Columns:    ProgressesColumns,
+		PrimaryKey: []*schema.Column{ProgressesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "progresses_meta_progress",
+				Columns:    []*schema.Column{ProgressesColumns[2]},
+				RefColumns: []*schema.Column{MetaColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "progresses_users_progress",
+				Columns:    []*schema.Column{ProgressesColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// TagsColumns holds the columns for the "tags" table.
 	TagsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -162,6 +189,7 @@ var (
 	Tables = []*schema.Table{
 		HistoriesTable,
 		MetaTable,
+		ProgressesTable,
 		TagsTable,
 		UsersTable,
 		MetaTagsTable,
@@ -173,6 +201,8 @@ var (
 func init() {
 	HistoriesTable.ForeignKeys[0].RefTable = MetaTable
 	HistoriesTable.ForeignKeys[1].RefTable = UsersTable
+	ProgressesTable.ForeignKeys[0].RefTable = MetaTable
+	ProgressesTable.ForeignKeys[1].RefTable = UsersTable
 	MetaTagsTable.ForeignKeys[0].RefTable = MetaTable
 	MetaTagsTable.ForeignKeys[1].RefTable = TagsTable
 	UserFavoriteItemsTable.ForeignKeys[0].RefTable = UsersTable

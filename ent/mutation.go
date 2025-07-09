@@ -14,6 +14,7 @@ import (
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
 	"github.com/wutipong/mangaweb3-backend/ent/predicate"
+	"github.com/wutipong/mangaweb3-backend/ent/progress"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
@@ -27,10 +28,11 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeHistory = "History"
-	TypeMeta    = "Meta"
-	TypeTag     = "Tag"
-	TypeUser    = "User"
+	TypeHistory  = "History"
+	TypeMeta     = "Meta"
+	TypeProgress = "Progress"
+	TypeTag      = "Tag"
+	TypeUser     = "User"
 )
 
 // HistoryMutation represents an operation that mutates the History nodes in the graph.
@@ -520,6 +522,9 @@ type MetaMutation struct {
 	favorite_of_user        map[int]struct{}
 	removedfavorite_of_user map[int]struct{}
 	clearedfavorite_of_user bool
+	progress                map[int]struct{}
+	removedprogress         map[int]struct{}
+	clearedprogress         bool
 	done                    bool
 	oldValue                func(context.Context) (*Meta, error)
 	predicates              []predicate.Meta
@@ -1438,6 +1443,60 @@ func (m *MetaMutation) ResetFavoriteOfUser() {
 	m.removedfavorite_of_user = nil
 }
 
+// AddProgresIDs adds the "progress" edge to the Progress entity by ids.
+func (m *MetaMutation) AddProgresIDs(ids ...int) {
+	if m.progress == nil {
+		m.progress = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.progress[ids[i]] = struct{}{}
+	}
+}
+
+// ClearProgress clears the "progress" edge to the Progress entity.
+func (m *MetaMutation) ClearProgress() {
+	m.clearedprogress = true
+}
+
+// ProgressCleared reports if the "progress" edge to the Progress entity was cleared.
+func (m *MetaMutation) ProgressCleared() bool {
+	return m.clearedprogress
+}
+
+// RemoveProgresIDs removes the "progress" edge to the Progress entity by IDs.
+func (m *MetaMutation) RemoveProgresIDs(ids ...int) {
+	if m.removedprogress == nil {
+		m.removedprogress = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.progress, ids[i])
+		m.removedprogress[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedProgress returns the removed IDs of the "progress" edge to the Progress entity.
+func (m *MetaMutation) RemovedProgressIDs() (ids []int) {
+	for id := range m.removedprogress {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ProgressIDs returns the "progress" edge IDs in the mutation.
+func (m *MetaMutation) ProgressIDs() (ids []int) {
+	for id := range m.progress {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetProgress resets all changes to the "progress" edge.
+func (m *MetaMutation) ResetProgress() {
+	m.progress = nil
+	m.clearedprogress = false
+	m.removedprogress = nil
+}
+
 // Where appends a list predicates to the MetaMutation builder.
 func (m *MetaMutation) Where(ps ...predicate.Meta) {
 	m.predicates = append(m.predicates, ps...)
@@ -1871,7 +1930,7 @@ func (m *MetaMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MetaMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.tags != nil {
 		edges = append(edges, meta.EdgeTags)
 	}
@@ -1880,6 +1939,9 @@ func (m *MetaMutation) AddedEdges() []string {
 	}
 	if m.favorite_of_user != nil {
 		edges = append(edges, meta.EdgeFavoriteOfUser)
+	}
+	if m.progress != nil {
+		edges = append(edges, meta.EdgeProgress)
 	}
 	return edges
 }
@@ -1906,13 +1968,19 @@ func (m *MetaMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case meta.EdgeProgress:
+		ids := make([]ent.Value, 0, len(m.progress))
+		for id := range m.progress {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MetaMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removedtags != nil {
 		edges = append(edges, meta.EdgeTags)
 	}
@@ -1921,6 +1989,9 @@ func (m *MetaMutation) RemovedEdges() []string {
 	}
 	if m.removedfavorite_of_user != nil {
 		edges = append(edges, meta.EdgeFavoriteOfUser)
+	}
+	if m.removedprogress != nil {
+		edges = append(edges, meta.EdgeProgress)
 	}
 	return edges
 }
@@ -1947,13 +2018,19 @@ func (m *MetaMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case meta.EdgeProgress:
+		ids := make([]ent.Value, 0, len(m.removedprogress))
+		for id := range m.removedprogress {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MetaMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedtags {
 		edges = append(edges, meta.EdgeTags)
 	}
@@ -1962,6 +2039,9 @@ func (m *MetaMutation) ClearedEdges() []string {
 	}
 	if m.clearedfavorite_of_user {
 		edges = append(edges, meta.EdgeFavoriteOfUser)
+	}
+	if m.clearedprogress {
+		edges = append(edges, meta.EdgeProgress)
 	}
 	return edges
 }
@@ -1976,6 +2056,8 @@ func (m *MetaMutation) EdgeCleared(name string) bool {
 		return m.clearedhistories
 	case meta.EdgeFavoriteOfUser:
 		return m.clearedfavorite_of_user
+	case meta.EdgeProgress:
+		return m.clearedprogress
 	}
 	return false
 }
@@ -2001,8 +2083,499 @@ func (m *MetaMutation) ResetEdge(name string) error {
 	case meta.EdgeFavoriteOfUser:
 		m.ResetFavoriteOfUser()
 		return nil
+	case meta.EdgeProgress:
+		m.ResetProgress()
+		return nil
 	}
 	return fmt.Errorf("unknown Meta edge %s", name)
+}
+
+// ProgressMutation represents an operation that mutates the Progress nodes in the graph.
+type ProgressMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	page          *int
+	addpage       *int
+	clearedFields map[string]struct{}
+	item          *int
+	cleareditem   bool
+	user          *int
+	cleareduser   bool
+	done          bool
+	oldValue      func(context.Context) (*Progress, error)
+	predicates    []predicate.Progress
+}
+
+var _ ent.Mutation = (*ProgressMutation)(nil)
+
+// progressOption allows management of the mutation configuration using functional options.
+type progressOption func(*ProgressMutation)
+
+// newProgressMutation creates new mutation for the Progress entity.
+func newProgressMutation(c config, op Op, opts ...progressOption) *ProgressMutation {
+	m := &ProgressMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeProgress,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withProgressID sets the ID field of the mutation.
+func withProgressID(id int) progressOption {
+	return func(m *ProgressMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Progress
+		)
+		m.oldValue = func(ctx context.Context) (*Progress, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Progress.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withProgress sets the old Progress of the mutation.
+func withProgress(node *Progress) progressOption {
+	return func(m *ProgressMutation) {
+		m.oldValue = func(context.Context) (*Progress, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ProgressMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ProgressMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ProgressMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ProgressMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Progress.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetPage sets the "page" field.
+func (m *ProgressMutation) SetPage(i int) {
+	m.page = &i
+	m.addpage = nil
+}
+
+// Page returns the value of the "page" field in the mutation.
+func (m *ProgressMutation) Page() (r int, exists bool) {
+	v := m.page
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPage returns the old "page" field's value of the Progress entity.
+// If the Progress object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProgressMutation) OldPage(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPage: %w", err)
+	}
+	return oldValue.Page, nil
+}
+
+// AddPage adds i to the "page" field.
+func (m *ProgressMutation) AddPage(i int) {
+	if m.addpage != nil {
+		*m.addpage += i
+	} else {
+		m.addpage = &i
+	}
+}
+
+// AddedPage returns the value that was added to the "page" field in this mutation.
+func (m *ProgressMutation) AddedPage() (r int, exists bool) {
+	v := m.addpage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPage resets all changes to the "page" field.
+func (m *ProgressMutation) ResetPage() {
+	m.page = nil
+	m.addpage = nil
+}
+
+// SetItemID sets the "item" edge to the Meta entity by id.
+func (m *ProgressMutation) SetItemID(id int) {
+	m.item = &id
+}
+
+// ClearItem clears the "item" edge to the Meta entity.
+func (m *ProgressMutation) ClearItem() {
+	m.cleareditem = true
+}
+
+// ItemCleared reports if the "item" edge to the Meta entity was cleared.
+func (m *ProgressMutation) ItemCleared() bool {
+	return m.cleareditem
+}
+
+// ItemID returns the "item" edge ID in the mutation.
+func (m *ProgressMutation) ItemID() (id int, exists bool) {
+	if m.item != nil {
+		return *m.item, true
+	}
+	return
+}
+
+// ItemIDs returns the "item" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ItemID instead. It exists only for internal usage by the builders.
+func (m *ProgressMutation) ItemIDs() (ids []int) {
+	if id := m.item; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetItem resets all changes to the "item" edge.
+func (m *ProgressMutation) ResetItem() {
+	m.item = nil
+	m.cleareditem = false
+}
+
+// SetUserID sets the "user" edge to the User entity by id.
+func (m *ProgressMutation) SetUserID(id int) {
+	m.user = &id
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *ProgressMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *ProgressMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserID returns the "user" edge ID in the mutation.
+func (m *ProgressMutation) UserID() (id int, exists bool) {
+	if m.user != nil {
+		return *m.user, true
+	}
+	return
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *ProgressMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *ProgressMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
+// Where appends a list predicates to the ProgressMutation builder.
+func (m *ProgressMutation) Where(ps ...predicate.Progress) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ProgressMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ProgressMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Progress, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ProgressMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ProgressMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Progress).
+func (m *ProgressMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ProgressMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.page != nil {
+		fields = append(fields, progress.FieldPage)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ProgressMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case progress.FieldPage:
+		return m.Page()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ProgressMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case progress.FieldPage:
+		return m.OldPage(ctx)
+	}
+	return nil, fmt.Errorf("unknown Progress field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProgressMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case progress.FieldPage:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPage(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Progress field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ProgressMutation) AddedFields() []string {
+	var fields []string
+	if m.addpage != nil {
+		fields = append(fields, progress.FieldPage)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ProgressMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case progress.FieldPage:
+		return m.AddedPage()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProgressMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case progress.FieldPage:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPage(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Progress numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ProgressMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ProgressMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ProgressMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Progress nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ProgressMutation) ResetField(name string) error {
+	switch name {
+	case progress.FieldPage:
+		m.ResetPage()
+		return nil
+	}
+	return fmt.Errorf("unknown Progress field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ProgressMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.item != nil {
+		edges = append(edges, progress.EdgeItem)
+	}
+	if m.user != nil {
+		edges = append(edges, progress.EdgeUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ProgressMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case progress.EdgeItem:
+		if id := m.item; id != nil {
+			return []ent.Value{*id}
+		}
+	case progress.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ProgressMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ProgressMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ProgressMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.cleareditem {
+		edges = append(edges, progress.EdgeItem)
+	}
+	if m.cleareduser {
+		edges = append(edges, progress.EdgeUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ProgressMutation) EdgeCleared(name string) bool {
+	switch name {
+	case progress.EdgeItem:
+		return m.cleareditem
+	case progress.EdgeUser:
+		return m.cleareduser
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ProgressMutation) ClearEdge(name string) error {
+	switch name {
+	case progress.EdgeItem:
+		m.ClearItem()
+		return nil
+	case progress.EdgeUser:
+		m.ClearUser()
+		return nil
+	}
+	return fmt.Errorf("unknown Progress unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ProgressMutation) ResetEdge(name string) error {
+	switch name {
+	case progress.EdgeItem:
+		m.ResetItem()
+		return nil
+	case progress.EdgeUser:
+		m.ResetUser()
+		return nil
+	}
+	return fmt.Errorf("unknown Progress edge %s", name)
 }
 
 // TagMutation represents an operation that mutates the Tag nodes in the graph.
@@ -2633,6 +3206,9 @@ type UserMutation struct {
 	histories             map[int]struct{}
 	removedhistories      map[int]struct{}
 	clearedhistories      bool
+	progress              map[int]struct{}
+	removedprogress       map[int]struct{}
+	clearedprogress       bool
 	done                  bool
 	oldValue              func(context.Context) (*User, error)
 	predicates            []predicate.User
@@ -2970,6 +3546,60 @@ func (m *UserMutation) ResetHistories() {
 	m.removedhistories = nil
 }
 
+// AddProgresIDs adds the "progress" edge to the Progress entity by ids.
+func (m *UserMutation) AddProgresIDs(ids ...int) {
+	if m.progress == nil {
+		m.progress = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.progress[ids[i]] = struct{}{}
+	}
+}
+
+// ClearProgress clears the "progress" edge to the Progress entity.
+func (m *UserMutation) ClearProgress() {
+	m.clearedprogress = true
+}
+
+// ProgressCleared reports if the "progress" edge to the Progress entity was cleared.
+func (m *UserMutation) ProgressCleared() bool {
+	return m.clearedprogress
+}
+
+// RemoveProgresIDs removes the "progress" edge to the Progress entity by IDs.
+func (m *UserMutation) RemoveProgresIDs(ids ...int) {
+	if m.removedprogress == nil {
+		m.removedprogress = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.progress, ids[i])
+		m.removedprogress[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedProgress returns the removed IDs of the "progress" edge to the Progress entity.
+func (m *UserMutation) RemovedProgressIDs() (ids []int) {
+	for id := range m.removedprogress {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ProgressIDs returns the "progress" edge IDs in the mutation.
+func (m *UserMutation) ProgressIDs() (ids []int) {
+	for id := range m.progress {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetProgress resets all changes to the "progress" edge.
+func (m *UserMutation) ResetProgress() {
+	m.progress = nil
+	m.clearedprogress = false
+	m.removedprogress = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -3120,7 +3750,7 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.favorite_items != nil {
 		edges = append(edges, user.EdgeFavoriteItems)
 	}
@@ -3129,6 +3759,9 @@ func (m *UserMutation) AddedEdges() []string {
 	}
 	if m.histories != nil {
 		edges = append(edges, user.EdgeHistories)
+	}
+	if m.progress != nil {
+		edges = append(edges, user.EdgeProgress)
 	}
 	return edges
 }
@@ -3155,13 +3788,19 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeProgress:
+		ids := make([]ent.Value, 0, len(m.progress))
+		for id := range m.progress {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removedfavorite_items != nil {
 		edges = append(edges, user.EdgeFavoriteItems)
 	}
@@ -3170,6 +3809,9 @@ func (m *UserMutation) RemovedEdges() []string {
 	}
 	if m.removedhistories != nil {
 		edges = append(edges, user.EdgeHistories)
+	}
+	if m.removedprogress != nil {
+		edges = append(edges, user.EdgeProgress)
 	}
 	return edges
 }
@@ -3196,13 +3838,19 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeProgress:
+		ids := make([]ent.Value, 0, len(m.removedprogress))
+		for id := range m.removedprogress {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedfavorite_items {
 		edges = append(edges, user.EdgeFavoriteItems)
 	}
@@ -3211,6 +3859,9 @@ func (m *UserMutation) ClearedEdges() []string {
 	}
 	if m.clearedhistories {
 		edges = append(edges, user.EdgeHistories)
+	}
+	if m.clearedprogress {
+		edges = append(edges, user.EdgeProgress)
 	}
 	return edges
 }
@@ -3225,6 +3876,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedfavorite_tags
 	case user.EdgeHistories:
 		return m.clearedhistories
+	case user.EdgeProgress:
+		return m.clearedprogress
 	}
 	return false
 }
@@ -3249,6 +3902,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeHistories:
 		m.ResetHistories()
+		return nil
+	case user.EdgeProgress:
+		m.ResetProgress()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/wutipong/mangaweb3-backend/ent/history"
 	"github.com/wutipong/mangaweb3-backend/ent/meta"
+	"github.com/wutipong/mangaweb3-backend/ent/progress"
 	"github.com/wutipong/mangaweb3-backend/ent/tag"
 	"github.com/wutipong/mangaweb3-backend/ent/user"
 )
@@ -234,6 +235,21 @@ func (mc *MetaCreate) AddFavoriteOfUser(u ...*User) *MetaCreate {
 		ids[i] = u[i].ID
 	}
 	return mc.AddFavoriteOfUserIDs(ids...)
+}
+
+// AddProgresIDs adds the "progress" edge to the Progress entity by IDs.
+func (mc *MetaCreate) AddProgresIDs(ids ...int) *MetaCreate {
+	mc.mutation.AddProgresIDs(ids...)
+	return mc
+}
+
+// AddProgress adds the "progress" edges to the Progress entity.
+func (mc *MetaCreate) AddProgress(p ...*Progress) *MetaCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return mc.AddProgresIDs(ids...)
 }
 
 // Mutation returns the MetaMutation object of the builder.
@@ -477,6 +493,22 @@ func (mc *MetaCreate) createSpec() (*Meta, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mc.mutation.ProgressIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   meta.ProgressTable,
+			Columns: []string{meta.ProgressColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(progress.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

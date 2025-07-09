@@ -783,6 +783,13 @@ const docTemplate = `{
         "ent.MetaEdges": {
             "type": "object",
             "properties": {
+                "favorite_of_user": {
+                    "description": "FavoriteOfUser holds the value of the favorite_of_user edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.User"
+                    }
+                },
                 "histories": {
                     "description": "Histories holds the value of the histories edge.",
                     "type": "array",
@@ -795,13 +802,6 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/ent.Tag"
-                    }
-                },
-                "user": {
-                    "description": "User holds the value of the user edge.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ent.User"
                     }
                 }
             }
@@ -989,6 +989,28 @@ const docTemplate = `{
                 "SortOrderDescending"
             ]
         },
+        "tag.SortField": {
+            "type": "string",
+            "enum": [
+                "name",
+                "itemCount"
+            ],
+            "x-enum-varnames": [
+                "SortFieldName",
+                "SortFieldPageCount"
+            ]
+        },
+        "tag.SortOrder": {
+            "type": "string",
+            "enum": [
+                "ascending",
+                "descending"
+            ],
+            "x-enum-varnames": [
+                "SortOrderAscending",
+                "SortOrderDescending"
+            ]
+        },
         "tag.Tag": {
             "type": "object",
             "properties": {
@@ -1013,11 +1035,17 @@ const docTemplate = `{
                     "type": "integer",
                     "default": 30
                 },
+                "order": {
+                    "$ref": "#/definitions/tag.SortOrder"
+                },
                 "page": {
                     "type": "integer"
                 },
                 "search": {
                     "type": "string"
+                },
+                "sort": {
+                    "$ref": "#/definitions/tag.SortField"
                 },
                 "user": {
                     "type": "string"
